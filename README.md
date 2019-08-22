@@ -121,7 +121,8 @@ interface IfStatement {
 interface ForStatement {
   type: "for";
   target: Expression;
-  id: string;
+  index: string;
+  value: string;
   body: FunctionStep | FunctionStep[];
 }
 ```
