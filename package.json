@@ -1,0 +1,55 @@
+{
+  "name": "build-function",
+  "version": "0.0.0",
+  "description": "The way to describe and build a function using json",
+  "keywords": [
+    "build",
+    "function",
+    "json"
+  ],
+  "main": "dist/build.cjs.js",
+  "module": "dist/build.es.js",
+  "browser": "dist/build.umd.js",
+  "types": "types/index.d.ts",
+  "typings": "types/index.d.ts",
+  "bundlib": {
+    "name": "buildFunc"
+  },
+  "scripts": {
+    "clean": "rm -rf dist types coverage node_modules/.cache/bundlib node_modules/.cache/jest",
+    "lint": "tslint src/**/*.ts",
+    "dev": "bundlib -dw",
+    "build": "npm run lint && bundlib -d",
+    "test": "jest --color -w 3",
+    "watch": "npm test -- --watch-all",
+    "preversion": "npm run clean && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.17",
+    "@types/node": "^12.7.1",
+    "bundlib": "^0.12.1",
+    "chokidar": "^3.0.2",
+    "eslint": "^6.1.0",
+    "husky": "^3.0.4",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": {
+    "name": "Manuel Fernandez",
+    "email": "manferlo81@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manferlo81/build-function.git"
+  },
+  "bugs": {
+    "url": "https://github.com/manferlo81/build-function/issues"
+  },
+  "homepage": "https://github.com/manferlo81/build-function#readme",
+  "license": "MIT"
+}

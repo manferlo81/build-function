@@ -1,0 +1,17 @@
+{
+  "defaultSeverity": "error",
+  "extends": "tslint:recommended",
+  "rules": {
+    "interface-name": {
+      "options": "never-prefix"
+    },
+    "trailing-comma": {
+      "options": {
+        "esSpecCompliant": true,
+        "singleline": "never",
+        "multiline": "always"
+      }
+    },
+    "object-literal-sort-keys": false
+  }
+}
