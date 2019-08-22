@@ -281,16 +281,20 @@ const stepTable: StatementLookupTable<Statement> = {
 
       while (i < len) {
 
-        setInScope(
-          bodyScope,
-          indexId,
-          i,
-        );
-        setInScope(
-          bodyScope,
-          valueId,
-          array[i],
-        );
+        if (indexId) {
+          setInScope(
+            bodyScope,
+            indexId,
+            i,
+          );
+        }
+        if (valueId) {
+          setInScope(
+            bodyScope,
+            valueId,
+            array[i],
+          );
+        }
 
         const result = resolveBody(bodyScope);
 

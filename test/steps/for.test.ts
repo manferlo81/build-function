@@ -1,7 +1,7 @@
 import { compileStep, createScope, ForStatement } from "../../src";
 import { $call, $get, $if, $literal, $oper, $return } from "../helpers/expressions";
 
-describe("loop statement step", () => {
+describe("for statement step", () => {
 
   test("should compile for statement step with single step body", () => {
 
@@ -33,7 +33,7 @@ describe("loop statement step", () => {
 
   });
 
-  test("should compile loop statement step with multiple steps body", () => {
+  test("should compile for statement step with multiple steps body", () => {
 
     const array = [1, 2, 3];
     const len = array.length;
@@ -65,7 +65,7 @@ describe("loop statement step", () => {
 
   });
 
-  test("should compile loop statement step and interrupt on break", () => {
+  test("should compile for statement step and interrupt on break", () => {
 
     const array = [1, 2, 3, 4, 5, 6, 8];
     const interrupt2 = 4;
@@ -108,7 +108,7 @@ describe("loop statement step", () => {
 
   });
 
-  test("should compile loop statement step and interrupt on return", () => {
+  test("should compile for statement step and interrupt on return", () => {
 
     const array = [1, 2, 3, 4, 5, 6, 8];
     const interrupt2 = 4;
@@ -151,6 +151,23 @@ describe("loop statement step", () => {
     for (let i = 0; i < interruptIndex; i++) {
       expect(func).toHaveBeenNthCalledWith(i + 1, array[i], i);
     }
+
+  });
+
+  test("should compile for statement step without index and value id", () => {
+
+    const array = [1, 2, 3];
+    const step: ForStatement = {
+      type: "for",
+      target: $literal(array),
+      body: [],
+    };
+
+    const resolve = compileStep(step);
+
+    const scope = createScope(null);
+
+    expect(() => resolve(scope)).not.toThrow();
 
   });
 

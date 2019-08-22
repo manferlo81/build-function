@@ -194,8 +194,8 @@ export interface ForStatement extends
   WithType<"for"> {
 
   target: Expression;
-  value: string;
-  index: string;
+  value?: string;
+  index?: string;
   body: SingleOrMulti<FunctionStep>;
 }
 
