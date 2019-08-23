@@ -77,7 +77,7 @@ export interface GetExpression extends
 export interface SetExpression extends
   WithType<"set">,
   WithId,
-  WithValue<any> {
+  WithValue<Expression> {
 }
 
 export interface FunctionCallExpression extends
@@ -235,9 +235,9 @@ export type FunctionStep =
   | Statement
   | Expression;
 
-export interface StepReturn<V = any> extends
+export interface StepReturn extends
   WithType<"return">,
-  WithValue<V> {
+  WithValue<Expression> {
 }
 
 export interface StepThrow extends
@@ -246,14 +246,14 @@ export interface StepThrow extends
   error: Error;
 }
 
-export type StepNonLoopResult<V = any> =
-  | StepReturn<V>
+export type StepNonLoopResult =
+  | StepReturn
   | StepThrow
   | void;
 
-export type StepLoopResult<V = any> =
+export type StepLoopResult =
   | "break"
-  | StepNonLoopResult<V>;
+  | StepNonLoopResult;
 
 // SCOPE
 
@@ -270,5 +270,5 @@ export type ScopeBasedResolver<V extends any = any> = (scope: Scope) => V;
 export type ArgsLibPopulator = (input: any[], lib: ScopeLib) => ScopeLib;
 export type InputArgsParser = (input: any[]) => ScopeLib;
 
-export type StepCompiler<S extends FunctionStep, V> =
-  (step: S, allowBreak?: boolean) => ScopeBasedResolver<StepLoopResult<V>>;
+export type StepCompiler<S extends FunctionStep> =
+  (step: S, allowBreak?: boolean) => ScopeBasedResolver<StepLoopResult>;

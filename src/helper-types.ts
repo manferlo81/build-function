@@ -8,5 +8,5 @@ export type ExpressionLookupTable<E extends Expression> = {
 };
 
 export type StatementLookupTable<S extends Statement> = {
-  [K in S["type"]]: S extends { type: K } ? StepCompiler<S, K> : never
+  [K in S["type"]]: S extends { type: K } ? StepCompiler<S> : never
 };

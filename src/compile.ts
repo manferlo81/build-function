@@ -311,7 +311,7 @@ const stepTable: StatementLookupTable<Statement> = {
       return functionReturning();
     }
 
-    return (scope): StepNonLoopResult<any> => {
+    return (scope): StepNonLoopResult => {
 
       const array = resolveTarget(scope);
       const len = array.length;
@@ -455,7 +455,7 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
       return functionReturning() as V;
     }
 
-    const func: AnyFunction = (...args: any[]) => {
+    const func: AnyFunction = (...args: any[]): any => {
 
       const funcBodyScope = createScope(
         funcScope,
@@ -625,23 +625,23 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak: true,
-): ScopeBasedResolver<StepLoopResult<V>>;
+): ScopeBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: false | undefined,
-): ScopeBasedResolver<StepNonLoopResult<V>>;
+): ScopeBasedResolver<StepNonLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: boolean | undefined,
-): ScopeBasedResolver<StepLoopResult<V>>;
+): ScopeBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: boolean | undefined,
-): ScopeBasedResolver<StepLoopResult<V>> {
+): ScopeBasedResolver<StepLoopResult> {
 
-  function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult<any>> {
+  function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult> {
 
-    const compile = stepTable[step.type as Statement["type"]] as StepCompiler<FunctionStep, any> | undefined;
+    const compile = stepTable[step.type as Statement["type"]] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
       return compile(step, allowBreak);
@@ -661,7 +661,7 @@ export function compileStep<V = any>(
 
   const resolvers = steps.map(compileSingle);
 
-  return (scope): StepLoopResult<V> => {
+  return (scope): StepLoopResult => {
 
     for (let i = 0, len = resolvers.length; i < len; i++) {
 
