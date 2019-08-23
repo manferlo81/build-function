@@ -29,31 +29,6 @@ describe("set expression", () => {
 
   });
 
-  test("should compile set expression with expression id", () => {
-
-    const id = "value";
-    const value = rand(1, 200);
-    const expression: SetExpression = $set(
-      $literal(id),
-      $literal(value),
-    );
-    const setValue = compileExpression(expression);
-    const getValue = compileExpression(
-      $get(id),
-    );
-
-    const initial = 100;
-    const scope: Scope = createScope(null, { [id]: initial });
-
-    expect(getValue(scope)).toBe(initial);
-
-    const valueSet = setValue(scope);
-
-    expect(valueSet).toBe(value);
-    expect(getValue(scope)).toBe(value);
-
-  });
-
   test("should throw if not found", () => {
 
     const expression: SetExpression = $set(

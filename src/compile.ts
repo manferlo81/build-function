@@ -120,12 +120,10 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
     const { id } = expression;
 
-    const resolveId = isObj(id) ? compileExpression<string>(id) : null;
-
     return (scope) => (
       findInScopeOrThrow<any>(
         scope,
-        resolveId ? resolveId(scope) : id as string,
+        id,
       ).value
     );
 
@@ -134,13 +132,12 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   set(expression) {
 
     const { id } = expression;
-    const resolveId = isObj(id) ? compileExpression<string>(id) : null;
     const resolveValue = compileExpression(expression.value);
 
     return (scope) => {
       const result = findInScopeOrThrow<any>(
         scope,
-        resolveId ? resolveId(scope) : id as string,
+        id,
       );
       return result.scope[result.id] = resolveValue(scope);
     };
@@ -253,8 +250,7 @@ const stepTable: StatementLookupTable<Statement> = {
     const resolveOtherwise = otherwise ? compileStep(otherwise, allowBreak) : null;
 
     return (scope) => {
-      const conditionResult = resolveCondition(scope);
-      const resolveSteps = conditionResult ? resolveThen : resolveOtherwise;
+      const resolveSteps = resolveCondition(scope) ? resolveThen : resolveOtherwise;
       if (resolveSteps) {
         return resolveSteps(
           createScope(scope),
@@ -351,15 +347,6 @@ const stepTable: StatementLookupTable<Statement> = {
     });
 
   },
-
-  // literal: ignoreExpressionAsStep,
-  // get: ignoreExpressionAsStep,
-  // set: compileExpressionAsStep,
-  // call: compileExpressionAsStep,
-  // ternary: compileExpressionAsStep,
-  // oper: compileExpressionAsStep,
-  // trans: compileExpressionAsStep,
-  // func: ignoreExpressionAsStep,
 
 };
 

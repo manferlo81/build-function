@@ -66,12 +66,12 @@ export interface LiteralExpression extends
 
 export interface GetExpression extends
   WithType<"get">,
-  WithId<string | Expression> {
+  WithId<string> {
 }
 
 export interface SetExpression extends
   WithType<"set">,
-  WithId<string | Expression>,
+  WithId<string>,
   WithValue<any> {
 }
 
