@@ -24,8 +24,6 @@ import {
   StepCompiler,
   StepLoopResult,
   StepNonLoopResult,
-  StepReturn,
-  StepThrow,
   TransformOperator,
 } from "./types";
 
@@ -244,9 +242,10 @@ const stepTable: StatementLookupTable<Statement> = {
 
   if(step, allowBreak) {
 
-    const { condition, then, otherwise } = step;
-    const resolveCondition = compileExpression(condition);
-    const resolveThen = compileStep(then, allowBreak);
+    const { then, otherwise } = step;
+
+    const resolveCondition = compileExpression(step.condition);
+    const resolveThen = then ? compileStep(then, allowBreak) : null;
     const resolveOtherwise = otherwise ? compileStep(otherwise, allowBreak) : null;
 
     return (scope) => {
@@ -262,12 +261,12 @@ const stepTable: StatementLookupTable<Statement> = {
 
   for(step) {
 
-    const { index: indexId, value: valueId, target, body } = step;
+    const { index: indexId, value: valueId, body } = step;
 
-    const resolveTarget = compileExpression<any[]>(target);
+    const resolveTarget = compileExpression<any[]>(step.target);
     const resolveBody = compileStep(body, true);
 
-    return (scope): StepReturn<any> | StepThrow | void => {
+    return (scope): StepNonLoopResult<any> => {
 
       const array = resolveTarget(scope);
       const len = array.length;

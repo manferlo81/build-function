@@ -6,16 +6,19 @@ interface WithType<T extends string> {
   type: T;
 }
 
-interface WithId<I> {
-  id: I;
+interface WithId {
+  id: string;
 }
 
 interface WithValue<V> {
   value: V;
 }
 
-interface WithConditions<C, T> {
-  condition: C;
+interface WithConditions {
+  condition: Expression;
+}
+
+interface WithThen<T> {
   then: T;
 }
 
@@ -36,7 +39,7 @@ interface WithExpressions<E> {
 export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
 
 export interface DeclareWithValue extends
-  WithId<string>,
+  WithId,
   Partial<WithValue<Expression>> {
 }
 
@@ -52,7 +55,7 @@ export interface BuildFunctionOptions {
 
 export interface ParameterDescriptor extends
   WithType<"param" | "rest">,
-  WithId<string> {
+  WithId {
 }
 
 export type FunctionParameter = string | ParameterDescriptor;
@@ -66,12 +69,12 @@ export interface LiteralExpression extends
 
 export interface GetExpression extends
   WithType<"get">,
-  WithId<string> {
+  WithId {
 }
 
 export interface SetExpression extends
   WithType<"set">,
-  WithId<string>,
+  WithId,
   WithValue<any> {
 }
 
@@ -84,7 +87,8 @@ export interface FunctionCallExpression extends
 
 export interface TernaryExpression extends
   WithType<"ternary">,
-  WithConditions<Expression, Expression>,
+  WithConditions,
+  WithThen<Expression>,
   WithOtherwise<Expression> {
 }
 
@@ -186,7 +190,8 @@ export interface DeclareStatement extends
 
 export interface IfStatement extends
   WithType<"if">,
-  WithConditions<Expression, SingleOrMulti<FunctionStep>>,
+  WithConditions,
+  Partial<WithThen<SingleOrMulti<FunctionStep>>>,
   Partial<WithOtherwise<SingleOrMulti<FunctionStep>>> {
 }
 

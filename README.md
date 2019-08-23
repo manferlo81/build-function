@@ -110,7 +110,7 @@ interface DeclareStatement {
 interface IfStatement {
   type: "if";
   condition: Expression;
-  then: FunctionStep | FunctionStep[];
+  then?: FunctionStep | FunctionStep[];
   otherwise?: FunctionStep | FunctionStep[];
 }
 ```
