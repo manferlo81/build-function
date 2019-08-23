@@ -5,6 +5,7 @@
 ***23-AUG-2019***
 
 * added badges
+* improved documentation
 
 ## 0.0.1
 
