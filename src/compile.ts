@@ -60,7 +60,7 @@ const paramTable: Record<
 
 const specialOperationTable: Record<
   SpecialOperator,
-  (expressions: MultiTermExpressions) => ScopeBasedResolver<any>
+  (expressions: MultiTermExpressions) => ScopeBasedResolver
 > = {
 
   "||": (expressions) => compileLogicOperation(
@@ -78,7 +78,7 @@ const specialOperationTable: Record<
   "**": (expressions) => {
 
     const resolvers = expressions.map(compileExpression);
-    const resolveLast = resolvers.pop() as ScopeBasedResolver<any>;
+    const resolveLast = resolvers.pop() as ScopeBasedResolver;
 
     return (scope) => {
       let result = resolveLast(scope);
@@ -172,7 +172,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
     const resolveValue = compileExpression(expression.value);
 
     return (scope) => {
-      const result = findInScopeOrThrow<any>(
+      const result = findInScopeOrThrow(
         scope,
         id,
       );
@@ -232,7 +232,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
       throw errorInvalid(oper, "operation");
     }
 
-    const [resolveFirst, ...otherResolvers] = exp.map(compileExpression);
+    const otherResolvers = exp.map(compileExpression);
+    const resolveFirst = otherResolvers.shift() as ScopeBasedResolver;
 
     return (scope) => {
       return otherResolvers.reduce(
@@ -511,7 +512,7 @@ function compileLogicOperation(
   expressions: MultiTermExpressions,
   compare: (left: any, right: any) => any,
   exit: (value: any) => boolean,
-): ScopeBasedResolver<any> {
+): ScopeBasedResolver {
 
   const resolvers = expressions.map(compileExpression);
   const len = resolvers.length;

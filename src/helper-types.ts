@@ -1,4 +1,4 @@
-import { ExpresionType, Expression, ScopeBasedResolver, Statement, StepCompiler } from "./types";
+import { ExpresionType, Expression, ScopeBasedResolver, Statement, StatementType, StepCompiler } from "./types";
 
 export type SingleOrMulti<T> = T | T[];
 export type AnyFunction = (...args: any[]) => any;
@@ -12,7 +12,7 @@ export type ExpressionLookupTable<E extends Expression> = {
 };
 
 export type StatementLookupTable<S extends Statement> = {
-  [K in S["type"]]: (
+  [K in StatementType]: (
     S extends { type: K }
     ? StepCompiler<S>
     : never

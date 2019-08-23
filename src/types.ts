@@ -235,6 +235,8 @@ export type Statement =
   | ReturnStatement
   | ThrowStatement;
 
+export type StatementType = Statement["type"];
+
 // STEPS
 
 export type FunctionStep =
