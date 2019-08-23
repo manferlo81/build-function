@@ -53,8 +53,10 @@ export interface BuildFunctionOptions {
 
 // PARAMETERS
 
+export type ParameterType = "param" | "rest";
+
 export interface ParameterDescriptor extends
-  WithType<"param" | "rest">,
+  WithType<ParameterType>,
   WithId {
 }
 

@@ -198,6 +198,17 @@ describe("function expression", () => {
 
   });
 
+  test("should throw on invalid parameter", () => {
+
+    const expression: FunctionExpression = {
+      type: "func",
+      params: { id: "param1", type: "invalid" } as any,
+    };
+
+    expect(() => compileExpression(expression)).toThrow();
+
+  });
+
   test("should declare arguments inside function scope", () => {
 
     const expression: FunctionExpression = {

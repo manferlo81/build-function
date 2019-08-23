@@ -13,6 +13,7 @@ import {
   FunctionStep,
   InputArgsParser,
   MultiTermExpressions,
+  ParameterType,
   RegularArithmeticOperator,
   RegularOperator,
   ScopeBasedPopulator,
@@ -27,7 +28,35 @@ import {
   TransformOperator,
 } from "./types";
 
-// EXPRESSION LOOKUP TABLE
+// LOOKUP TABLES
+
+const paramTable: Record<
+  ParameterType,
+  (index: number) => (input: any[]) => any
+> = {
+
+  rest: (index) => {
+
+    return (input) => {
+
+      const arg: any[] = [];
+      const len = input.length;
+
+      for (let i = index; i < len; i++) {
+        arg.push(
+          input[i],
+        );
+      }
+
+      return arg;
+
+    };
+
+  },
+
+  param: (index) => (input) => input[index],
+
+};
 
 const specialOperationTable: Record<
   SpecialOperator,
@@ -215,14 +244,19 @@ const expressionTable: ExpressionLookupTable<Expression> = {
     const resolve = compileExpression(expression.exp);
 
     return (scope) => {
-      return transform(resolve(scope));
+      return transform(
+        resolve(scope),
+      );
     };
 
   },
 
   func(expression) {
 
-    return compileFunction(expression, false) as any;
+    return compileFunction(
+      expression,
+      false,
+    ) as any;
 
   },
 
@@ -253,19 +287,22 @@ const stepTable: StatementLookupTable<Statement> = {
     }
 
     return (scope) => {
+
       const resolveSteps = resolveCondition(scope) ? resolveThen : resolveOtherwise;
+
       if (resolveSteps) {
         return resolveSteps(
           createScope(scope),
         );
       }
+
     };
 
   },
 
   for(step) {
 
-    const { index: indexId, value: valueId, body } = step;
+    const { index, value, body } = step;
 
     const resolveTarget = compileExpression<any[]>(step.target);
     const resolveBody = body ? compileStep(body, true) : null;
@@ -284,17 +321,17 @@ const stepTable: StatementLookupTable<Statement> = {
 
       while (i < len) {
 
-        if (indexId) {
+        if (index) {
           setInScope(
             bodyScope,
-            indexId,
+            index,
             i,
           );
         }
-        if (valueId) {
+        if (value) {
           setInScope(
             bodyScope,
-            valueId,
+            value,
             array[i],
           );
         }
@@ -349,7 +386,7 @@ const stepTable: StatementLookupTable<Statement> = {
     return (scope) => ({
       type,
       error: error(
-        resolveMessage ? resolveMessage(scope) : msg as string,
+        resolveMessage ? resolveMessage(scope) : `${msg}`,
       ),
     });
 
@@ -367,24 +404,20 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
       param = { id: param, type: "param" };
     }
 
-    const { id, type } = param;
+    const { id } = param;
 
-    return type === "rest"
-      ? (input, lib) => {
-        const arg: any[] = [];
-        const len = input.length;
-        for (let i = index; i < len; i++) {
-          arg.push(
-            input[i],
-          );
-        }
-        lib[id] = arg;
-        return lib;
-      }
-      : (input, lib) => {
-        lib[id] = input[index];
-        return lib;
-      };
+    const compileGetter = paramTable[param.type];
+
+    if (!compileGetter) {
+      throw errorInvalid(param.type, "parameter");
+    }
+
+    const getValue = compileGetter(index);
+
+    return (input, lib) => {
+      lib[id] = getValue(input);
+      return lib;
+    };
 
   }
 
@@ -419,7 +452,7 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
   return (scope): V => {
 
     if (!resolveFuncBody) {
-      return functionReturning() as any;
+      return functionReturning() as V;
     }
 
     const func: AnyFunction = (...args: any[]) => {
