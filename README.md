@@ -46,7 +46,7 @@ return true;
 
 ### Get Expression
 
-It gets a value of the variable identified by the `id` from the current virtual scope. If the variable if not found it will throw.
+It gets a value of the variable identified by the `id` from the current virtual scope. If the variable if not found it will throw, unless it is inside a `typeof` transform operation.
 
 ***syntax***
 

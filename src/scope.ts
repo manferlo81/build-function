@@ -1,4 +1,4 @@
-import { error } from "./errors";
+import { errorNotInScope } from "./errors";
 import { Scope, ScopeLib } from "./types";
 
 export interface ScopeValue<V> {
@@ -43,7 +43,7 @@ export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | 
 export function findInScopeOrThrow<V = any>(scope: Scope, id: string): ScopeValue<V> {
   const result = findInScope<V>(scope, id);
   if (!result) {
-    throw error(`"${id}" can't be found in this scope`);
+    throw errorNotInScope(id);
   }
   return result;
 }

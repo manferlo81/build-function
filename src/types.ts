@@ -125,12 +125,6 @@ export type RegularArithmeticOperator =
 export type SpecialArithmeticOperator =
   | "**";
 
-export type TransformOperator =
-  | "!"
-  | "!!"
-  | "typeof"
-  | "~";
-
 export type SpecialOperator =
   | LogicOperator
   | SpecialArithmeticOperator;
@@ -149,6 +143,18 @@ export interface OperationExpression extends
   WithOperation<MultiTermOperator>,
   WithExpressions<MultiTermExpressions> {
 }
+
+export type SpecialTransformOperator =
+  | "typeof";
+
+export type RegularTransformOperator =
+  | "!"
+  | "!!"
+  | "~";
+
+export type TransformOperator =
+  | SpecialTransformOperator
+  | RegularTransformOperator;
 
 export interface TransformExpression extends
   WithType<"trans">,

@@ -1,4 +1,4 @@
-import { error, errorInvalid } from "./errors";
+import { error, errorInvalid, errorNotInScope } from "./errors";
 import { functionReturning } from "./helpers";
 import { createScope, findInScope, findInScopeOrThrow, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
@@ -16,6 +16,7 @@ import {
   ParameterType,
   RegularArithmeticOperator,
   RegularOperator,
+  RegularTransformOperator,
   ScopeBasedPopulator,
   ScopeBasedResolver,
   ScopeLib,
@@ -25,7 +26,6 @@ import {
   StepCompiler,
   StepLoopResult,
   StepNonLoopResult,
-  TransformOperator,
 } from "./types";
 
 // LOOKUP TABLES
@@ -125,10 +125,9 @@ const operationReducerTable: Record<
   "<=": (total, value) => (total <= value),
 };
 
-const transformTable: Record<TransformOperator, (value: any) => any> = {
+const transformTable: Record<RegularTransformOperator, (value: any) => any> = {
   "!": (value) => !value,
   "!!": (value) => !!value,
-  "typeof": (value) => (typeof value),
   // tslint:disable-next-line: no-bitwise
   "~": (value) => ~value,
 };
@@ -149,25 +148,19 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
     return (scope) => {
 
-      if (ignoreError) {
-
-        const result = findInScope(
-          scope,
-          id,
-        );
-
-        if (!result) {
-          return;
-        }
-
-        return result.value;
-
-      }
-
-      return findInScopeOrThrow<any>(
+      const result = findInScope(
         scope,
         id,
-      ).value;
+      );
+
+      if (!result) {
+        if (!ignoreError) {
+          throw errorNotInScope(id);
+        }
+        return;
+      }
+
+      return result.value;
 
     };
 
@@ -251,6 +244,17 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   },
 
   trans(expression) {
+
+    if (expression.oper === "typeof") {
+
+      const resolveSafe = compileExpressionSafe(expression.exp, true);
+
+      return (scope) => {
+        const value = resolveSafe(scope);
+        return typeof value;
+      };
+
+    }
 
     const transform = transformTable[expression.oper];
 
@@ -535,20 +539,26 @@ function compileLogicOperation(
 
 // EXPRESSION
 
-export function compileExpression<V extends any = any>(expression: Expression): ScopeBasedResolver<V> {
+function compileExpressionSafe<V extends any = any>(expression: Expression, ignoreError?: boolean) {
 
   const { type } = expression;
 
   const compile = expressionTable[type] as (
-    (expression: Expression, ignoreError: boolean) => ScopeBasedResolver<V>
+    (expression: Expression, ignoreError?: boolean) => ScopeBasedResolver<V>
   ) | undefined;
 
   if (!compile) {
     throw errorInvalid(type, "expression");
   }
 
-  return compile(expression, false);
+  return compile(expression, ignoreError);
 
+}
+
+export function compileExpression<V extends any = any>(expression: Expression): ScopeBasedResolver<V> {
+  return compileExpressionSafe(
+    expression,
+  );
 }
 
 // SPREADABLE

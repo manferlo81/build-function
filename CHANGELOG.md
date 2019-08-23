@@ -6,6 +6,7 @@
 
 * added badges
 * improved documentation
+* `typeof` transform operation is safe to get not-in-scope variables
 
 ## 0.0.1
 
