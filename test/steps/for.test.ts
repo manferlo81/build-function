@@ -65,6 +65,19 @@ describe("for statement step", () => {
 
   });
 
+  test("should compile for statement step with no body", () => {
+
+    const array = [1, 2, 3];
+    const step: ForStatement = {
+      type: "for",
+      target: $literal(array),
+    };
+    const resolve = compileStep(step);
+
+    expect(resolve.length).toBe(0);
+
+  });
+
   test("should compile for statement step and interrupt on break", () => {
 
     const array = [1, 2, 3, 4, 5, 6, 8];

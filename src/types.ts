@@ -201,7 +201,7 @@ export interface ForStatement extends
   target: Expression;
   value?: string;
   index?: string;
-  body: SingleOrMulti<FunctionStep>;
+  body?: SingleOrMulti<FunctionStep>;
 }
 
 export interface BreakStatement extends

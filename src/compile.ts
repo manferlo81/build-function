@@ -264,7 +264,11 @@ const stepTable: StatementLookupTable<Statement> = {
     const { index: indexId, value: valueId, body } = step;
 
     const resolveTarget = compileExpression<any[]>(step.target);
-    const resolveBody = compileStep(body, true);
+    const resolveBody = body ? compileStep(body, true) : null;
+
+    if (!resolveBody) {
+      return functionReturning();
+    }
 
     return (scope): StepNonLoopResult<any> => {
 
@@ -410,23 +414,29 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
 
   return (scope): V => {
 
+    if (!resolveFuncBody) {
+      return functionReturning() as any;
+    }
+
     const func: AnyFunction = (...args: any[]) => {
-      if (resolveFuncBody) {
-        const funcBodyScope = createScope(
-          funcScope,
-          {
-            arguments: args,
-            ...parseArgs && parseArgs(args),
-          },
-        );
-        const result = resolveFuncBody(funcBodyScope);
-        if (result) {
-          if (result.type === "throw") {
-            throw result.error;
-          }
-          return result.value;
+
+      const funcBodyScope = createScope(
+        funcScope,
+        {
+          arguments: args,
+          ...parseArgs && parseArgs(args),
+        },
+      );
+
+      const result = resolveFuncBody(funcBodyScope);
+
+      if (result) {
+        if (result.type === "throw") {
+          throw result.error;
         }
+        return result.value;
       }
+
     };
 
     const funcScope = (addToScope && name) ? createScope(scope, { [name]: func }) : scope;
