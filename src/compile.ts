@@ -248,6 +248,10 @@ const stepTable: StatementLookupTable<Statement> = {
     const resolveThen = then ? compileStep(then, allowBreak) : null;
     const resolveOtherwise = otherwise ? compileStep(otherwise, allowBreak) : null;
 
+    if (!resolveThen && !resolveOtherwise) {
+      return functionReturning();
+    }
+
     return (scope) => {
       const resolveSteps = resolveCondition(scope) ? resolveThen : resolveOtherwise;
       if (resolveSteps) {
