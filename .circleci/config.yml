@@ -1,37 +1,93 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
-version: 2
-jobs:
-  build:
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.5
+
+executors:
+
+  node:
     docker:
-      # specify the version you desire here
       - image: circleci/node:10
+    working_directory: &working_directory ~/build-function
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
+commands:
 
-    working_directory: ~/repo
+  npm_publish:
+    steps:
+      - run:
+          name: Login to npm
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+      - run:
+          name: Publish to npm
+          command: npm publish
 
+jobs:
+
+  unit_test:
+    executor: node
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: npm install
-
+            - v1-deps-build-function-{{ checksum "package.json" }}
+            - v1-deps-build-function-
+      - run:
+          name: Install Dependencies
+          command: npm install
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-deps-build-function-{{ checksum "package.json" }}
+      - run:
+          name: Test
+          command: npm test
+      - persist_to_workspace:
+          root: *working_directory
+          paths: .
 
-      # run tests!
-      - run: npm test
+  upload_coverage:
+    executor: node
+    steps:
+      - attach_workspace: &attach_workspace
+          at: *working_directory
+      - codecov/upload:
+          file: coverage/*.json
+
+  build_and_publish:
+    executor: node
+    steps:
+      - attach_workspace: *attach_workspace
+      - run:
+          name: Build
+          command: npm run build
+      - npm_publish
+
+workflows:
+  version: 2
+
+  workflow:
+    jobs:
+
+      - unit_test:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+
+      - upload_coverage:
+          requires:
+            - unit_test
+          filters:
+            branches:
+              only: /master/
+
+      - build_and_publish:
+          context: npm
+          requires:
+            - unit_test
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
