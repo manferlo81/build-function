@@ -396,6 +396,27 @@ interface DeclareStatement {
 }
 ```
 
+***example***
+
+```json
+{
+  "type": "declare",
+  "set": [
+    "a",
+    {
+      "id": "b",
+      "value": 10
+    }
+  ]
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+let a, b = 10;
+```
+
 ### If Statement
 
 Declares an `if` statement.
@@ -408,6 +429,42 @@ interface IfStatement {
   condition: Expression;
   then?: FunctionStep | FunctionStep[];
   otherwise?: FunctionStep | FunctionStep[];
+}
+```
+
+***example***
+
+```json
+{
+  "type": "if",
+  "condition": {
+    "type": "get",
+    "id": "test"
+  },
+  "then": {
+    "type": "call",
+    "func": {
+      "type": "get",
+      "id": "func1"
+    }
+  },
+  "otherwise": {
+    "type": "call",
+    "func": {
+      "type": "get",
+      "id": "func2"
+    }
+  }
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+if (test) {
+  func1();
+} else {
+  func2();
 }
 ```
 
@@ -452,6 +509,24 @@ interface ReturnStatement {
 }
 ```
 
+***example***
+
+```json
+{
+  "type": "return",
+  "value": {
+    "type": "get",
+    "id": "result"
+  }
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+return result;
+```
+
 ### Throw Statement
 
 It represents a `throw` statement.
@@ -463,6 +538,21 @@ interface ThrowStatement {
   type: "throw";
   msg: string | Expression;
 }
+```
+
+***example***
+
+```json
+{
+  "type": "throw",
+  "msg": "Unknown Error"
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+throw new Error("Unknown Error");
 ```
 
 ## Operations
