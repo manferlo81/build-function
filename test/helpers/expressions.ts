@@ -20,12 +20,12 @@ export const $literal = (value: any): LiteralExpression => ({
   value,
 });
 
-export const $get = (id: string | Expression): GetExpression => ({
+export const $get = (id: string): GetExpression => ({
   type: "get",
   id,
 });
 
-export const $set = (id: string | Expression, value: Expression): SetExpression => ({
+export const $set = (id: string, value: Expression): SetExpression => ({
   type: "set",
   id,
   value,
