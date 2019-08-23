@@ -1,5 +1,7 @@
 # build-function
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/manferlo81/build-function.svg)](https://greenkeeper.io/)
+
 The way to describe and build a function using json
 
 ## Expressions
