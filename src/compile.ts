@@ -1,6 +1,6 @@
 import { error, errorInvalid } from "./errors";
 import { functionReturning } from "./helpers";
-import { createScope, findInScopeOrThrow, setInScope } from "./scope";
+import { createScope, findInScope, findInScopeOrThrow, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
 
 import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
@@ -143,16 +143,33 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
   },
 
-  get(expression) {
+  get(expression, ignoreError) {
 
     const { id } = expression;
 
-    return (scope) => (
-      findInScopeOrThrow<any>(
+    return (scope) => {
+
+      if (ignoreError) {
+
+        const result = findInScope(
+          scope,
+          id,
+        );
+
+        if (!result) {
+          return;
+        }
+
+        return result.value;
+
+      }
+
+      return findInScopeOrThrow<any>(
         scope,
         id,
-      ).value
-    );
+      ).value;
+
+    };
 
   },
 
@@ -523,14 +540,14 @@ export function compileExpression<V extends any = any>(expression: Expression): 
   const { type } = expression;
 
   const compile = expressionTable[type] as (
-    (expression: Expression) => ScopeBasedResolver<V>
+    (expression: Expression, ignoreError: boolean) => ScopeBasedResolver<V>
   ) | undefined;
 
   if (!compile) {
     throw errorInvalid(type, "expression");
   }
 
-  return compile(expression);
+  return compile(expression, false);
 
 }
 
