@@ -70,7 +70,7 @@ interface FunctionExpression {
   type: "func";
   name?: string;
   params?: FunctionParameter | FunctionParameter[];
-  body: FunctionStep | FunctionStep[];
+  body?: FunctionStep | FunctionStep[];
 }
 ```
 

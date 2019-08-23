@@ -420,25 +420,26 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
   const parseArgs: InputArgsParser | null = !params
     ? null
     : compileParam(params);
-  const resolveFuncBody = compileStep(body);
+  const resolveFuncBody = body ? compileStep(body) : null;
 
   return (scope): V => {
 
-    // tslint:disable-next-line: space-before-function-paren only-arrow-functions
-    const func: AnyFunction = function (...args: any[]) {
-      const funcBodyScope = createScope(
-        funcScope,
-        {
-          arguments: args,
-          ...parseArgs && parseArgs(args),
-        },
-      );
-      const result = resolveFuncBody(funcBodyScope);
-      if (result) {
-        if (result.type === "throw") {
-          throw result.error;
+    const func: AnyFunction = (...args: any[]) => {
+      if (resolveFuncBody) {
+        const funcBodyScope = createScope(
+          funcScope,
+          {
+            arguments: args,
+            ...parseArgs && parseArgs(args),
+          },
+        );
+        const result = resolveFuncBody(funcBodyScope);
+        if (result) {
+          if (result.type === "throw") {
+            throw result.error;
+          }
+          return result.value;
         }
-        return result.value;
       }
     };
 

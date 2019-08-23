@@ -45,7 +45,7 @@ export interface DeclareWithValue extends
 export interface BuildFunctionOptions {
   name?: string;
   params?: SingleOrMulti<FunctionParameter>;
-  body: SingleOrMulti<FunctionStep>;
+  body?: SingleOrMulti<FunctionStep>;
 }
 
 // PARAMETERS

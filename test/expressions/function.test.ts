@@ -23,7 +23,6 @@ describe("function expression", () => {
     const resolve = compileExpression<(a: number, b: number) => number>(expression);
 
     const scope = createScope(null);
-
     const func = resolve(scope);
 
     const a = rand(1, 50);
@@ -44,7 +43,6 @@ describe("function expression", () => {
     const resolve = compileExpression<() => true>(expression);
 
     const scope = createScope(null);
-
     const func = resolve(scope);
 
     expect(func()).toBe(true);
@@ -63,7 +61,6 @@ describe("function expression", () => {
     const resolve = compileExpression<(param: any) => true | undefined>(expression);
 
     const scope = createScope(null);
-
     const func = resolve(scope);
     const param = {};
 
@@ -83,7 +80,6 @@ describe("function expression", () => {
     const resolve = compileExpression<(param: any) => true | undefined>(expression);
 
     const scope = createScope(null);
-
     const func: (...args: any[]) => any = resolve(scope);
     const params = [1, 2, 3];
 
@@ -109,7 +105,6 @@ describe("function expression", () => {
     const resolve = compileExpression<(a: number, b: number, ...others: number[]) => number>(expression);
 
     const scope = createScope(null);
-
     const func = resolve(scope);
 
     const a = rand(1, 50);
@@ -146,11 +141,23 @@ describe("function expression", () => {
     const resolve = compileExpression<(param: any) => true | undefined>(expression);
 
     const scope = createScope(null);
-
     const func = resolve(scope);
 
     expect(func(true)).toBe(true);
     expect(func(null)).toBeUndefined();
+
+  });
+
+  test("should compile function expression without body", () => {
+
+    const expression: FunctionExpression = {
+      type: "func",
+    };
+    const resolve = compileExpression<() => undefined>(expression);
+
+    const func = resolve(null as any);
+
+    expect(func()).toBeUndefined();
 
   });
 
