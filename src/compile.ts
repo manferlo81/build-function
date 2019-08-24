@@ -1,6 +1,6 @@
 import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired } from "./errors";
 import { functionReturning, hasOwn } from "./helpers";
-import { createScope, findInScope, findInScopeOrThrow, setInScope } from "./scope";
+import { createScope, findInScope, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
 
 import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
@@ -162,10 +162,7 @@ const expressionTable: ExpressionLookupTable = {
 
     return (scope) => {
 
-      const result = findInScope(
-        scope,
-        id,
-      );
+      const result = findInScope(scope, id);
 
       if (!result) {
         if (!safe) {
@@ -198,11 +195,15 @@ const expressionTable: ExpressionLookupTable = {
     const resolveValue = compileExpression(expression.value);
 
     return (scope) => {
-      const result = findInScopeOrThrow(
-        scope,
-        id,
-      );
+
+      const result = findInScope(scope, id);
+
+      if (!result) {
+        throw errorNotInScope(id);
+      }
+
       return result.scope[result.id] = resolveValue(scope);
+
     };
 
   },
