@@ -7,14 +7,12 @@ export interface ScopeValue<V> {
   value: V;
 }
 
-export function transformId(id: string): string {
-  return `$_${id}`;
-}
+const pre = "$_";
 
 export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope {
-  const scope: Scope = {
-    parent,
-  };
+
+  const scope: Scope = { parent };
+
   if (lib) {
     for (const id in lib) {
       if (hasOwn.call(lib, id)) {
@@ -22,12 +20,14 @@ export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope 
       }
     }
   }
+
   return scope;
+
 }
 
 export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | void {
 
-  const tid = transformId(id);
+  const tid = pre + id;
 
   let current: Scope | null = scope;
 
@@ -47,14 +47,6 @@ export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | 
 
 }
 
-export function setInScope<V>(scope: Scope, id: string, value: V): ScopeValue<V> {
-
-  const tid = transformId(id);
-
-  return {
-    scope,
-    id: tid,
-    value: scope[tid] = value,
-  };
-
+export function setInScope<V>(scope: Scope, id: string, value: V): void {
+  scope[pre + id] = value;
 }
