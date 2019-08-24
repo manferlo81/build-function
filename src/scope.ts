@@ -48,10 +48,13 @@ export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | 
 }
 
 export function setInScope<V>(scope: Scope, id: string, value: V): ScopeValue<V> {
+
   const tid = transformId(id);
+
   return {
     scope,
     id: tid,
     value: scope[tid] = value,
   };
+
 }
