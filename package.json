@@ -13,7 +13,8 @@
   "types": "types/index.d.ts",
   "typings": "types/index.d.ts",
   "bundlib": {
-    "name": "buildFunc"
+    "name": "buildFunc",
+    "min": "browser"
   },
   "scripts": {
     "clean": "rm -rf dist types coverage node_modules/.cache/bundlib node_modules/.cache/jest",
