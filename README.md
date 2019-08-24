@@ -520,6 +520,45 @@ interface ForStatement {
 }
 ```
 
+***example***
+
+```json
+{
+  "type": "for",
+  "target": {
+    "type": "get",
+    "id": "array"
+  },
+  "index": "index",
+  "value": "item",
+  "body": {
+    "type": "call",
+    "func": {
+      "type": "get",
+      "id": "func"
+    },
+    "args": [
+      {
+        "type": "get",
+        "id": "index"
+      },
+      {
+        "type": "get",
+        "id": "item"
+      }
+    ]
+  }
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+for (let i = 0; i < array.length; i++) {
+  func(i, array[i]);
+}
+```
+
 ### Break Statement
 
 Declares a `break` statement, it will throw at build time if used outside a loop.
