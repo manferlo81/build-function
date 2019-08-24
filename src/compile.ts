@@ -755,6 +755,10 @@ export function compileStep<V = any>(
 
   function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult> {
 
+    if (!step || !isObj(step)) {
+      throw errorInvalid(step, "step");
+    }
+
     const compile = stepTable[step.type as StatementType] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
