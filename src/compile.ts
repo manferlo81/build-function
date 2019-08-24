@@ -1,4 +1,4 @@
-import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired } from "./errors";
+import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired, errorRequired2 } from "./errors";
 import { functionReturning, hasOwn } from "./helpers";
 import { createScope, findInScope, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
@@ -347,6 +347,10 @@ const stepTable: StatementLookupTable = {
 
   declare(step) {
 
+    if (!hasOwn.call(step, "set")) {
+      throw errorRequired2("set", "declare");
+    }
+
     const resolve = compileVarDeclaration(step.set);
 
     return (scope) => {
@@ -356,6 +360,10 @@ const stepTable: StatementLookupTable = {
   },
 
   if(step, allowBreak) {
+
+    if (!hasOwn.call(step, "condition")) {
+      throw errorRequired2("condition", "if");
+    }
 
     const { then, otherwise } = step;
 
@@ -383,22 +391,29 @@ const stepTable: StatementLookupTable = {
 
   for(step) {
 
-    const { index, value, body } = step;
+    if (!hasOwn.call(step, "target")) {
+      throw errorRequired2("target", "for");
+    }
 
-    const resolveTarget = compileExpression<any[]>(step.target);
+    const { body } = step;
+
     const resolveBody = body ? compileStep(body, true) : null;
 
     if (!resolveBody) {
       return functionReturning();
     }
 
+    const { index, value } = step;
+    const resolveTarget = compileExpression<any[]>(step.target);
+
     return (scope): StepNonLoopResult => {
 
       const array = resolveTarget(scope);
       const len = array.length;
 
-      let i = 0;
       const bodyScope = createScope(scope);
+
+      let i = 0;
 
       while (i < len) {
 
@@ -448,6 +463,10 @@ const stepTable: StatementLookupTable = {
 
   return(step) {
 
+    if (!hasOwn.call(step, "value")) {
+      throw errorRequired2("value", "return");
+    }
+
     const { value, type } = step;
     const resolveValue = compileExpression(value);
 
@@ -459,6 +478,10 @@ const stepTable: StatementLookupTable = {
   },
 
   throw(step) {
+
+    if (!hasOwn.call(step, "msg")) {
+      throw errorRequired2("msg", "throw");
+    }
 
     const { type, msg } = step;
 

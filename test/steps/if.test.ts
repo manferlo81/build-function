@@ -3,6 +3,21 @@ import { $call, $get, $literal, $set } from "../helpers/expressions";
 
 describe("if statement step", () => {
 
+  test("should throw on invalid if statement step", () => {
+
+    const base = { type: "if" };
+    const invalid = [
+      base,
+    ];
+
+    invalid.forEach((step) => {
+
+      expect(() => compileStep(step as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile if statement step with single step", () => {
 
     const step: IfStatement = {

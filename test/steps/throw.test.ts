@@ -3,6 +3,21 @@ import { $literal, $oper } from "../helpers/expressions";
 
 describe("throw error statement step", () => {
 
+  test("should throw on invalid throw error statement step", () => {
+
+    const base = { type: "throw" };
+    const invalid = [
+      base,
+    ];
+
+    invalid.forEach((step) => {
+
+      expect(() => compileStep(step as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile throw error statement step using string message", () => {
 
     const step: ThrowStatement = {

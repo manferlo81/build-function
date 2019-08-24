@@ -17,3 +17,7 @@ export function errorNotInScope(id: string) {
 export function errorRequired(key: string, type: string) {
   return error(`"${key}" is required in a "${type}" expression`);
 }
+
+export function errorRequired2(key: string, type: string) {
+  return error(`"${key}" is required in a "${type}" statement`);
+}

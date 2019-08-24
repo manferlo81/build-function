@@ -3,6 +3,21 @@ import { $call, $get, $if, $literal, $oper, $return } from "../helpers/expressio
 
 describe("for statement step", () => {
 
+  test("should throw on invalid for statement step", () => {
+
+    const base = { type: "for" };
+    const invalid = [
+      base,
+    ];
+
+    invalid.forEach((step) => {
+
+      expect(() => compileStep(step as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile for statement step with single step body", () => {
 
     const array = [1, 2, 3];

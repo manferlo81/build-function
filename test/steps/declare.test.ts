@@ -3,6 +3,21 @@ import { $get, $literal } from "../helpers/expressions";
 
 describe("declare statement step", () => {
 
+  test("should throw on invalid declare statement step", () => {
+
+    const base = { type: "declare" };
+    const invalid = [
+      base,
+    ];
+
+    invalid.forEach((step) => {
+
+      expect(() => compileStep(step as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile single declare statement step with single value", () => {
 
     const step: DeclareStatement = {
