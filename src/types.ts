@@ -269,7 +269,13 @@ export type StepLoopResult =
 export type ScopeLib = Record<string, any>;
 
 export interface Scope extends ScopeLib {
-  parent: Scope | null;
+  parent?: Scope;
+}
+
+export interface ScopeValue<V> {
+  scope: Scope;
+  id: string;
+  value: V;
 }
 
 // GENERAL

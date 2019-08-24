@@ -1,17 +1,11 @@
 import { hasOwn } from "./helpers";
-import { Scope, ScopeLib } from "./types";
-
-export interface ScopeValue<V> {
-  scope: Scope;
-  id: string;
-  value: V;
-}
+import { Scope, ScopeLib, ScopeValue } from "./types";
 
 const pre = "$_";
 
 export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope {
 
-  const scope: Scope = { parent };
+  const scope: Scope = parent ? { parent } : {};
 
   if (lib) {
     for (const id in lib) {
@@ -29,7 +23,7 @@ export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | 
 
   const tid = pre + id;
 
-  let current: Scope | null = scope;
+  let current: Scope | undefined = scope;
 
   while (current) {
 
