@@ -8,6 +8,7 @@
 * improved documentation
 * `typeof` transform operation is safe to get not-in-scope variables
 * better error checking
+* dependencies updated
 
 ## 0.0.1
 
