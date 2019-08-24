@@ -219,6 +219,10 @@ interface OperationExpression {
       {
         "type": "literal",
         "value": 2
+      },
+      {
+        "type": "literal",
+        "value": 5
       }
     ]
   }
@@ -228,8 +232,10 @@ interface OperationExpression {
 *... is equivalent to...*
 
 ```javascript
-return value + 2;
+return value + 2 + 5;
 ```
+
+Every operation expression acts like its operands has been grouped inside parentheses, so the order of operations don't apply.
 
 ### Transform Expression
 
@@ -252,7 +258,7 @@ interface TransformExpression {
   "type": "return",
   "value": {
     "type": "trans",
-    "oper": "!",
+    "oper": "typeof",
     "exp": {
       "type": "get",
       "id": "value"
@@ -264,7 +270,7 @@ interface TransformExpression {
 *... is equivalent to...*
 
 ```javascript
-return !value;
+return typeof value;
 ```
 
 ### Function Expression
@@ -591,35 +597,53 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 ### Supported Operators
 
-***Arithmetic Operators***
+* ***Arithmetic Operators***
 
-* Addition (`+`)
-* Subtraction (`-`)
-* Multiplication (`*`)
-* Division (`/`)
-* Modulus (`%`)
-* Exponentiation (`**`)
+#### `+` Addition Operator
 
-***Logic Operators***
+#### `-` Subtraction Operator
 
-* Logic AND (`&&`)
-* Logic OR (`||`)
-* Equal (`==`)
-* Strict equal (`===`)
-* Unequal (`!=`)
-* Strict unequal (`!==`)
-* Less than (`<`)
-* Less than or equal (`<=`)
-* Greater than (`>`)
-* Greater than or equal (`>=`)
+#### `*` Multiplication Operator
 
-***Bitwise Operators***
+#### `/` Division Operator
 
-* Bitwise AND (`&`)
-* Bitwise OR (`|`)
-* Bitwise XOR (`^`)
-* Shift left (`<<`)
-* Shift right (`>>`)
+#### `%` Modulus Operator
+
+#### `**` Exponentiation Operator
+
+* ***Logic Operators***
+
+#### `&&` Logic AND Operator
+
+#### `||` Logic OR Operator
+
+#### `==` Equal Operator
+
+#### `===` Strict equal Operator
+
+#### `!=` Unequal Operator
+
+#### `!==` Strict unequal Operator
+
+#### `<` Less than Operator
+
+#### `<=` Less than or equal Operator
+
+#### `>` Greater than Operator
+
+#### `>=` Greater than or equal Operator
+
+* ***Bitwise Operators***
+
+#### `&` Bitwise AND Operator
+
+#### `|` Bitwise OR Operator
+
+#### `^` Bitwise XOR Operator
+
+#### `<<` Shift left Operator
+
+#### `>>` Shift right Operator
 
 ## Transformations
 
@@ -627,10 +651,13 @@ Transformations are defined using the [Transform Expression](#transform-expressi
 
 ### Supported Transform Operators
 
-* Type (`typeof`)
-* NOT (`!`)
-* To Boolean (`!!`)
-* Bitwise NOT (`~`)
+#### `typeof` Type Operator
+
+#### `!` NOT Operator
+
+#### `!!` To Boolean Operator
+
+#### `~` Bitwise NOT Operator
 
 ## License
 
