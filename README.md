@@ -597,8 +597,6 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 ### Supported Operators
 
-* ***Arithmetic Operators***
-
 #### `+` Addition Operator
 
 #### `-` Subtraction Operator
@@ -610,8 +608,6 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 #### `%` Modulus Operator
 
 #### `**` Exponentiation Operator
-
-* ***Logic Operators***
 
 #### `&&` Logic AND Operator
 
@@ -633,17 +629,17 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 #### `>=` Greater than or equal Operator
 
-* ***Bitwise Operators***
-
 #### `&` Bitwise AND Operator
 
 #### `|` Bitwise OR Operator
 
 #### `^` Bitwise XOR Operator
 
-#### `<<` Shift left Operator
+#### `<<` Shift Left Operator
 
-#### `>>` Shift right Operator
+#### `>>` Shift Right Operator
+
+#### `>>>` Unsigned Shift Right Operator
 
 ## Transformations
 

@@ -112,8 +112,9 @@ export type BitwiseOperator =
   | "&"
   | "|"
   | "^"
+  | "<<"
   | ">>"
-  | "<<";
+  | ">>>";
 
 export type RegularArithmeticOperator =
   | "+"

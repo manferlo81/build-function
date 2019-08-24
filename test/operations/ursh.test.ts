@@ -2,26 +2,26 @@ import { compileExpression, OperationExpression } from "../../src";
 import { $literal, $oper } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
-describe("shift right operation expression", () => {
+describe("unsigned shift right operation expression", () => {
 
-  test("should compile shift right operation expression with 2 operands", () => {
+  test("should compile unsigned shift right operation expression with 2 operands", () => {
 
     const a = -rand(5000, 10000, true);
     const b = rand(1, 3, true);
 
     const expression: OperationExpression = $oper(
-      ">>",
+      ">>>",
       $literal(a),
       $literal(b),
     );
     const resolve = compileExpression(expression);
 
     // tslint:disable-next-line: no-bitwise
-    expect(resolve(null as any)).toBe(a >> b);
+    expect(resolve(null as any)).toBe(a >>> b);
 
   });
 
-  test("should compile shift right operation expression with multiple operands", () => {
+  test("should compile unsigned shift right operation expression with multiple operands", () => {
 
     const a = -rand(5000, 10000, true);
     const b = rand(1, 3, true);
@@ -29,7 +29,7 @@ describe("shift right operation expression", () => {
     const d = rand(1, 3, true);
 
     const expression: OperationExpression = $oper(
-      ">>",
+      ">>>",
       $literal(a),
       $literal(b),
       $literal(c),
@@ -38,7 +38,7 @@ describe("shift right operation expression", () => {
     const resolve = compileExpression(expression);
 
     // tslint:disable-next-line: no-bitwise
-    expect(resolve(null as any)).toBe(a >> b >> c >> d);
+    expect(resolve(null as any)).toBe(a >>> b >>> c >>> d);
 
   });
 

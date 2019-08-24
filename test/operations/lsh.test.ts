@@ -6,7 +6,7 @@ describe("shift left operation expression", () => {
 
   test("should compile shift left operation expression with 2 operands", () => {
 
-    const a = rand(1, 10, true);
+    const a = -rand(1, 10, true);
     const b = rand(1, 8, true);
 
     const expression: OperationExpression = $oper(
@@ -23,7 +23,7 @@ describe("shift left operation expression", () => {
 
   test("should compile shift left operation expression with multiple operands", () => {
 
-    const a = rand(1, 8, true);
+    const a = -rand(1, 8, true);
     const b = rand(1, 3, true);
     const c = rand(1, 3, true);
     const d = rand(1, 3, true);

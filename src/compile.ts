@@ -113,6 +113,8 @@ const operationReducerTable: Record<
   "<<": (total, value) => (total << value),
   // tslint:disable-next-line: no-bitwise
   ">>": (total, value) => (total >> value),
+  // tslint:disable-next-line: no-bitwise
+  ">>>": (total, value) => (total >>> value),
   // tslint:disable-next-line: triple-equals
   "==": (total, value) => (total == value),
   "===": (total, value) => (total === value),
