@@ -2,11 +2,12 @@
 
 ## 0.0.2
 
-***24-AUG-2019***
+***25-AUG-2019***
 
 * added badges
 * improved documentation
 * `typeof` transform operation is safe to get not-in-scope variables
+* better error checking
 
 ## 0.0.1
 
