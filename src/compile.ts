@@ -1,5 +1,5 @@
-import { error, errorInvalid, errorInvalidType, errorNotInScope } from "./errors";
-import { functionReturning } from "./helpers";
+import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired } from "./errors";
+import { functionReturning, hasOwn } from "./helpers";
 import { createScope, findInScope, findInScopeOrThrow, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
 
@@ -27,7 +27,6 @@ import {
   StepLoopResult,
   StepNonLoopResult,
 } from "./types";
-import { validateExpression } from "./validate";
 
 // LOOKUP TABLES
 
@@ -137,7 +136,9 @@ const expressionTable: ExpressionLookupTable = {
 
   literal(expression) {
 
-    validateExpression(expression, "value");
+    if (!hasOwn.call(expression, "value")) {
+      throw errorRequired("value", "literal");
+    }
 
     return functionReturning(
       expression.value,
@@ -147,7 +148,9 @@ const expressionTable: ExpressionLookupTable = {
 
   get(expression, safe) {
 
-    validateExpression(expression, "id");
+    if (!hasOwn.call(expression, "id")) {
+      throw errorRequired("id", "get");
+    }
 
     if (typeof expression.id !== "string") {
       throw error('A "get" expression "id" must be a string');
@@ -177,7 +180,17 @@ const expressionTable: ExpressionLookupTable = {
 
   set(expression) {
 
-    validateExpression(expression, ["id", "value"]);
+    if (!hasOwn.call(expression, "id")) {
+      throw errorRequired("id", "set");
+    }
+
+    if (!hasOwn.call(expression, "value")) {
+      throw errorRequired("value", "set");
+    }
+
+    if (typeof expression.id !== "string") {
+      throw error('A "set" expression "id" must be a string');
+    }
 
     const { id } = expression;
     const resolveValue = compileExpression(expression.value);
@@ -194,7 +207,9 @@ const expressionTable: ExpressionLookupTable = {
 
   call(expression) {
 
-    validateExpression(expression, "func");
+    if (!hasOwn.call(expression, "func")) {
+      throw errorRequired("func", "call");
+    }
 
     const { args } = expression;
 
@@ -215,7 +230,17 @@ const expressionTable: ExpressionLookupTable = {
 
   ternary(expression) {
 
-    validateExpression(expression, ["condition", "then", "otherwise"]);
+    if (!hasOwn.call(expression, "condition")) {
+      throw errorRequired("condition", "ternary");
+    }
+
+    if (!hasOwn.call(expression, "then")) {
+      throw errorRequired("then", "ternary");
+    }
+
+    if (!hasOwn.call(expression, "otherwise")) {
+      throw errorRequired("otherwise", "ternary");
+    }
 
     const resolveCondition = compileExpression(expression.condition);
     const resolveThen = compileExpression(expression.then);
@@ -229,7 +254,13 @@ const expressionTable: ExpressionLookupTable = {
 
   oper(expression) {
 
-    validateExpression(expression, ["oper", "exp"]);
+    if (!hasOwn.call(expression, "oper")) {
+      throw errorRequired("oper", "oper");
+    }
+
+    if (!hasOwn.call(expression, "exp")) {
+      throw errorRequired("exp", "oper");
+    }
 
     const { exp, oper } = expression;
 
@@ -263,7 +294,13 @@ const expressionTable: ExpressionLookupTable = {
 
   trans(expression) {
 
-    validateExpression(expression, ["oper", "exp"]);
+    if (!hasOwn.call(expression, "oper")) {
+      throw errorRequired("oper", "trans");
+    }
+
+    if (!hasOwn.call(expression, "exp")) {
+      throw errorRequired("exp", "trans");
+    }
 
     if (expression.oper === "typeof") {
 

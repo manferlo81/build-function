@@ -13,3 +13,7 @@ export function errorInvalidType(type: string, what: string) {
 export function errorNotInScope(id: string) {
   return error(`"${id}" can't be found in this scope`);
 }
+
+export function errorRequired(key: string, type: string) {
+  return error(`"${key}" is required in a "${type}" expression`);
+}

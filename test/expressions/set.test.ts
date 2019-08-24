@@ -4,6 +4,24 @@ import { rand } from "../helpers/number";
 
 describe("set expression", () => {
 
+  test("should throw on invalid set expression", () => {
+
+    const base = { type: "set" };
+    const invalid = [
+      base,
+      { ...base, id: "id" },
+      { ...base, value: $literal(0) },
+      { ...base, id: 10, value: $literal(0) },
+    ];
+
+    invalid.forEach((expression) => {
+
+      expect(() => compileExpression(expression as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile set expression with string id", () => {
 
     const id = "value";

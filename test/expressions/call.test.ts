@@ -3,6 +3,14 @@ import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call expression", () => {
 
+  test("should throw on invalid call expression", () => {
+
+    const invalid = { type: "call" };
+
+    expect(() => compileExpression(invalid as any)).toThrow();
+
+  });
+
   test("should compile function call expression", () => {
 
     const expression: FunctionCallExpression = $call(

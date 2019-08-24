@@ -4,6 +4,22 @@ import { rand } from "../helpers/number";
 
 describe("get expression", () => {
 
+  test("should throw on invalid get expression", () => {
+
+    const base = { type: "get" };
+    const invalid = [
+      base,
+      { ...base, id: 10 },
+    ];
+
+    invalid.forEach((expression) => {
+
+      expect(() => compileExpression(expression as any)).toThrow();
+
+    });
+
+  });
+
   test("should compile get expression with string id", () => {
 
     const getId = "value";

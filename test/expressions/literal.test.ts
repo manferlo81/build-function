@@ -4,6 +4,14 @@ import { rand } from "../helpers/number";
 
 describe("literal expression", () => {
 
+  test("should throw on invalid literal expression", () => {
+
+    const invalid = { type: "literal" };
+
+    expect(() => compileExpression(invalid as any)).toThrow();
+
+  });
+
   test("should compile literal expression", () => {
 
     const value = rand(1, 20);
