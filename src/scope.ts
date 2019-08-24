@@ -1,4 +1,5 @@
 import { errorNotInScope } from "./errors";
+import { hasOwn } from "./helpers";
 import { Scope, ScopeLib } from "./types";
 
 export interface ScopeValue<V> {
@@ -17,7 +18,7 @@ export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope 
   };
   if (lib) {
     for (const id in lib) {
-      if (Object.prototype.hasOwnProperty.call(lib, id)) {
+      if (hasOwn.call(lib, id)) {
         setInScope(scope, id, lib[id]);
       }
     }
@@ -29,7 +30,7 @@ export function findInScope<V = any>(scope: Scope, id: string): ScopeValue<V> | 
   let current: Scope | null = scope;
   const tid = transformId(id);
   while (current) {
-    if (current.hasOwnProperty(tid)) {
+    if (hasOwn.call(current, tid)) {
       return {
         scope: current,
         id: tid,

@@ -3,3 +3,5 @@ export function functionReturning(): () => undefined;
 export function functionReturning<V>(value?: V): () => V | undefined {
   return () => value;
 }
+
+export const hasOwn = Object.prototype.hasOwnProperty;

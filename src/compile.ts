@@ -22,11 +22,12 @@ import {
   ScopeLib,
   SpecialOperator,
   SpreadableExpression,
-  Statement,
+  StatementType,
   StepCompiler,
   StepLoopResult,
   StepNonLoopResult,
 } from "./types";
+import { validateExpression } from "./validate";
 
 // LOOKUP TABLES
 
@@ -132,9 +133,11 @@ const transformTable: Record<RegularTransformOperator, (value: any) => any> = {
   "~": (value) => ~value,
 };
 
-const expressionTable: ExpressionLookupTable<Expression> = {
+const expressionTable: ExpressionLookupTable = {
 
   literal(expression) {
+
+    validateExpression(expression, "value");
 
     return functionReturning(
       expression.value,
@@ -143,6 +146,12 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   },
 
   get(expression, safe) {
+
+    validateExpression(expression, "id");
+
+    if (typeof expression.id !== "string") {
+      throw error('A "get" expression "id" must be a string');
+    }
 
     const { id } = expression;
 
@@ -168,6 +177,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
   set(expression) {
 
+    validateExpression(expression, ["id", "value"]);
+
     const { id } = expression;
     const resolveValue = compileExpression(expression.value);
 
@@ -182,6 +193,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   },
 
   call(expression) {
+
+    validateExpression(expression, "func");
 
     const { args } = expression;
 
@@ -202,6 +215,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
   ternary(expression) {
 
+    validateExpression(expression, ["condition", "then", "otherwise"]);
+
     const resolveCondition = compileExpression(expression.condition);
     const resolveThen = compileExpression(expression.then);
     const resolveOtherwise = compileExpression(expression.otherwise);
@@ -213,6 +228,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   },
 
   oper(expression) {
+
+    validateExpression(expression, ["oper", "exp"]);
 
     const { exp, oper } = expression;
 
@@ -245,6 +262,8 @@ const expressionTable: ExpressionLookupTable<Expression> = {
   },
 
   trans(expression) {
+
+    validateExpression(expression, ["oper", "exp"]);
 
     if (expression.oper === "typeof") {
 
@@ -284,7 +303,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
 };
 
-const stepTable: StatementLookupTable<Statement> = {
+const stepTable: StatementLookupTable = {
 
   declare(step) {
 
@@ -673,7 +692,7 @@ export function compileStep<V = any>(
 
   function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult> {
 
-    const compile = stepTable[step.type as Statement["type"]] as StepCompiler<FunctionStep> | undefined;
+    const compile = stepTable[step.type as StatementType] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
       return compile(step, allowBreak);
