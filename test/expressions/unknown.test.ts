@@ -4,6 +4,13 @@ describe("unknown expression", () => {
 
   test("should throw on unknown expression", () => {
 
+    expect(() => compileExpression(undefined as any)).toThrow();
+    expect(() => compileExpression(null as any)).toThrow();
+
+  });
+
+  test("should throw on unknown expression type", () => {
+
     const expression: any = {
       type: "unknown",
     };

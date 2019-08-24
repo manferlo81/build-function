@@ -4,6 +4,17 @@ import { rand } from "../helpers/number";
 
 describe("function expression", () => {
 
+  test("should throw on invalid parameter", () => {
+
+    const expression: FunctionExpression = {
+      type: "func",
+      params: { id: "param1", type: "invalid" } as any,
+    };
+
+    expect(() => compileExpression(expression)).toThrow();
+
+  });
+
   test("should compile function expression", () => {
 
     const expression: FunctionExpression = {
@@ -72,7 +83,7 @@ describe("function expression", () => {
 
     const expression: FunctionExpression = {
       type: "func",
-      params: { type: "rest", id: "params" },
+      params: { id: "params", type: "rest" },
       body: $return(
         $get("params"),
       ),
@@ -195,17 +206,6 @@ describe("function expression", () => {
     const func = resolve(scope);
 
     expect(() => func()).toThrow(msg);
-
-  });
-
-  test("should throw on invalid parameter", () => {
-
-    const expression: FunctionExpression = {
-      type: "func",
-      params: { id: "param1", type: "invalid" } as any,
-    };
-
-    expect(() => compileExpression(expression)).toThrow();
 
   });
 

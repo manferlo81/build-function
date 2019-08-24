@@ -1,4 +1,4 @@
-import { error, errorInvalid, errorNotInScope } from "./errors";
+import { error, errorInvalid, errorInvalidType, errorNotInScope } from "./errors";
 import { functionReturning } from "./helpers";
 import { createScope, findInScope, findInScopeOrThrow, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
@@ -142,7 +142,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
 
   },
 
-  get(expression, ignoreError) {
+  get(expression, safe) {
 
     const { id } = expression;
 
@@ -154,7 +154,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
       );
 
       if (!result) {
-        if (!ignoreError) {
+        if (!safe) {
           throw errorNotInScope(id);
         }
         return;
@@ -229,7 +229,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
     const reducer = operationReducerTable[oper as RegularArithmeticOperator];
 
     if (!reducer) {
-      throw errorInvalid(oper, "operation");
+      throw errorInvalidType(oper, "operation");
     }
 
     const otherResolvers = exp.map(compileExpression);
@@ -260,7 +260,7 @@ const expressionTable: ExpressionLookupTable<Expression> = {
     const transform = transformTable[expression.oper];
 
     if (!transform) {
-      throw errorInvalid(expression.oper, "transform operation");
+      throw errorInvalidType(expression.oper, "transform operation");
     }
 
     const resolve = compileExpression(expression.exp);
@@ -431,7 +431,7 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
     const compileGetter = paramTable[param.type];
 
     if (!compileGetter) {
-      throw errorInvalid(param.type, "parameter");
+      throw errorInvalidType(param.type, "parameter");
     }
 
     const getValue = compileGetter(index);
@@ -540,7 +540,11 @@ function compileLogicOperation(
 
 // EXPRESSION
 
-function compileExpressionSafe<V extends any = any>(expression: Expression, ignoreError?: boolean) {
+function compileExpressionSafe<V extends any = any>(expression: Expression, safe?: boolean) {
+
+  if (!expression || !isObj(expression)) {
+    throw errorInvalid(expression, "expression");
+  }
 
   const { type } = expression;
 
@@ -549,10 +553,10 @@ function compileExpressionSafe<V extends any = any>(expression: Expression, igno
   ) | undefined;
 
   if (!compile) {
-    throw errorInvalid(type, "expression");
+    throw errorInvalidType(type, "expression");
   }
 
-  return compile(expression, ignoreError);
+  return compile(expression, safe);
 
 }
 
