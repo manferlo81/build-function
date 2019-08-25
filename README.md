@@ -419,7 +419,7 @@ Always `"call"`, it's what identifies a `function call` expression from other ex
 
 Expression which result will be used as function to be called.
 
-**`args`**
+**`args`** (`optional`)
 
 Optional [expression](#expressions), [spread expression](#spread-expression) or an array of them to be used as `arguments` to call the function.
 
@@ -581,11 +581,11 @@ Always `"if"`, it's what identifies an `if` statement from other statements and 
 
 Expression which result will be used as condition for the `if` statement.
 
-**`then`**
+**`then`** (`optional`)
 
 A optional step or series of steps to be executed if `condition` resolves to a truthy value.
 
-**`otherwise`**
+**`otherwise`** (`optional`)
 
 A optional step or series of steps to be executed if `condition` resolves to a falsy value.
 
@@ -637,7 +637,7 @@ interface ForStatement {
   target: Expression;
   index?: string;
   value?: string;
-  body: FunctionStep | FunctionStep[];
+  body?: FunctionStep | FunctionStep[];
 }
 ```
 
@@ -649,15 +649,15 @@ Always `"for"`, it's what identifies a `for` statement from other statements and
 
 Expression resolving to an array-like object, which `length` property will be used for the loop.
 
-**`index`**
+**`index`** (`optional`)
 
 Optional `id` to be registered inside the loop body environment containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
-**`value`**
+**`value`** (`optional`)
 
 Optional `id` to be registered inside the loop body environment containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
-**`body`**
+**`body`** (`optional`)
 
 A step or series of steps to be executed for every iteration.
 
@@ -797,49 +797,49 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 ### Supported Operators
 
-#### `+` Addition Operator
+**`+` `Addition Operator`**
 
-#### `-` Subtraction Operator
+**`-` `Subtraction Operator`**
 
-#### `*` Multiplication Operator
+**`*` `Multiplication Operator`**
 
-#### `/` Division Operator
+**`/` `Division Operator`**
 
-#### `%` Modulus Operator
+**`%` `Modulus Operator`**
 
-#### `**` Exponentiation Operator
+**`**` `Exponentiation Operator`**
 
-#### `&&` Logic AND Operator
+**`&&` `Logic AND Operator`**
 
-#### `||` Logic OR Operator
+**`||` `Logic OR Operator`**
 
-#### `==` Equal Operator
+**`==` `Equal Operator`**
 
-#### `===` Strict equal Operator
+**`===` `Strict equal Operator`**
 
-#### `!=` Unequal Operator
+**`!=` `Unequal Operator`**
 
-#### `!==` Strict unequal Operator
+**`!==` `Strict unequal Operator`**
 
-#### `<` Less than Operator
+**`<` `Less than Operator`**
 
-#### `<=` Less than or equal Operator
+**`<=` `Less than or equal Operator`**
 
-#### `>` Greater than Operator
+**`>` `Greater than Operator`**
 
-#### `>=` Greater than or equal Operator
+**`>=` `Greater than or equal Operator`**
 
-#### `&` Bitwise AND Operator
+**`&` `Bitwise AND Operator`**
 
-#### `|` Bitwise OR Operator
+**`|` `Bitwise OR Operator`**
 
-#### `^` Bitwise XOR Operator
+**`^` `Bitwise XOR Operator`**
 
-#### `<<` Shift Left Operator
+**`<<` `Shift Left Operator`**
 
-#### `>>` Shift Right Operator
+**`>>` `Shift Right Operator`**
 
-#### `>>>` Unsigned Shift Right Operator
+**`>>>` `Unsigned Shift Right Operator`**
 
 ## Transformations
 
@@ -847,13 +847,13 @@ Transformations are defined using the [Transform Expression](#transform-expressi
 
 ### Supported Transform Operators
 
-#### `typeof` Type Operator
+**`typeof` `Type Operator`**
 
-#### `!` NOT Operator
+**`!` `NOT Operator`**
 
-#### `!!` To Boolean Operator
+**`!!` `To Boolean Operator`**
 
-#### `~` Bitwise NOT Operator
+**`~` `Bitwise NOT Operator`**
 
 ## License
 
