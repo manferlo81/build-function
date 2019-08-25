@@ -6,7 +6,9 @@ The way to describe and build a function using json
 
 ## In This Guide
 
+* [CDN](#cdn)
 * [Expressions](#expressions)
+* [Statements](#statements)
 * [Function Steps](#function-steps)
 * [Operations](#operations)
 * [Transformations](#transformations)
@@ -84,7 +86,7 @@ return true;
 
 ### Get Expression
 
-It gets a value of the variable identified by the `id` from the current environment. If the variable if not found, it will throw, unless it is inside a `typeof` transform operation.
+Gets a value of the variable identified by the `id` from the current virtual scope. If the variable if not found, it will throw, unless it is inside a `typeof` transform operation.
 
 ***syntax***
 
@@ -102,6 +104,8 @@ Always `"get"`, it's what identifies a `get` expression from other expressions a
 **`id`**
 
 String representing the `id` to be used when expression is resolved.
+
+If the `id` is not present in the current virtual scope, it will throw.
 
 ***example***
 
@@ -121,11 +125,9 @@ String representing the `id` to be used when expression is resolved.
 return expression;
 ```
 
-*... if `expression` is not present in the current environment, it will throw.*
-
 ### Set Expression
 
-It sets a value to the variable identified by the `id` in the current environment. If the variable has not been declared prevoiusly it will throw.
+It sets a value to the variable identified by the `id` in the current virtual scope. If the variable has not been declared prevoiusly, it will throw.
 
 ***syntax***
 
@@ -147,7 +149,7 @@ String representing the `id` to be used when expression is resolved.
 
 **`value`**
 
-Expression resolving to a value to be assigned to the corresponding `id` in the current environment.
+Expression resolving to a value to be assigned to the corresponding `id` in the current virtual scope.
 
 ***example***
 
@@ -170,8 +172,6 @@ Expression resolving to a value to be assigned to the corresponding `id` in the 
 ```javascript
 return result = 10;
 ```
-
-*... if `result` is not present in the current environment, it will throw.*
 
 ### Ternary Expression
 
@@ -360,6 +360,12 @@ interface FunctionExpression {
 
 Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
 
+**`name`** (`optional`)
+
+**`params`** (`optional`)
+
+**`body`** (`optional`)
+
 ***example***
 
 ```json
@@ -421,7 +427,7 @@ Expression which result will be used as function to be called.
 
 **`args`** (`optional`)
 
-Optional [expression](#expressions), [spread expression](#spread-expression) or an array of them to be used as `arguments` to call the function.
+[`Expression`](#expressions), [`spread expression`](#spread-expression) or `array of them` to be used as `arguments` to call the function.
 
 ***example***
 
@@ -509,11 +515,11 @@ Expression which resolves to an array to be spread.
 return func(100, ...others);
 ```
 
-## Function Steps
+## Statements
 
 ### `let` Statement
 
-Declares variables into the current environment.
+Declares variables into the current virtual scope.
 
 ***syntax***
 
@@ -535,7 +541,7 @@ Always `"let"`, it's what identifies a `let` statement from other statements and
 
 **`declare`**
 
-An `id`, `id-value-pair` or series of them in an array to be declared into the current environment.
+An `id`, `id-value-pair` or `array of them` to be declared into the current virtual scope.
 
 ***example***
 
@@ -583,11 +589,11 @@ Expression which result will be used as condition for the `if` statement.
 
 **`then`** (`optional`)
 
-A optional step or series of steps to be executed if `condition` resolves to a truthy value.
+A optional `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
 
 **`otherwise`** (`optional`)
 
-A optional step or series of steps to be executed if `condition` resolves to a falsy value.
+A optional `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -647,19 +653,19 @@ Always `"for"`, it's what identifies a `for` statement from other statements and
 
 **`target`**
 
-Expression resolving to an array-like object, which `length` property will be used for the loop.
+Expression resolving to an `array-like` object, which `length` property will be used for the loop.
 
 **`index`** (`optional`)
 
-Optional `id` to be registered inside the loop body environment containing the current iteration index, if not specified it won't be registered, the loop will still run.
+The `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
 **`value`** (`optional`)
 
-Optional `id` to be registered inside the loop body environment containing the current iteration value, if not specified it won't be registered, the loop will still run.
+The `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
 **`body`** (`optional`)
 
-A step or series of steps to be executed for every iteration.
+A `step` or `array of steps` to be executed for every iteration. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -790,6 +796,10 @@ A string or Expression resolving to a string to be used as `Error` message.
 ```javascript
 throw new Error("Unknown Error");
 ```
+
+## Function Steps
+
+Any [statement](#statements) or [expression](#expressions) is considered a function step.
 
 ## Operations
 
