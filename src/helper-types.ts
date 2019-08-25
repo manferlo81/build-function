@@ -1,4 +1,4 @@
-import { EnvBasedResolver, ExpresionType, Expression, Statement, StatementType, StepCompiler } from "./types";
+import { ExpresionType, Expression, ScopeBasedResolver, Statement, StatementType, StepCompiler } from "./types";
 
 export type SingleOrMulti<T> = T | T[];
 export type AnyFunction = (...args: any[]) => any;
@@ -6,7 +6,7 @@ export type AnyFunction = (...args: any[]) => any;
 export type ExpressionLookupTable<E extends Expression = Expression> = {
   [K in ExpresionType]: (
     E extends { type: K }
-    ? <V>(expression: E, safe?: boolean) => EnvBasedResolver<V>
+    ? <V>(expression: E, safe?: boolean) => ScopeBasedResolver<V>
     : never
   );
 };

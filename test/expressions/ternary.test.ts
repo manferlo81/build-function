@@ -1,4 +1,4 @@
-import { compileExp, createEnv, TernaryExpression } from "../../src";
+import { compileExp, createScope, TernaryExpression } from "../../src";
 import { $get, $literal, $set, $ternary, $trans } from "../helpers/expressions";
 
 describe("ternary expression", () => {
@@ -42,16 +42,16 @@ describe("ternary expression", () => {
       ),
     );
 
-    const env = createEnv(null, {
+    const scope = createScope(null, {
       cond: false,
     });
 
-    const shouldBeNo = resolve(env);
+    const shouldBeNo = resolve(scope);
 
     expect(shouldBeNo).toBe("no");
 
-    negate(env);
-    const shouldBeYes = resolve(env);
+    negate(scope);
+    const shouldBeYes = resolve(scope);
 
     expect(shouldBeYes).toBe("yes");
 

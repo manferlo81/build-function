@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createEnv, IfStatement } from "../../src";
+import { compileExp, compileStep, createScope, IfStatement } from "../../src";
 import { $call, $get, $literal, $set } from "../helpers/expressions";
 
 describe("if statement step", () => {
@@ -43,11 +43,11 @@ describe("if statement step", () => {
     const then = jest.fn();
     const otherwise = jest.fn();
 
-    const env = createEnv(null, { cond: false, then, otherwise });
+    const scope = createScope(null, { cond: false, then, otherwise });
 
-    expect(resolve(env)).toBeUndefined();
-    setCond(env);
-    expect(resolve(env)).toBeUndefined();
+    expect(resolve(scope)).toBeUndefined();
+    setCond(scope);
+    expect(resolve(scope)).toBeUndefined();
 
     expect(then).toHaveBeenCalledTimes(1);
     expect(otherwise).toHaveBeenCalledTimes(1);
@@ -83,11 +83,11 @@ describe("if statement step", () => {
     const then = jest.fn();
     const otherwise = jest.fn();
 
-    const env = createEnv(null, { cond: false, then, otherwise });
+    const scope = createScope(null, { cond: false, then, otherwise });
 
-    expect(resolve(env)).toBeUndefined();
-    setCond(env);
-    expect(resolve(env)).toBeUndefined();
+    expect(resolve(scope)).toBeUndefined();
+    setCond(scope);
+    expect(resolve(scope)).toBeUndefined();
 
     expect(then).toHaveBeenCalledTimes(1);
     expect(otherwise).toHaveBeenCalledTimes(1);

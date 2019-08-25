@@ -1,4 +1,4 @@
-import { compileExp, createEnv, LexicalEnvironment } from "../src";
+import { compileExp, createScope, Scope } from "../src";
 import { $get } from "./helpers/expressions";
 import { rand } from "./helpers/number";
 
@@ -9,14 +9,14 @@ describe("create scope", () => {
     const a = rand(0, 10);
     const b = rand(0, 10);
 
-    const env = createEnv(null, { a, b });
+    const scope = createScope(null, { a, b });
 
-    const get = (id: string, getScope: LexicalEnvironment) => compileExp(
+    const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
     )(getScope);
 
-    expect(get("a", env)).toBe(a);
-    expect(get("b", env)).toBe(b);
+    expect(get("a", scope)).toBe(a);
+    expect(get("b", scope)).toBe(b);
 
   });
 
@@ -25,17 +25,17 @@ describe("create scope", () => {
     const a = rand(0, 10);
     const b = rand(0, 10);
 
-    const parent = createEnv(null, { a });
-    const env = createEnv(parent, { b });
+    const parent = createScope(null, { a });
+    const scope = createScope(parent, { b });
 
-    expect(env.parent).toBe(parent);
+    expect(scope.parent).toBe(parent);
 
-    const get = (id: string, getScope: LexicalEnvironment) => compileExp(
+    const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
     )(getScope);
 
-    expect(get("a", env)).toBe(a);
-    expect(get("b", env)).toBe(b);
+    expect(get("a", scope)).toBe(a);
+    expect(get("b", scope)).toBe(b);
 
   });
 
@@ -48,14 +48,14 @@ describe("create scope", () => {
       { b },
     );
 
-    const env = createEnv(null, lib);
+    const scope = createScope(null, lib);
 
-    const get = (id: string, getScope: LexicalEnvironment) => compileExp(
+    const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
     )(getScope);
 
-    expect(() => get("a", env)).toThrow();
-    expect(get("b", env)).toBe(b);
+    expect(() => get("a", scope)).toThrow();
+    expect(get("b", scope)).toBe(b);
 
   });
 

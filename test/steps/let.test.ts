@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createEnv, LetStatement } from "../../src";
+import { compileExp, compileStep, createScope, LetStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("let statement step", () => {
@@ -23,14 +23,14 @@ describe("let statement step", () => {
       $get("value"),
     );
 
-    const env = createEnv(null);
+    const scope = createScope(null);
 
-    expect(() => getValue(env)).toThrow();
+    expect(() => getValue(scope)).toThrow();
 
-    const result = resolve(env);
+    const result = resolve(scope);
 
     expect(result).toBeUndefined();
-    expect(getValue(env)).toBe(true);
+    expect(getValue(scope)).toBe(true);
 
   });
 
@@ -52,16 +52,16 @@ describe("let statement step", () => {
       $get("value2"),
     );
 
-    const env = createEnv(null);
+    const scope = createScope(null);
 
-    expect(() => getValue1(env)).toThrow();
-    expect(() => getValue2(env)).toThrow();
+    expect(() => getValue1(scope)).toThrow();
+    expect(() => getValue2(scope)).toThrow();
 
-    const result = resolve(env);
+    const result = resolve(scope);
 
     expect(result).toBeUndefined();
-    expect(getValue1(env)).toBe(true);
-    expect(getValue2(env)).toBe(true);
+    expect(getValue1(scope)).toBe(true);
+    expect(getValue2(scope)).toBe(true);
 
   });
 
@@ -83,13 +83,13 @@ describe("let statement step", () => {
       $get("value2"),
     );
 
-    const env = createEnv(null);
+    const scope = createScope(null);
 
-    const result = resolve(env);
+    const result = resolve(scope);
 
     expect(result).toBeUndefined();
-    expect(getValue1(env)).toBeUndefined();
-    expect(getValue2(env)).toBeUndefined();
+    expect(getValue1(scope)).toBeUndefined();
+    expect(getValue2(scope)).toBeUndefined();
 
   });
 
@@ -101,10 +101,10 @@ describe("let statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const env = createEnv(null);
+    const scope = createScope(null);
 
-    resolve(env);
-    expect(() => resolve(env)).toThrow();
+    resolve(scope);
+    expect(() => resolve(scope)).toThrow();
 
   });
 

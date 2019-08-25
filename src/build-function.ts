@@ -1,10 +1,10 @@
 import { compileFunc } from "./compile";
-import { createEnv } from "./env";
-import { BuildFunctionOptions, LexicalEnvironment } from "./types";
+import { createScope } from "./scope";
+import { BuildFunctionOptions, Scope } from "./types";
 
 export function build<F extends (...args: any[]) => any>(
   options: BuildFunctionOptions,
-  scope?: LexicalEnvironment,
+  scope?: Scope,
 ): F {
-  return compileFunc(options, true)(scope || createEnv(null)) as F;
+  return compileFunc(options, true)(scope || createScope(null)) as F;
 }

@@ -1,4 +1,4 @@
-import { compileExp, createEnv, SetExpression } from "../../src";
+import { compileExp, createScope, SetExpression } from "../../src";
 import { $get, $literal, $set } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -36,14 +36,14 @@ describe("set expression", () => {
     );
 
     const initial = 100;
-    const env = createEnv(null, { [id]: initial });
+    const scope = createScope(null, { [id]: initial });
 
-    expect(getValue(env)).toBe(initial);
+    expect(getValue(scope)).toBe(initial);
 
-    const valueSet = setValue(env);
+    const valueSet = setValue(scope);
 
     expect(valueSet).toBe(value);
-    expect(getValue(env)).toBe(value);
+    expect(getValue(scope)).toBe(value);
 
   });
 
@@ -55,9 +55,9 @@ describe("set expression", () => {
     );
     const resolve = compileExp(expression);
 
-    const env = createEnv(null);
+    const scope = createScope(null);
 
-    expect(() => resolve(env)).toThrow();
+    expect(() => resolve(scope)).toThrow();
 
   });
 
