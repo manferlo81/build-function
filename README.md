@@ -56,6 +56,14 @@ interface LiteralExpression {
 }
 ```
 
+**`type`**
+
+Always `"literal"`, it's what identifies a `literal` expression from other expressions and statements.
+
+**`value`**
+
+Value to be used as literal when expression is evaluated.
+
 ***example***
 
 ```json
@@ -86,6 +94,14 @@ interface GetExpression {
   id: string;
 }
 ```
+
+**`type`**
+
+Always `"get"`, it's what identifies a `get` expression from other expressions and statements.
+
+**`id`**
+
+String representing the `id` to be used when expression is resolved.
 
 ***example***
 
@@ -120,6 +136,18 @@ interface SetExpression {
   value: Expression;
 }
 ```
+
+**`type`**
+
+Always `"set"`, it's what identifies a `set` expression from other expressions and statements.
+
+**`id`**
+
+String representing the `id` to be used when expression is resolved.
+
+**`value`**
+
+Expression resolving to a value to be assigned to the corresponding `id` in the current environment.
 
 ***example***
 
@@ -159,6 +187,22 @@ interface TernaryExpression {
   otherwise: Expression;
 }
 ```
+
+**`type`**
+
+Always `"ternary"`, it's what identifies a `ternary` expression from other expressions and statements.
+
+**`condition`**
+
+Expression which result will be used as condition for the `ternary` expression.
+
+**`then`**
+
+Expression which result will be used as resul for the `ternary` expression if `condition` is truthy.
+
+**`otherwise`**
+
+Expression which result will be used as resul for the `ternary` expression if `condition` is falsy.
 
 ***example***
 
@@ -202,6 +246,18 @@ interface OperationExpression {
   exp: Expression[];
 }
 ```
+
+**`type`**
+
+Always `"oper"`, it's what identifies an `operation` expression from other expressions and statements.
+
+**`oper`**
+
+The operator to be used in the operation, see [operations](#operations) for more information.
+
+**`exp`**
+
+Array of expressions to be used in the operation, if less than 2 operators provided, it will throw at compile time.
 
 ***example***
 
@@ -251,6 +307,18 @@ interface TransformExpression {
 }
 ```
 
+**`type`**
+
+Always `"trans"`, it's what identifies a `transform` expression from other expressions and statements.
+
+**`oper`**
+
+The operator to be used in the operation, see [transformations](#transformations) for more information.
+
+**`exp`**
+
+Expression which result will be transformed.
+
 ***example***
 
 ```json
@@ -287,6 +355,10 @@ interface FunctionExpression {
   body?: FunctionStep | FunctionStep[];
 }
 ```
+
+**`type`**
+
+Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
 
 ***example***
 
@@ -339,6 +411,18 @@ interface FunctionCallExpression {
 }
 ```
 
+**`type`**
+
+Always `"call"`, it's what identifies a `function call` expression from other expressions and statements.
+
+**`func`**
+
+Expression which result will be used as function to be called.
+
+**`args`**
+
+Optional [expression](#expressions), [spread expression](#spread-expression) or an array of them to be used as `arguments` to call the function.
+
 ***example***
 
 ```json
@@ -382,6 +466,14 @@ interface SpreadExpression {
   exp: Expression;
 }
 ```
+
+**`type`**
+
+Always `"spread"`, it's what identifies a `spread` expression from other expressions and statements.
+
+**`exp`**
+
+Expression which resolves to an array to be spread.
 
 ***example***
 
