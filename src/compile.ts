@@ -425,28 +425,22 @@ const stepTable: StatementLookupTable = {
       const array = resolveTarget(scope);
       const len = array.length;
 
-      const bodyScope = createScope(scope);
-
       let i = 0;
 
       while (i < len) {
 
+        const lib: ScopeLib = {};
+
         if (index) {
-          setInScope(
-            bodyScope,
-            index,
-            i,
-          );
+          lib[index] = i;
         }
         if (value) {
-          setInScope(
-            bodyScope,
-            value,
-            array[i],
-          );
+          lib[value] = array[i];
         }
 
-        const result = resolveBody(bodyScope);
+        const result = resolveBody(
+          createScope(scope, lib),
+        );
 
         if (result) {
           if (result === "break") {
