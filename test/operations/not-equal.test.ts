@@ -1,4 +1,4 @@
-import { compileExpression, OperationExpression } from "../../src";
+import { compileExp, OperationExpression } from "../../src";
 import { $literal, $oper } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -14,7 +14,7 @@ describe("not equal operation expression", () => {
       $literal(a),
       $literal(b),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     // tslint:disable-next-line: triple-equals
     expect(resolve(null as any)).toBe(a != b);
@@ -35,7 +35,7 @@ describe("not equal operation expression", () => {
       $literal(c),
       $literal(d),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     // tslint:disable-next-line: triple-equals
     expect(resolve(null as any)).toBe(a != b != c != d);
@@ -49,7 +49,7 @@ describe("not equal operation expression", () => {
       $literal("10"),
       $literal(10),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     expect(resolve(null as any)).toBe(false);
 

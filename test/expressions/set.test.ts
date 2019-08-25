@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, SetExpression } from "../../src";
+import { compileExp, createEnv, SetExpression } from "../../src";
 import { $get, $literal, $set } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -16,7 +16,7 @@ describe("set expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExpression(expression as any)).toThrow();
+      expect(() => compileExp(expression as any)).toThrow();
 
     });
 
@@ -30,8 +30,8 @@ describe("set expression", () => {
       id,
       $literal(value),
     );
-    const setValue = compileExpression(expression);
-    const getValue = compileExpression(
+    const setValue = compileExp(expression);
+    const getValue = compileExp(
       $get(id),
     );
 
@@ -53,7 +53,7 @@ describe("set expression", () => {
       "value",
       $literal(true),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const env = createEnv(null);
 

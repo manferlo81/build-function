@@ -1,4 +1,4 @@
-import { BreakStatement, compileExpression, compileStep, FunctionExpression } from "../../src";
+import { BreakStatement, compileExp, compileStep, FunctionExpression } from "../../src";
 
 describe("break statement step", () => {
 
@@ -24,7 +24,7 @@ describe("break statement step", () => {
       },
     };
 
-    expect(() => compileExpression(expression)).toThrow();
+    expect(() => compileExp(expression)).toThrow();
 
   });
 

@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createEnv, IfStatement } from "../../src";
+import { compileExp, compileStep, createEnv, IfStatement } from "../../src";
 import { $call, $get, $literal, $set } from "../helpers/expressions";
 
 describe("if statement step", () => {
@@ -33,7 +33,7 @@ describe("if statement step", () => {
 
     const resolve = compileStep(step);
 
-    const setCond = compileExpression(
+    const setCond = compileExp(
       $set(
         "cond",
         $literal(true),
@@ -73,7 +73,7 @@ describe("if statement step", () => {
 
     const resolve = compileStep(step);
 
-    const setCond = compileExpression(
+    const setCond = compileExp(
       $set(
         "cond",
         $literal(true),

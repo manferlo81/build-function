@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, TransformExpression } from "../../src";
+import { compileExp, createEnv, TransformExpression } from "../../src";
 import { $get, $literal, $trans } from "../helpers/expressions";
 
 describe("typeof transform expression", () => {
@@ -9,7 +9,7 @@ describe("typeof transform expression", () => {
       "typeof",
       $literal(10),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     expect(resolve(null as any)).toBe("number");
 
@@ -21,7 +21,7 @@ describe("typeof transform expression", () => {
       "typeof",
       $get("notinscope"),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const env = createEnv(null);
 

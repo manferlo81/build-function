@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, TernaryExpression } from "../../src";
+import { compileExp, createEnv, TernaryExpression } from "../../src";
 import { $get, $literal, $set, $ternary, $trans } from "../helpers/expressions";
 
 describe("ternary expression", () => {
@@ -17,7 +17,7 @@ describe("ternary expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExpression(expression as any)).toThrow();
+      expect(() => compileExp(expression as any)).toThrow();
 
     });
 
@@ -30,9 +30,9 @@ describe("ternary expression", () => {
       $literal("yes"),
       $literal("no"),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
-    const negate = compileExpression(
+    const negate = compileExp(
       $set(
         "cond",
         $trans(

@@ -6,7 +6,7 @@ export type AnyFunction = (...args: any[]) => any;
 export type ExpressionLookupTable<E extends Expression = Expression> = {
   [K in ExpresionType]: (
     E extends { type: K }
-    ? <V>(expression: E, ignoreError?: boolean) => EnvBasedResolver<V>
+    ? <V>(expression: E, safe?: boolean) => EnvBasedResolver<V>
     : never
   );
 };

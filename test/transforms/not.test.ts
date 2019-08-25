@@ -1,4 +1,4 @@
-import { compileExpression, TransformExpression } from "../../src";
+import { compileExp, TransformExpression } from "../../src";
 import { $literal, $trans } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -12,7 +12,7 @@ describe("not transform expression", () => {
       "!",
       $literal(value),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     expect(resolve(null as any)).toBe(!value);
 

@@ -1,4 +1,4 @@
-import { compileExpression } from "../../src";
+import { compileExp } from "../../src";
 import { $literal } from "../helpers/expressions";
 
 describe("transform expression", () => {
@@ -14,7 +14,7 @@ describe("transform expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExpression(expression as any)).toThrow();
+      expect(() => compileExp(expression as any)).toThrow();
 
     });
 

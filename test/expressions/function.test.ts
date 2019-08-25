@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, FunctionExpression } from "../../src";
+import { compileExp, createEnv, FunctionExpression } from "../../src";
 import { $get, $if, $literal, $oper, $return, $set } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -11,7 +11,7 @@ describe("function expression", () => {
       params: { id: "param1", type: "invalid" } as any,
     };
 
-    expect(() => compileExpression(expression)).toThrow();
+    expect(() => compileExp(expression)).toThrow();
 
   });
 
@@ -31,7 +31,7 @@ describe("function expression", () => {
         ),
       ),
     };
-    const resolve = compileExpression<(a: number, b: number) => number>(expression);
+    const resolve = compileExp<(a: number, b: number) => number>(expression);
 
     const env = createEnv(null);
     const func = resolve(env);
@@ -51,7 +51,7 @@ describe("function expression", () => {
         $literal(true),
       ),
     };
-    const resolve = compileExpression<() => true>(expression);
+    const resolve = compileExp<() => true>(expression);
 
     const env = createEnv(null);
     const func = resolve(env);
@@ -69,7 +69,7 @@ describe("function expression", () => {
         $get("param"),
       ),
     };
-    const resolve = compileExpression<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression);
 
     const env = createEnv(null);
     const func = resolve(env);
@@ -88,7 +88,7 @@ describe("function expression", () => {
         $get("params"),
       ),
     };
-    const resolve = compileExpression<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression);
 
     const env = createEnv(null);
     const func: (...args: any[]) => any = resolve(env);
@@ -113,7 +113,7 @@ describe("function expression", () => {
         ),
       ],
     };
-    const resolve = compileExpression<(a: number, b: number, ...others: number[]) => number>(expression);
+    const resolve = compileExp<(a: number, b: number, ...others: number[]) => number>(expression);
 
     const env = createEnv(null);
     const func = resolve(env);
@@ -149,7 +149,7 @@ describe("function expression", () => {
         ),
       ],
     };
-    const resolve = compileExpression<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression);
 
     const env = createEnv(null);
     const func = resolve(env);
@@ -164,7 +164,7 @@ describe("function expression", () => {
     const expression: FunctionExpression = {
       type: "func",
     };
-    const resolve = compileExpression<() => undefined>(expression);
+    const resolve = compileExp<() => undefined>(expression);
 
     const func = resolve(null as any);
 
@@ -178,7 +178,7 @@ describe("function expression", () => {
       type: "func",
       body: [],
     };
-    const resolve = compileExpression<() => void>(expression);
+    const resolve = compileExp<() => void>(expression);
 
     const env = createEnv(null);
 
@@ -199,7 +199,7 @@ describe("function expression", () => {
         msg,
       },
     };
-    const resolve = compileExpression<() => void>(expression);
+    const resolve = compileExp<() => void>(expression);
 
     const env = createEnv(null);
 
@@ -217,7 +217,7 @@ describe("function expression", () => {
         $get("arguments"),
       ),
     };
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const env = createEnv(null);
 

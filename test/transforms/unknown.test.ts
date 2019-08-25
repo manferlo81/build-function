@@ -1,4 +1,4 @@
-import { compileExpression, OperationExpression } from "../../src";
+import { compileExp, OperationExpression } from "../../src";
 import { $get, $trans } from "../helpers/expressions";
 
 describe("unknown transform expression", () => {
@@ -11,7 +11,7 @@ describe("unknown transform expression", () => {
       $get("a"),
     );
 
-    expect(() => compileExpression(expression)).toThrow();
+    expect(() => compileExp(expression)).toThrow();
 
   });
 

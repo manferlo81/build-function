@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, TransformExpression } from "../../src";
+import { compileExp, createEnv, TransformExpression } from "../../src";
 import { $get, $trans } from "../helpers/expressions";
 
 describe("bitwise not transform expression", () => {
@@ -9,7 +9,7 @@ describe("bitwise not transform expression", () => {
       "~",
       $get("value"),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const value = 100;
 

@@ -1,11 +1,11 @@
-import { compileExpression } from "../../src";
+import { compileExp } from "../../src";
 
 describe("unknown expression", () => {
 
   test("should throw on unknown expression", () => {
 
-    expect(() => compileExpression(undefined as any)).toThrow();
-    expect(() => compileExpression(null as any)).toThrow();
+    expect(() => compileExp(undefined as any)).toThrow();
+    expect(() => compileExp(null as any)).toThrow();
 
   });
 
@@ -15,7 +15,7 @@ describe("unknown expression", () => {
       type: "unknown",
     };
 
-    expect(() => compileExpression(expression)).toThrow();
+    expect(() => compileExp(expression)).toThrow();
 
   });
 

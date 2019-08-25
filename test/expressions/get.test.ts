@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, GetExpression } from "../../src";
+import { compileExp, createEnv, GetExpression } from "../../src";
 import { $get } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -14,7 +14,7 @@ describe("get expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExpression(expression as any)).toThrow();
+      expect(() => compileExp(expression as any)).toThrow();
 
     });
 
@@ -24,7 +24,7 @@ describe("get expression", () => {
 
     const getId = "value";
     const expression: GetExpression = $get(getId);
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const value = rand(1, 100);
     const env = createEnv(null, {
@@ -39,7 +39,7 @@ describe("get expression", () => {
   test("should throw if not found", () => {
 
     const expression: GetExpression = $get("value");
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const env = createEnv(null);
 

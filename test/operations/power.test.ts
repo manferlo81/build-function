@@ -1,4 +1,4 @@
-import { compileExpression, OperationExpression } from "../../src";
+import { compileExp, OperationExpression } from "../../src";
 import { $literal, $oper } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -14,7 +14,7 @@ describe("power operation expression", () => {
       $literal(base),
       $literal(exp),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     expect(resolve(null as any)).toBe(base ** exp);
 
@@ -34,7 +34,7 @@ describe("power operation expression", () => {
       $literal(exp2),
       $literal(exp3),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     expect(resolve(null as any)).toBe(base ** exp1 ** exp2 ** exp3);
 

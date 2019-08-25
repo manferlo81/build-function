@@ -1,4 +1,4 @@
-import { compileExpression, OperationExpression } from "../../src";
+import { compileExp, OperationExpression } from "../../src";
 import { $get, $literal, $oper } from "../helpers/expressions";
 
 describe("operation expression", () => {
@@ -14,7 +14,7 @@ describe("operation expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExpression(expression as any)).toThrow();
+      expect(() => compileExp(expression as any)).toThrow();
 
     });
 
@@ -28,7 +28,7 @@ describe("operation expression", () => {
       $get("a"),
     );
 
-    expect(() => compileExpression(expression)).toThrow();
+    expect(() => compileExp(expression)).toThrow();
 
   });
 

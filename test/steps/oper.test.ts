@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createEnv, OperationExpression } from "../../src";
+import { compileExp, compileStep, createEnv, OperationExpression } from "../../src";
 import { $get, $literal, $oper, $set } from "../helpers/expressions";
 
 describe("operation expression step", () => {
@@ -15,7 +15,7 @@ describe("operation expression step", () => {
     );
     const resolve = compileStep(step);
 
-    const getValue = compileExpression(
+    const getValue = compileExp(
       $get("value"),
     );
 
@@ -44,7 +44,7 @@ describe("operation expression step", () => {
     );
     const resolve = compileStep(step);
 
-    const getValue = compileExpression(
+    const getValue = compileExp(
       $get("value"),
     );
 

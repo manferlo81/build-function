@@ -1,4 +1,4 @@
-import { compileExpression, createEnv, FunctionCallExpression } from "../../src";
+import { compileExp, createEnv, FunctionCallExpression } from "../../src";
 import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call expression", () => {
@@ -7,7 +7,7 @@ describe("call expression", () => {
 
     const invalid = { type: "call" };
 
-    expect(() => compileExpression(invalid as any)).toThrow();
+    expect(() => compileExp(invalid as any)).toThrow();
 
   });
 
@@ -16,7 +16,7 @@ describe("call expression", () => {
     const expression: FunctionCallExpression = $call(
       $get("func"),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const returnValue = "ok";
     const func = jest.fn(() => returnValue);
@@ -45,7 +45,7 @@ describe("call expression", () => {
         exp: $literal([a, b, c]),
       },
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const func = jest.fn((x, y, z) => (x + y + z));
 
@@ -66,7 +66,7 @@ describe("call expression", () => {
     const expression: FunctionCallExpression = $call(
       $get("func"),
     );
-    const resolve = compileExpression(expression);
+    const resolve = compileExp(expression);
 
     const func = jest.fn((...args: any[]) => {
       return true;

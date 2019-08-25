@@ -293,4 +293,4 @@ export type ArgsLibPopulator = (input: any[], lib: EnvLib) => EnvLib;
 export type InputArgsParser = (input: any[]) => EnvLib;
 
 export type StepCompiler<S extends FunctionStep> =
-  (step: S, allowBreak?: boolean) => EnvBasedResolver<StepLoopResult>;
+  (step: S, breakable?: boolean) => EnvBasedResolver<StepLoopResult>;

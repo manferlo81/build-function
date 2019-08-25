@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createEnv, LetStatement } from "../../src";
+import { compileExp, compileStep, createEnv, LetStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("let statement step", () => {
@@ -19,7 +19,7 @@ describe("let statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue = compileExpression(
+    const getValue = compileExp(
       $get("value"),
     );
 
@@ -45,10 +45,10 @@ describe("let statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue1 = compileExpression(
+    const getValue1 = compileExp(
       $get("value1"),
     );
-    const getValue2 = compileExpression(
+    const getValue2 = compileExp(
       $get("value2"),
     );
 
@@ -76,10 +76,10 @@ describe("let statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue1 = compileExpression(
+    const getValue1 = compileExp(
       $get("value1"),
     );
-    const getValue2 = compileExpression(
+    const getValue2 = compileExp(
       $get("value2"),
     );
 

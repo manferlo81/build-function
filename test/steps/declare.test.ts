@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createEnv, DeprecatedDeclareStatement } from "../../src";
+import { compileExp, compileStep, createEnv, DeprecatedDeclareStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("declare statement step", () => {
@@ -26,7 +26,7 @@ describe("declare statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue = compileExpression(
+    const getValue = compileExp(
       $get("value"),
     );
 
@@ -52,10 +52,10 @@ describe("declare statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue1 = compileExpression(
+    const getValue1 = compileExp(
       $get("value1"),
     );
-    const getValue2 = compileExpression(
+    const getValue2 = compileExp(
       $get("value2"),
     );
 
@@ -83,10 +83,10 @@ describe("declare statement step", () => {
     };
     const resolve = compileStep(step);
 
-    const getValue1 = compileExpression(
+    const getValue1 = compileExp(
       $get("value1"),
     );
-    const getValue2 = compileExpression(
+    const getValue2 = compileExp(
       $get("value2"),
     );
 

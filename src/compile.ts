@@ -63,13 +63,13 @@ const specialOperationTable: Record<
   (expressions: MultiTermExpressions) => EnvBasedResolver
 > = {
 
-  "||": (expressions) => compileLogicOperation(
+  "||": (expressions) => compileLogic(
     expressions,
     (left, right) => (left || right),
     (value) => value,
   ),
 
-  "&&": (expressions) => compileLogicOperation(
+  "&&": (expressions) => compileLogic(
     expressions,
     (left, right) => (left && right),
     (value) => !value,
@@ -77,7 +77,7 @@ const specialOperationTable: Record<
 
   "**": (expressions) => {
 
-    const resolvers = expressions.map(compileExpression);
+    const resolvers = expressions.map(compileExp);
     const resolveLast = resolvers.pop() as EnvBasedResolver;
 
     return (env) => {
@@ -192,7 +192,7 @@ const expressionTable: ExpressionLookupTable = {
     }
 
     const { id } = expression;
-    const resolveValue = compileExpression(expression.value);
+    const resolveValue = compileExp(expression.value);
 
     return (env) => {
 
@@ -216,7 +216,7 @@ const expressionTable: ExpressionLookupTable = {
 
     const { args } = expression;
 
-    const resolveFunc = compileExpression<AnyFunction>(expression.func);
+    const resolveFunc = compileExp<AnyFunction>(expression.func);
     const resolveArgs = args ? compileSpreadable(args) : null;
 
     return (env) => {
@@ -249,9 +249,9 @@ const expressionTable: ExpressionLookupTable = {
       throw errorRequired("otherwise", "ternary");
     }
 
-    const resolveCondition = compileExpression(expression.condition);
-    const resolveThen = compileExpression(expression.then);
-    const resolveOtherwise = compileExpression(expression.otherwise);
+    const resolveCondition = compileExp(expression.condition);
+    const resolveThen = compileExp(expression.then);
+    const resolveOtherwise = compileExp(expression.otherwise);
 
     return (env) => resolveCondition(env)
       ? resolveThen(env)
@@ -287,7 +287,7 @@ const expressionTable: ExpressionLookupTable = {
       throw errorInvalidType(oper, "operation");
     }
 
-    const otherResolvers = exp.map(compileExpression);
+    const otherResolvers = exp.map(compileExp);
     const resolveFirst = otherResolvers.shift() as EnvBasedResolver;
 
     return (env) => {
@@ -311,7 +311,7 @@ const expressionTable: ExpressionLookupTable = {
 
     if (expression.oper === "typeof") {
 
-      const resolveSafe = compileExpressionSafe(expression.exp, true);
+      const resolveSafe = compileExpSafe(expression.exp, true);
 
       return (env) => {
         const value = resolveSafe(env);
@@ -326,7 +326,7 @@ const expressionTable: ExpressionLookupTable = {
       throw errorInvalidType(expression.oper, "transform operation");
     }
 
-    const resolve = compileExpression(expression.exp);
+    const resolve = compileExp(expression.exp);
 
     return (env) => {
       return transform(
@@ -338,7 +338,7 @@ const expressionTable: ExpressionLookupTable = {
 
   func(expression) {
 
-    return compileFunction(
+    return compileFunc(
       expression,
       false,
     ) as any;
@@ -377,7 +377,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  if(step, allowBreak) {
+  if(step, breakable) {
 
     if (!hasOwn.call(step, "condition")) {
       throw errorRequired2("condition", "if");
@@ -385,9 +385,9 @@ const stepTable: StatementLookupTable = {
 
     const { then, otherwise } = step;
 
-    const resolveCondition = compileExpression(step.condition);
-    const resolveThen = then ? compileStep(then, allowBreak) : null;
-    const resolveOtherwise = otherwise ? compileStep(otherwise, allowBreak) : null;
+    const resolveCondition = compileExp(step.condition);
+    const resolveThen = then ? compileStep(then, breakable) : null;
+    const resolveOtherwise = otherwise ? compileStep(otherwise, breakable) : null;
 
     if (!resolveThen && !resolveOtherwise) {
       return functionReturning();
@@ -422,7 +422,7 @@ const stepTable: StatementLookupTable = {
     }
 
     const { index, value } = step;
-    const resolveTarget = compileExpression<any[]>(step.target);
+    const resolveTarget = compileExp<any[]>(step.target);
 
     return (env): StepNonLoopResult => {
 
@@ -461,9 +461,9 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  break(step, allowBreak) {
+  break(step, breakable) {
 
-    if (!allowBreak) {
+    if (!breakable) {
       throw error('"break" is not allowed outside loops');
     }
 
@@ -480,7 +480,7 @@ const stepTable: StatementLookupTable = {
     }
 
     const { value, type } = step;
-    const resolveValue = compileExpression(value);
+    const resolveValue = compileExp(value);
 
     return (env) => ({
       type,
@@ -497,7 +497,7 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObj(msg) ? compileExpression<string>(msg) : null;
+    const resolveMessage = isObj(msg) ? compileExp<string>(msg) : null;
 
     return (env) => ({
       type,
@@ -553,7 +553,7 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 
 // FUNCTION
 
-export function compileFunction<V extends AnyFunction = AnyFunction>(
+export function compileFunc<V extends AnyFunction = AnyFunction>(
   options: BuildFunctionOptions,
   addToScope: boolean,
 ): EnvBasedResolver<V> {
@@ -602,13 +602,13 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
 
 // LOGIC
 
-function compileLogicOperation(
+function compileLogic(
   expressions: MultiTermExpressions,
   compare: (left: any, right: any) => any,
   exit: (value: any) => boolean,
 ): EnvBasedResolver {
 
-  const resolvers = expressions.map(compileExpression);
+  const resolvers = expressions.map(compileExp);
   const len = resolvers.length;
 
   return (env) => {
@@ -634,7 +634,7 @@ function compileLogicOperation(
 
 // EXPRESSION
 
-function compileExpressionSafe<V extends any = any>(expression: Expression, safe?: boolean) {
+function compileExpSafe<V extends any = any>(expression: Expression, safe?: boolean) {
 
   if (!expression || !isObj(expression)) {
     throw errorInvalid(expression, "expression");
@@ -654,8 +654,8 @@ function compileExpressionSafe<V extends any = any>(expression: Expression, safe
 
 }
 
-export function compileExpression<V extends any = any>(expression: Expression): EnvBasedResolver<V> {
-  return compileExpressionSafe(
+export function compileExp<V extends any = any>(expression: Expression): EnvBasedResolver<V> {
+  return compileExpSafe(
     expression,
   );
 }
@@ -669,7 +669,7 @@ export function compileSpreadable<V = any>(
   function compileSingle(expression: SpreadableExpression): EnvBasedPopulator<V[]> {
 
     if (expression.type === "spread") {
-      const resolveArray = compileExpression<V[]>(expression.exp);
+      const resolveArray = compileExp<V[]>(expression.exp);
       return (env, resolved) => {
         resolved.push.apply(
           resolved,
@@ -679,7 +679,7 @@ export function compileSpreadable<V = any>(
       };
     }
 
-    const resolveParam = compileExpression(expression);
+    const resolveParam = compileExp(expression);
     return (env, resolved) => {
       resolved.push(
         resolveParam(env),
@@ -719,7 +719,7 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 
     let resolveValue: EnvBasedResolver | undefined;
     if (value) {
-      resolveValue = compileExpression(value);
+      resolveValue = compileExp(value);
     }
 
     return (env) => {
@@ -750,19 +750,19 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
-  allowBreak: true,
+  breakable: true,
 ): EnvBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
-  allowBreak?: false | undefined,
+  breakable?: false | undefined,
 ): EnvBasedResolver<StepNonLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
-  allowBreak?: boolean | undefined,
+  breakable?: boolean | undefined,
 ): EnvBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
-  allowBreak?: boolean | undefined,
+  breakable?: boolean | undefined,
 ): EnvBasedResolver<StepLoopResult> {
 
   function compileSingle(step: FunctionStep): EnvBasedResolver<StepLoopResult> {
@@ -774,10 +774,10 @@ export function compileStep<V = any>(
     const compile = stepTable[step.type as StatementType] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
-      return compile(step, allowBreak);
+      return compile(step, breakable);
     }
 
-    const resolve = compileExpression(step as Expression);
+    const resolve = compileExp(step as Expression);
 
     return (env) => {
       resolve(env);
