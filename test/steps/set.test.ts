@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createScope, SetExpression } from "../../src";
+import { compileExpression, compileStep, createEnv, SetExpression } from "../../src";
 import { $get, $literal, $set } from "../helpers/expressions";
 
 describe("set expression step", () => {
@@ -15,16 +15,16 @@ describe("set expression step", () => {
       $get("value"),
     );
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       value: false,
     });
 
-    expect(getValue(scope)).toBe(false);
+    expect(getValue(env)).toBe(false);
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue(scope)).toBe(true);
+    expect(getValue(env)).toBe(true);
 
   });
 

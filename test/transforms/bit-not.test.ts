@@ -1,4 +1,4 @@
-import { compileExpression, createScope, TransformExpression } from "../../src";
+import { compileExpression, createEnv, TransformExpression } from "../../src";
 import { $get, $trans } from "../helpers/expressions";
 
 describe("bitwise not transform expression", () => {
@@ -13,12 +13,12 @@ describe("bitwise not transform expression", () => {
 
     const value = 100;
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       value,
     });
 
     // tslint:disable-next-line: no-bitwise
-    expect(resolve(scope)).toBe(~value);
+    expect(resolve(env)).toBe(~value);
 
   });
 

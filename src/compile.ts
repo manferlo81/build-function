@@ -1,6 +1,6 @@
+import { createEnv, findInEnv, setInEnv } from "./env";
 import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired, errorRequired2 } from "./errors";
 import { functionReturning, hasOwn } from "./helpers";
-import { createScope, findInScope, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
 
 import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
@@ -8,6 +8,9 @@ import {
   ArgsLibPopulator,
   BuildFunctionOptions,
   DeclareWithValue,
+  EnvBasedPopulator,
+  EnvBasedResolver,
+  EnvLib,
   Expression,
   FunctionParameter,
   FunctionStep,
@@ -17,9 +20,6 @@ import {
   RegularArithmeticOperator,
   RegularOperator,
   RegularTransformOperator,
-  ScopeBasedPopulator,
-  ScopeBasedResolver,
-  ScopeLib,
   SpecialOperator,
   SpreadableExpression,
   StatementType,
@@ -60,7 +60,7 @@ const paramTable: Record<
 
 const specialOperationTable: Record<
   SpecialOperator,
-  (expressions: MultiTermExpressions) => ScopeBasedResolver
+  (expressions: MultiTermExpressions) => EnvBasedResolver
 > = {
 
   "||": (expressions) => compileLogicOperation(
@@ -78,13 +78,13 @@ const specialOperationTable: Record<
   "**": (expressions) => {
 
     const resolvers = expressions.map(compileExpression);
-    const resolveLast = resolvers.pop() as ScopeBasedResolver;
+    const resolveLast = resolvers.pop() as EnvBasedResolver;
 
-    return (scope) => {
-      let result = resolveLast(scope);
+    return (env) => {
+      let result = resolveLast(env);
       let i = resolvers.length - 1;
       while (i >= 0) {
-        result = resolvers[i](scope) ** result;
+        result = resolvers[i](env) ** result;
         i--;
       }
       return result;
@@ -160,9 +160,9 @@ const expressionTable: ExpressionLookupTable = {
 
     const { id } = expression;
 
-    return (scope) => {
+    return (env) => {
 
-      const result = findInScope(scope, id);
+      const result = findInEnv(env, id);
 
       if (!result) {
         if (!safe) {
@@ -194,15 +194,15 @@ const expressionTable: ExpressionLookupTable = {
     const { id } = expression;
     const resolveValue = compileExpression(expression.value);
 
-    return (scope) => {
+    return (env) => {
 
-      const result = findInScope(scope, id);
+      const result = findInEnv(env, id);
 
       if (!result) {
         throw errorNotInScope(id);
       }
 
-      return result.scope[result.id] = resolveValue(scope);
+      return result.env[result.id] = resolveValue(env);
 
     };
 
@@ -219,14 +219,18 @@ const expressionTable: ExpressionLookupTable = {
     const resolveFunc = compileExpression<AnyFunction>(expression.func);
     const resolveArgs = args ? compileSpreadable(args) : null;
 
-    return (scope) => {
-      const func = resolveFunc(scope);
+    return (env) => {
+
+      const func = resolveFunc(env);
+
       if (!resolveArgs) {
         return func();
       }
+
       return func(
-        ...resolveArgs(scope),
+        ...resolveArgs(env),
       );
+
     };
 
   },
@@ -249,9 +253,9 @@ const expressionTable: ExpressionLookupTable = {
     const resolveThen = compileExpression(expression.then);
     const resolveOtherwise = compileExpression(expression.otherwise);
 
-    return (scope) => resolveCondition(scope)
-      ? resolveThen(scope)
-      : resolveOtherwise(scope);
+    return (env) => resolveCondition(env)
+      ? resolveThen(env)
+      : resolveOtherwise(env);
 
   },
 
@@ -284,12 +288,12 @@ const expressionTable: ExpressionLookupTable = {
     }
 
     const otherResolvers = exp.map(compileExpression);
-    const resolveFirst = otherResolvers.shift() as ScopeBasedResolver;
+    const resolveFirst = otherResolvers.shift() as EnvBasedResolver;
 
-    return (scope) => {
+    return (env) => {
       return otherResolvers.reduce(
-        (total, resolve) => reducer(total, resolve(scope)),
-        resolveFirst(scope),
+        (total, resolve) => reducer(total, resolve(env)),
+        resolveFirst(env),
       );
     };
 
@@ -309,8 +313,8 @@ const expressionTable: ExpressionLookupTable = {
 
       const resolveSafe = compileExpressionSafe(expression.exp, true);
 
-      return (scope) => {
-        const value = resolveSafe(scope);
+      return (env) => {
+        const value = resolveSafe(env);
         return typeof value;
       };
 
@@ -324,9 +328,9 @@ const expressionTable: ExpressionLookupTable = {
 
     const resolve = compileExpression(expression.exp);
 
-    return (scope) => {
+    return (env) => {
       return transform(
-        resolve(scope),
+        resolve(env),
       );
     };
 
@@ -353,8 +357,8 @@ const stepTable: StatementLookupTable = {
 
     const resolve = compileVarDeclaration(step.set);
 
-    return (scope) => {
-      resolve(scope);
+    return (env) => {
+      resolve(env);
     };
 
   },
@@ -367,8 +371,8 @@ const stepTable: StatementLookupTable = {
 
     const resolve = compileVarDeclaration(step.declare);
 
-    return (scope) => {
-      resolve(scope);
+    return (env) => {
+      resolve(env);
     };
 
   },
@@ -389,13 +393,13 @@ const stepTable: StatementLookupTable = {
       return functionReturning();
     }
 
-    return (scope) => {
+    return (env) => {
 
-      const resolveSteps = resolveCondition(scope) ? resolveThen : resolveOtherwise;
+      const resolveSteps = resolveCondition(env) ? resolveThen : resolveOtherwise;
 
       if (resolveSteps) {
         return resolveSteps(
-          createScope(scope),
+          createEnv(env),
         );
       }
 
@@ -420,16 +424,16 @@ const stepTable: StatementLookupTable = {
     const { index, value } = step;
     const resolveTarget = compileExpression<any[]>(step.target);
 
-    return (scope): StepNonLoopResult => {
+    return (env): StepNonLoopResult => {
 
-      const array = resolveTarget(scope);
+      const array = resolveTarget(env);
       const len = array.length;
 
       let i = 0;
 
       while (i < len) {
 
-        const lib: ScopeLib = {};
+        const lib: EnvLib = {};
 
         if (index) {
           lib[index] = i;
@@ -439,7 +443,7 @@ const stepTable: StatementLookupTable = {
         }
 
         const result = resolveBody(
-          createScope(scope, lib),
+          createEnv(env, lib),
         );
 
         if (result) {
@@ -478,9 +482,9 @@ const stepTable: StatementLookupTable = {
     const { value, type } = step;
     const resolveValue = compileExpression(value);
 
-    return (scope) => ({
+    return (env) => ({
       type,
-      value: resolveValue(scope),
+      value: resolveValue(env),
     });
 
   },
@@ -495,10 +499,10 @@ const stepTable: StatementLookupTable = {
 
     const resolveMessage = isObj(msg) ? compileExpression<string>(msg) : null;
 
-    return (scope) => ({
+    return (env) => ({
       type,
       error: error(
-        resolveMessage ? resolveMessage(scope) : `${msg}`,
+        resolveMessage ? resolveMessage(env) : `${msg}`,
       ),
     });
 
@@ -540,7 +544,7 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 
   const populators = params.map<ArgsLibPopulator>(compileSingle);
 
-  return (input) => populators.reduce<ScopeLib>(
+  return (input) => populators.reduce<EnvLib>(
     (result, populate) => populate(input, result),
     {},
   );
@@ -552,7 +556,7 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 export function compileFunction<V extends AnyFunction = AnyFunction>(
   options: BuildFunctionOptions,
   addToScope: boolean,
-): ScopeBasedResolver<V> {
+): EnvBasedResolver<V> {
 
   const { name, params, body } = options;
 
@@ -561,7 +565,7 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
     : compileParam(params);
   const resolveFuncBody = body ? compileStep(body) : null;
 
-  return (scope): V => {
+  return (env): V => {
 
     if (!resolveFuncBody) {
       return functionReturning() as V;
@@ -569,15 +573,15 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
 
     const func: AnyFunction = (...args: any[]): any => {
 
-      const funcBodyScope = createScope(
-        funcScope,
+      const funcScope = createEnv(
+        outerScope,
         {
           arguments: args,
           ...parseArgs && parseArgs(args),
         },
       );
 
-      const result = resolveFuncBody(funcBodyScope);
+      const result = resolveFuncBody(funcScope);
 
       if (result) {
         if (result.type === "throw") {
@@ -588,7 +592,7 @@ export function compileFunction<V extends AnyFunction = AnyFunction>(
 
     };
 
-    const funcScope = (addToScope && name) ? createScope(scope, { [name]: func }) : scope;
+    const outerScope = (addToScope && name) ? createEnv(env, { [name]: func }) : env;
 
     return func as V;
 
@@ -602,18 +606,18 @@ function compileLogicOperation(
   expressions: MultiTermExpressions,
   compare: (left: any, right: any) => any,
   exit: (value: any) => boolean,
-): ScopeBasedResolver {
+): EnvBasedResolver {
 
   const resolvers = expressions.map(compileExpression);
   const len = resolvers.length;
 
-  return (scope) => {
+  return (env) => {
 
     let result;
 
     for (let i = 0; i < len; i++) {
 
-      const itemResult = resolvers[i](scope);
+      const itemResult = resolvers[i](env);
       result = i ? compare(result, itemResult) : itemResult;
 
       if (exit(result)) {
@@ -639,7 +643,7 @@ function compileExpressionSafe<V extends any = any>(expression: Expression, safe
   const { type } = expression;
 
   const compile = expressionTable[type] as (
-    (expression: Expression, ignoreError?: boolean) => ScopeBasedResolver<V>
+    (expression: Expression, ignoreError?: boolean) => EnvBasedResolver<V>
   ) | undefined;
 
   if (!compile) {
@@ -650,7 +654,7 @@ function compileExpressionSafe<V extends any = any>(expression: Expression, safe
 
 }
 
-export function compileExpression<V extends any = any>(expression: Expression): ScopeBasedResolver<V> {
+export function compileExpression<V extends any = any>(expression: Expression): EnvBasedResolver<V> {
   return compileExpressionSafe(
     expression,
   );
@@ -660,25 +664,25 @@ export function compileExpression<V extends any = any>(expression: Expression): 
 
 export function compileSpreadable<V = any>(
   expressions: SingleOrMulti<SpreadableExpression>,
-): ScopeBasedResolver<V[]> {
+): EnvBasedResolver<V[]> {
 
-  function compileSingle(expression: SpreadableExpression): ScopeBasedPopulator<V[]> {
+  function compileSingle(expression: SpreadableExpression): EnvBasedPopulator<V[]> {
 
     if (expression.type === "spread") {
       const resolveArray = compileExpression<V[]>(expression.exp);
-      return (scope, resolved) => {
+      return (env, resolved) => {
         resolved.push.apply(
           resolved,
-          resolveArray(scope),
+          resolveArray(env),
         );
         return resolved;
       };
     }
 
     const resolveParam = compileExpression(expression);
-    return (scope, resolved) => {
+    return (env, resolved) => {
       resolved.push(
-        resolveParam(scope),
+        resolveParam(env),
       );
       return resolved;
     };
@@ -687,13 +691,13 @@ export function compileSpreadable<V = any>(
 
   if (!isArray(expressions)) {
     const populate = compileSingle(expressions);
-    return (scope) => populate(scope, []);
+    return (env) => populate(env, []);
   }
 
   const populators = expressions.map(compileSingle);
 
-  return (scope) => populators.reduce(
-    (result, populate) => populate(scope, result),
+  return (env) => populators.reduce(
+    (result, populate) => populate(env, result),
     [] as V[],
   );
 
@@ -701,9 +705,9 @@ export function compileSpreadable<V = any>(
 
 // VARIABLE DECLARATION
 
-export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithValue>): ScopeBasedResolver<void> {
+export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithValue>): EnvBasedResolver<void> {
 
-  function compileSingle(set: string | DeclareWithValue): ScopeBasedResolver<void> {
+  function compileSingle(set: string | DeclareWithValue): EnvBasedResolver<void> {
 
     if (!isObj(set)) {
       set = {
@@ -713,16 +717,16 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 
     const { id, value } = set;
 
-    let resolveValue: ScopeBasedResolver | undefined;
+    let resolveValue: EnvBasedResolver | undefined;
     if (value) {
       resolveValue = compileExpression(value);
     }
 
-    return (scope) => {
-      setInScope(
-        scope,
+    return (env) => {
+      setInEnv(
+        env,
         id,
-        resolveValue && resolveValue(scope),
+        resolveValue && resolveValue(env),
       );
     };
 
@@ -732,11 +736,11 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
     return compileSingle(sets);
   }
 
-  const resolvers = sets.map<ScopeBasedResolver<void>>(compileSingle);
+  const resolvers = sets.map<EnvBasedResolver<void>>(compileSingle);
 
-  return (scope) => {
+  return (env) => {
     resolvers.forEach((resolve) => {
-      resolve(scope);
+      resolve(env);
     });
   };
 
@@ -747,21 +751,21 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak: true,
-): ScopeBasedResolver<StepLoopResult>;
+): EnvBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: false | undefined,
-): ScopeBasedResolver<StepNonLoopResult>;
+): EnvBasedResolver<StepNonLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: boolean | undefined,
-): ScopeBasedResolver<StepLoopResult>;
+): EnvBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
   allowBreak?: boolean | undefined,
-): ScopeBasedResolver<StepLoopResult> {
+): EnvBasedResolver<StepLoopResult> {
 
-  function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult> {
+  function compileSingle(step: FunctionStep): EnvBasedResolver<StepLoopResult> {
 
     if (!step || !isObj(step)) {
       throw errorInvalid(step, "step");
@@ -775,8 +779,8 @@ export function compileStep<V = any>(
 
     const resolve = compileExpression(step as Expression);
 
-    return (scope) => {
-      resolve(scope);
+    return (env) => {
+      resolve(env);
     };
 
   }
@@ -787,12 +791,12 @@ export function compileStep<V = any>(
 
   const resolvers = steps.map(compileSingle);
 
-  return (scope): StepLoopResult => {
+  return (env): StepLoopResult => {
 
     for (let i = 0, len = resolvers.length; i < len; i++) {
 
       const resolveStep = resolvers[i];
-      const result = resolveStep(scope);
+      const result = resolveStep(env);
 
       if (result) {
         return result;

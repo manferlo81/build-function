@@ -76,7 +76,7 @@ return true;
 
 ### Get Expression
 
-It gets a value of the variable identified by the `id` from the current virtual scope. If the variable if not found it will throw, unless it is inside a `typeof` transform operation.
+It gets a value of the variable identified by the `id` from the current environment. If the variable if not found, it will throw, unless it is inside a `typeof` transform operation.
 
 ***syntax***
 
@@ -105,11 +105,11 @@ interface GetExpression {
 return expression;
 ```
 
-*... if `expression` is not present in the current virtual scope, it will throw.*
+*... if `expression` is not present in the current environment, it will throw.*
 
 ### Set Expression
 
-It sets a value to the variable identified by the `id` in the current virtual scope. If the variable has not been declared prevoiusly it will throw.
+It sets a value to the variable identified by the `id` in the current environment. If the variable has not been declared prevoiusly it will throw.
 
 ***syntax***
 
@@ -143,7 +143,7 @@ interface SetExpression {
 return result = 10;
 ```
 
-*... if `result` is not present in the current virtual scope, it will throw.*
+*... if `result` is not present in the current environment, it will throw.*
 
 ### Ternary Expression
 
@@ -419,43 +419,9 @@ return func(100, ...others);
 
 ## Function Steps
 
-### Declare Variable Statement
-
-Declares variables into the current virtual scope. It has been deprecated, use [`let` statement](#let-statement) instead.
-
-***syntax***
-
-```typescript
-interface DeclareStatement {
-  type: "declare";
-  set: string | DeclareWithValue | Array<string | DeclareWithValue>;
-}
-```
-
-***example***
-
-```json
-{
-  "type": "declare",
-  "set": [
-    "a",
-    {
-      "id": "b",
-      "value": 10
-    }
-  ]
-}
-```
-
-*... is equivalent to...*
-
-```javascript
-let a, b = 10;
-```
-
 ### `let` Statement
 
-Declares variables into the current virtual scope.
+Declares variables into the current environment.
 
 ***syntax***
 
@@ -470,6 +436,14 @@ interface DeclareWithValue {
   value?: Expression;
 }
 ```
+
+**`type`**
+
+Always `"let"`, it's what identifies a `let` statement from other statements and expressions.
+
+**`declare`**
+
+An `id`, `id-value-pair` or series of them in an array to be declared into the current environment.
 
 ***example***
 
@@ -506,6 +480,22 @@ interface IfStatement {
   otherwise?: FunctionStep | FunctionStep[];
 }
 ```
+
+**`type`**
+
+Always `"if"`, it's what identifies an `if` statement from other statements and expressions.
+
+**`condition`**
+
+Expression which result will be used as condition for the `if` statement.
+
+**`then`**
+
+A optional step or series of steps to be executed if `condition` resolves to a truthy value.
+
+**`otherwise`**
+
+A optional step or series of steps to be executed if `condition` resolves to a falsy value.
 
 ***example***
 
@@ -569,15 +559,15 @@ Expression resolving to an array-like object, which `length` property will be us
 
 **`index`**
 
-Optional `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered.
+Optional `id` to be registered inside the loop body environment containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
 **`value`**
 
-Optional `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered.
+Optional `id` to be registered inside the loop body environment containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
 **`body`**
 
-The loop body.
+A step or series of steps to be executed for every iteration.
 
 ***example***
 
@@ -630,6 +620,10 @@ interface BreakStatement {
 }
 ```
 
+**`type`**
+
+Always `"break"`, it's what identifies a `break` statement from other statements and expressions.
+
 ### `return` Statement
 
 It represents a `return` statement.
@@ -642,6 +636,14 @@ interface ReturnStatement {
   value: Expression;
 }
 ```
+
+**`type`**
+
+Always `"return"`, it's what identifies a `return` statement from other statements and expressions.
+
+**`value`**
+
+Expression which result will be used as `return` value.
 
 ***example***
 
@@ -673,6 +675,14 @@ interface ThrowStatement {
   msg: string | Expression;
 }
 ```
+
+**`type`**
+
+Always `"throw"`, it's what identifies a `throw` statement from other statements and expressions.
+
+**`msg`**
+
+A string or Expression resolving to a string to be used as `Error` message.
 
 ***example***
 

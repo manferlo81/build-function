@@ -1,4 +1,4 @@
-import { compileStep, createScope, FunctionCallExpression } from "../../src";
+import { compileStep, createEnv, FunctionCallExpression } from "../../src";
 import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call expression step", () => {
@@ -12,11 +12,11 @@ describe("call expression step", () => {
 
     const func = jest.fn();
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       func,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
     expect(func).toHaveBeenCalledTimes(1);
@@ -34,11 +34,11 @@ describe("call expression step", () => {
 
     const func = jest.fn(() => "ignored");
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       func,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
     expect(func).toHaveBeenCalledTimes(1);

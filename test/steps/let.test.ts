@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createScope, LetStatement } from "../../src";
+import { compileExpression, compileStep, createEnv, LetStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("let statement step", () => {
@@ -23,14 +23,14 @@ describe("let statement step", () => {
       $get("value"),
     );
 
-    const scope = createScope(null);
+    const env = createEnv(null);
 
-    expect(() => getValue(scope)).toThrow();
+    expect(() => getValue(env)).toThrow();
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue(scope)).toBe(true);
+    expect(getValue(env)).toBe(true);
 
   });
 
@@ -52,16 +52,16 @@ describe("let statement step", () => {
       $get("value2"),
     );
 
-    const scope = createScope(null);
+    const env = createEnv(null);
 
-    expect(() => getValue1(scope)).toThrow();
-    expect(() => getValue2(scope)).toThrow();
+    expect(() => getValue1(env)).toThrow();
+    expect(() => getValue2(env)).toThrow();
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue1(scope)).toBe(true);
-    expect(getValue2(scope)).toBe(true);
+    expect(getValue1(env)).toBe(true);
+    expect(getValue2(env)).toBe(true);
 
   });
 
@@ -83,13 +83,13 @@ describe("let statement step", () => {
       $get("value2"),
     );
 
-    const scope = createScope(null);
+    const env = createEnv(null);
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue1(scope)).toBeUndefined();
-    expect(getValue2(scope)).toBeUndefined();
+    expect(getValue1(env)).toBeUndefined();
+    expect(getValue2(env)).toBeUndefined();
 
   });
 

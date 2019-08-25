@@ -1,4 +1,4 @@
-import { compileExpression, createScope, Scope } from "../src";
+import { compileExpression, createEnv, LexicalEnvironment } from "../src";
 import { $get } from "./helpers/expressions";
 import { rand } from "./helpers/number";
 
@@ -9,33 +9,33 @@ describe("create scope", () => {
     const a = rand(0, 10);
     const b = rand(0, 10);
 
-    const scope = createScope(null, { a, b });
+    const env = createEnv(null, { a, b });
 
-    const get = (id: string, getScope: Scope) => compileExpression(
+    const get = (id: string, getScope: LexicalEnvironment) => compileExpression(
       $get(id),
     )(getScope);
 
-    expect(get("a", scope)).toBe(a);
-    expect(get("b", scope)).toBe(b);
+    expect(get("a", env)).toBe(a);
+    expect(get("b", env)).toBe(b);
 
   });
 
-  test("should set parent scope scope", () => {
+  test("should set parent environment", () => {
 
     const a = rand(0, 10);
     const b = rand(0, 10);
 
-    const parent = createScope(null, { a });
-    const scope = createScope(parent, { b });
+    const parent = createEnv(null, { a });
+    const env = createEnv(parent, { b });
 
-    expect(scope.parent).toBe(parent);
+    expect(env.parent).toBe(parent);
 
-    const get = (id: string, getScope: Scope) => compileExpression(
+    const get = (id: string, getScope: LexicalEnvironment) => compileExpression(
       $get(id),
     )(getScope);
 
-    expect(get("a", scope)).toBe(a);
-    expect(get("b", scope)).toBe(b);
+    expect(get("a", env)).toBe(a);
+    expect(get("b", env)).toBe(b);
 
   });
 
@@ -48,14 +48,14 @@ describe("create scope", () => {
       { b },
     );
 
-    const scope = createScope(null, lib);
+    const env = createEnv(null, lib);
 
-    const get = (id: string, getScope: Scope) => compileExpression(
+    const get = (id: string, getScope: LexicalEnvironment) => compileExpression(
       $get(id),
     )(getScope);
 
-    expect(() => get("a", scope)).toThrow();
-    expect(get("b", scope)).toBe(b);
+    expect(() => get("a", env)).toThrow();
+    expect(get("b", env)).toBe(b);
 
   });
 

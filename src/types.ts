@@ -271,26 +271,26 @@ export type StepLoopResult =
   | "break"
   | StepNonLoopResult;
 
-// SCOPE
+// LEXICAL ENVIRONMENT
 
-export type ScopeLib = Record<string, any>;
+export type EnvLib = Record<string, any>;
 
-export interface Scope extends ScopeLib {
-  parent?: Scope;
+export interface LexicalEnvironment extends EnvLib {
+  parent?: LexicalEnvironment;
 }
 
-export interface ScopeValue<V> {
-  scope: Scope;
+export interface EnvValue<V> {
+  env: LexicalEnvironment;
   id: string;
   value: V;
 }
 
 // GENERAL
 
-export type ScopeBasedPopulator<R> = (scope: Scope, target: R) => R;
-export type ScopeBasedResolver<V extends any = any> = (scope: Scope) => V;
-export type ArgsLibPopulator = (input: any[], lib: ScopeLib) => ScopeLib;
-export type InputArgsParser = (input: any[]) => ScopeLib;
+export type EnvBasedPopulator<R> = (env: LexicalEnvironment, target: R) => R;
+export type EnvBasedResolver<V extends any = any> = (env: LexicalEnvironment) => V;
+export type ArgsLibPopulator = (input: any[], lib: EnvLib) => EnvLib;
+export type InputArgsParser = (input: any[]) => EnvLib;
 
 export type StepCompiler<S extends FunctionStep> =
-  (step: S, allowBreak?: boolean) => ScopeBasedResolver<StepLoopResult>;
+  (step: S, allowBreak?: boolean) => EnvBasedResolver<StepLoopResult>;

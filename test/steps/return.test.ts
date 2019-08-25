@@ -1,4 +1,4 @@
-import { compileStep, createScope, ReturnStatement } from "../../src";
+import { compileStep, createEnv, ReturnStatement } from "../../src";
 import { $get } from "../helpers/expressions";
 
 describe("return statement step", () => {
@@ -27,11 +27,11 @@ describe("return statement step", () => {
 
     const resolve = compileStep(step);
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       value: "result",
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toEqual({ type: "return", value: "result" });
 

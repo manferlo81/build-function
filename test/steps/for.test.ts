@@ -1,4 +1,4 @@
-import { compileStep, createScope, ForStatement } from "../../src";
+import { compileStep, createEnv, ForStatement } from "../../src";
 import { $call, $get, $if, $literal, $oper, $return } from "../helpers/expressions";
 
 describe("for statement step", () => {
@@ -37,9 +37,9 @@ describe("for statement step", () => {
     const resolve = compileStep(step);
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const env = createEnv(null, { func });
 
-    expect(resolve(scope)).toBeUndefined();
+    expect(resolve(env)).toBeUndefined();
 
     expect(func).toHaveBeenCalledTimes(len);
     for (let i = 0; i < len; i++) {
@@ -69,9 +69,9 @@ describe("for statement step", () => {
     const resolve = compileStep(step);
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const env = createEnv(null, { func });
 
-    expect(resolve(scope)).toBeUndefined();
+    expect(resolve(env)).toBeUndefined();
 
     expect(func).toHaveBeenCalledTimes(len);
     for (let i = 0; i < len; i++) {
@@ -125,9 +125,9 @@ describe("for statement step", () => {
     const resolve = compileStep(step);
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const env = createEnv(null, { func });
 
-    expect(resolve(scope)).toBeUndefined();
+    expect(resolve(env)).toBeUndefined();
 
     expect(func).toHaveBeenCalledTimes(interruptIndex);
     for (let i = 0; i < interruptIndex; i++) {
@@ -168,9 +168,9 @@ describe("for statement step", () => {
     const resolve = compileStep(step);
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const env = createEnv(null, { func });
 
-    expect(resolve(scope)).toEqual({
+    expect(resolve(env)).toEqual({
       type: "return",
       value: "result",
     });
@@ -193,9 +193,9 @@ describe("for statement step", () => {
 
     const resolve = compileStep(step);
 
-    const scope = createScope(null);
+    const env = createEnv(null);
 
-    expect(() => resolve(scope)).not.toThrow();
+    expect(() => resolve(env)).not.toThrow();
 
   });
 

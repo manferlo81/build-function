@@ -1,4 +1,4 @@
-import { compileExpression, createScope, FunctionCallExpression } from "../../src";
+import { compileExpression, createEnv, FunctionCallExpression } from "../../src";
 import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call expression", () => {
@@ -21,11 +21,11 @@ describe("call expression", () => {
     const returnValue = "ok";
     const func = jest.fn(() => returnValue);
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       func,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(func).toHaveBeenCalledTimes(1);
     expect(result).toBe(returnValue);
@@ -49,11 +49,11 @@ describe("call expression", () => {
 
     const func = jest.fn((x, y, z) => (x + y + z));
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       func,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(func).toHaveBeenCalledTimes(1);
     expect(func).toHaveBeenCalledWith(a, b, c);
@@ -72,11 +72,11 @@ describe("call expression", () => {
       return true;
     });
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       func,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(func).toHaveBeenCalledTimes(1);
     expect(func).toHaveBeenCalledWith();

@@ -1,4 +1,4 @@
-import { compileExpression, compileStep, createScope, OperationExpression } from "../../src";
+import { compileExpression, compileStep, createEnv, OperationExpression } from "../../src";
 import { $get, $literal, $oper, $set } from "../helpers/expressions";
 
 describe("operation expression step", () => {
@@ -19,16 +19,16 @@ describe("operation expression step", () => {
       $get("value"),
     );
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       value: 0,
     });
 
-    expect(getValue(scope)).toBe(0);
+    expect(getValue(env)).toBe(0);
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue(scope)).toBe(100);
+    expect(getValue(env)).toBe(100);
 
   });
 
@@ -48,16 +48,16 @@ describe("operation expression step", () => {
       $get("value"),
     );
 
-    const scope = createScope(null, {
+    const env = createEnv(null, {
       value: 0,
     });
 
-    expect(getValue(scope)).toBe(0);
+    expect(getValue(env)).toBe(0);
 
-    const result = resolve(scope);
+    const result = resolve(env);
 
     expect(result).toBeUndefined();
-    expect(getValue(scope)).toBe(100);
+    expect(getValue(env)).toBe(100);
 
   });
 

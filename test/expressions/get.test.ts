@@ -1,4 +1,4 @@
-import { compileExpression, createScope, GetExpression, Scope } from "../../src";
+import { compileExpression, createEnv, GetExpression } from "../../src";
 import { $get } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -27,11 +27,11 @@ describe("get expression", () => {
     const resolve = compileExpression(expression);
 
     const value = rand(1, 100);
-    const scope: Scope = createScope(null, {
+    const env = createEnv(null, {
       [getId]: value,
     });
 
-    const result = resolve(scope);
+    const result = resolve(env);
     expect(result).toBe(value);
 
   });
@@ -41,9 +41,9 @@ describe("get expression", () => {
     const expression: GetExpression = $get("value");
     const resolve = compileExpression(expression);
 
-    const scope: Scope = createScope(null);
+    const env = createEnv(null);
 
-    expect(() => resolve(scope)).toThrow();
+    expect(() => resolve(env)).toThrow();
 
   });
 
