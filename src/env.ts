@@ -19,7 +19,7 @@ export function createEnv(parent: LexicalEnvironment | null, lib?: EnvLib | null
 
 }
 
-export function findInEnv<V = any>(env: LexicalEnvironment, id: string): EnvValue<V> | void {
+export function findInEnv<V = any>(env: LexicalEnvironment, id: string, topOnly?: boolean): EnvValue<V> | void {
 
   const tid = pre + id;
 
@@ -33,6 +33,10 @@ export function findInEnv<V = any>(env: LexicalEnvironment, id: string): EnvValu
         id: tid,
         value: current[tid],
       };
+    }
+
+    if (topOnly) {
+      return;
     }
 
     current = current.parent;

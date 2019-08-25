@@ -723,6 +723,17 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
     }
 
     return (env) => {
+
+      if (
+        findInEnv(
+          env,
+          id,
+          true,
+        )
+      ) {
+        throw error(`"${id}" has already been declared in this scope`);
+      }
+
       setInEnv(
         env,
         id,

@@ -93,4 +93,19 @@ describe("let statement step", () => {
 
   });
 
+  test("should throw if already been declared", () => {
+
+    const step: LetStatement = {
+      type: "let",
+      declare: "value1",
+    };
+    const resolve = compileStep(step);
+
+    const env = createEnv(null);
+
+    resolve(env);
+    expect(() => resolve(env)).toThrow();
+
+  });
+
 });
