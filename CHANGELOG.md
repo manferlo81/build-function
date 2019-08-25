@@ -9,6 +9,7 @@
 * `typeof` transform operation is safe to get not-in-scope variables
 * better error checking
 * dependencies updated
+* deprecated `declare` statement in favor of newly added `let` statement
 
 ## 0.0.1
 

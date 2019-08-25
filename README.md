@@ -421,7 +421,7 @@ return func(100, ...others);
 
 ### Declare Variable Statement
 
-Declares variables into the current virtual scope.
+Declares variables into the current virtual scope. It has been deprecated, use [`let` statement](#let-statement) instead.
 
 ***syntax***
 
@@ -453,7 +453,46 @@ interface DeclareStatement {
 let a, b = 10;
 ```
 
-### If Statement
+### `let` Statement
+
+Declares variables into the current virtual scope.
+
+***syntax***
+
+```typescript
+interface LetStatement {
+  type: "let";
+  declare: string | DeclareWithValue | Array<string | DeclareWithValue>;
+}
+
+interface DeclareWithValue {
+  id: string;
+  value?: Expression;
+}
+```
+
+***example***
+
+```json
+{
+  "type": "let",
+  "declare": [
+    "a",
+    {
+      "id": "b",
+      "value": 10
+    }
+  ]
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+let a, b = 10;
+```
+
+### `if` Statement
 
 Declares an `if` statement.
 
@@ -504,7 +543,7 @@ if (test) {
 }
 ```
 
-### For Statement
+### `for` Statement
 
 Declares a `for` loop.
 
@@ -519,6 +558,26 @@ interface ForStatement {
   body: FunctionStep | FunctionStep[];
 }
 ```
+
+**`type`**
+
+Always `"for"`, it's what identifies a `for` statement from other statements and expressions.
+
+**`target`**
+
+Expression resolving to an array-like object, which `length` property will be used for the loop.
+
+**`index`**
+
+Optional `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered.
+
+**`value`**
+
+Optional `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered.
+
+**`body`**
+
+The loop body.
 
 ***example***
 
@@ -559,7 +618,7 @@ for (let i = 0; i < array.length; i++) {
 }
 ```
 
-### Break Statement
+### `break` Statement
 
 Declares a `break` statement, it will throw at build time if used outside a loop.
 
@@ -571,7 +630,7 @@ interface BreakStatement {
 }
 ```
 
-### Return Statement
+### `return` Statement
 
 It represents a `return` statement.
 
@@ -602,7 +661,7 @@ interface ReturnStatement {
 return result;
 ```
 
-### Throw Statement
+### `throw` Statement
 
 It represents a `throw` statement.
 

@@ -1,28 +1,21 @@
-import { compileExpression, compileStep, createScope, DeprecatedDeclareStatement } from "../../src";
+import { compileExpression, compileStep, createScope, LetStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
-describe("declare statement step", () => {
+describe("let statement step", () => {
 
-  test("should throw on invalid declare statement step", () => {
+  test("should throw on invalid let statement step", () => {
 
-    const base = { type: "declare" };
-    const invalid = [
-      base,
-    ];
+    const invalid = { type: "let" };
 
-    invalid.forEach((step) => {
-
-      expect(() => compileStep(step as any)).toThrow();
-
-    });
+    expect(() => compileStep(invalid as any)).toThrow();
 
   });
 
-  test("should compile single declare statement step with single value", () => {
+  test("should compile single let statement step with single value", () => {
 
-    const step: DeprecatedDeclareStatement = {
-      type: "declare",
-      set: { id: "value", value: $literal(true) },
+    const step: LetStatement = {
+      type: "let",
+      declare: { id: "value", value: $literal(true) },
     };
     const resolve = compileStep(step);
 
@@ -41,11 +34,11 @@ describe("declare statement step", () => {
 
   });
 
-  test("should compile multiple declare statement step with multiple values", () => {
+  test("should compile multiple let statement step with multiple values", () => {
 
-    const step: DeprecatedDeclareStatement = {
-      type: "declare",
-      set: [
+    const step: LetStatement = {
+      type: "let",
+      declare: [
         { id: "value1", value: $literal(true) },
         { id: "value2", value: $literal(true) },
       ],
@@ -72,11 +65,11 @@ describe("declare statement step", () => {
 
   });
 
-  test("should compile declare statement step without value", () => {
+  test("should compile let statement step without value", () => {
 
-    const step: DeprecatedDeclareStatement = {
-      type: "declare",
-      set: [
+    const step: LetStatement = {
+      type: "let",
+      declare: [
         "value1",
         "value2",
       ],

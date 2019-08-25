@@ -191,10 +191,16 @@ export type SpreadableExpression = Expression | SpreadExpression;
 
 // STATEMENTS
 
-export interface DeclareStatement extends
+export interface DeprecatedDeclareStatement extends
   WithType<"declare"> {
 
   set: SingleOrMulti<string | DeclareWithValue>;
+}
+
+export interface LetStatement extends
+  WithType<"let"> {
+
+  declare: SingleOrMulti<string | DeclareWithValue>;
 }
 
 export interface IfStatement extends
@@ -229,7 +235,8 @@ export interface ThrowStatement extends
 }
 
 export type Statement =
-  | DeclareStatement
+  | DeprecatedDeclareStatement
+  | LetStatement
   | IfStatement
   | ForStatement
   | BreakStatement

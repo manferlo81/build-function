@@ -359,6 +359,20 @@ const stepTable: StatementLookupTable = {
 
   },
 
+  let(step) {
+
+    if (!hasOwn.call(step, "declare")) {
+      throw errorRequired2("declare", "let");
+    }
+
+    const resolve = compileVarDeclaration(step.declare);
+
+    return (scope) => {
+      resolve(scope);
+    };
+
+  },
+
   if(step, allowBreak) {
 
     if (!hasOwn.call(step, "condition")) {
