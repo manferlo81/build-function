@@ -1,7 +1,7 @@
 import { hasOwn } from "./helpers";
 import { Scope, ScopeLib, ScopeValue } from "./types";
 
-const pre = "$_";
+const pre = "0$_";
 
 export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope {
 

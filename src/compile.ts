@@ -6,7 +6,6 @@ import { isArray, isObj } from "./type-check";
 import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
 import {
   ArgsLibPopulator,
-  DeclareWithValue,
   Expression,
   FunctionOptions,
   FunctionParameter,
@@ -25,6 +24,7 @@ import {
   StepCompiler,
   StepLoopResult,
   StepNonLoopResult,
+  VariableDeclaration,
 } from "./types";
 
 // LOOKUP TABLES
@@ -57,7 +57,7 @@ const paramTable: Record<
 
 };
 
-const specialOperationTable: Record<
+const specialOperTable: Record<
   SpecialOperator,
   (resolvers: ScopeBasedResolver[]) => ScopeBasedResolver
 > = {
@@ -132,7 +132,7 @@ const specialOperationTable: Record<
 
 };
 
-const operationReducerTable: Record<
+const operTable: Record<
   RegularOperator,
   (total: any, value: any) => any
 > = {
@@ -165,38 +165,38 @@ const operationReducerTable: Record<
   "<=": (total, value) => (total <= value),
 };
 
-const transformTable: Record<RegularTransformOperator, (value: any) => any> = {
+const transTable: Record<RegularTransformOperator, (value: any) => any> = {
   "!": (value) => !value,
   "!!": (value) => !!value,
   // tslint:disable-next-line: no-bitwise
   "~": (value) => ~value,
 };
 
-const expressionTable: ExpressionLookupTable = {
+const expTable: ExpressionLookupTable = {
 
-  literal(expression) {
+  literal(exp) {
 
-    if (!hasOwn.call(expression, "value")) {
+    if (!hasOwn.call(exp, "value")) {
       throw errorRequired("value", "literal");
     }
 
     return functionReturning(
-      expression.value,
+      exp.value,
     );
 
   },
 
-  get(expression, safe) {
+  get(exp, safe) {
 
-    if (!hasOwn.call(expression, "id")) {
+    if (!hasOwn.call(exp, "id")) {
       throw errorRequired("id", "get");
     }
 
-    if (typeof expression.id !== "string") {
+    if (typeof exp.id !== "string") {
       throw error('A "get" expression "id" must be a string');
     }
 
-    const { id } = expression;
+    const { id } = exp;
 
     return (scope) => {
 
@@ -215,22 +215,22 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  set(expression) {
+  set(exp) {
 
-    if (!hasOwn.call(expression, "id")) {
+    if (!hasOwn.call(exp, "id")) {
       throw errorRequired("id", "set");
     }
 
-    if (!hasOwn.call(expression, "value")) {
+    if (!hasOwn.call(exp, "value")) {
       throw errorRequired("value", "set");
     }
 
-    if (typeof expression.id !== "string") {
+    if (typeof exp.id !== "string") {
       throw error('A "set" expression "id" must be a string');
     }
 
-    const { id } = expression;
-    const resolveValue = compileExp(expression.value);
+    const { id } = exp;
+    const resolveValue = compileExp(exp.value);
 
     return (scope) => {
 
@@ -246,16 +246,16 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  call(expression) {
+  call(exp) {
 
-    if (!hasOwn.call(expression, "func")) {
+    if (!hasOwn.call(exp, "func")) {
       throw errorRequired("func", "call");
     }
 
-    const { args } = expression;
+    const { args } = exp;
 
-    const resolveFunc = compileExp<AnyFunction>(expression.func);
-    const resolveArgs = args ? compileSpreadable(args) : null;
+    const resolveFunc = compileExp<AnyFunction>(exp.func);
+    const resolveArgs = args ? compileSpread(args) : null;
 
     return (scope) => {
 
@@ -273,23 +273,23 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  ternary(expression) {
+  ternary(exp) {
 
-    if (!hasOwn.call(expression, "condition")) {
+    if (!hasOwn.call(exp, "condition")) {
       throw errorRequired("condition", "ternary");
     }
 
-    if (!hasOwn.call(expression, "then")) {
+    if (!hasOwn.call(exp, "then")) {
       throw errorRequired("then", "ternary");
     }
 
-    if (!hasOwn.call(expression, "otherwise")) {
+    if (!hasOwn.call(exp, "otherwise")) {
       throw errorRequired("otherwise", "ternary");
     }
 
-    const resolveCondition = compileExp(expression.condition);
-    const resolveThen = compileExp(expression.then);
-    const resolveOtherwise = compileExp(expression.otherwise);
+    const resolveCondition = compileExp(exp.condition);
+    const resolveThen = compileExp(exp.then);
+    const resolveOtherwise = compileExp(exp.otherwise);
 
     return (scope) => resolveCondition(scope)
       ? resolveThen(scope)
@@ -297,31 +297,31 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  oper(expression) {
+  oper(exp) {
 
-    if (!hasOwn.call(expression, "oper")) {
+    if (!hasOwn.call(exp, "oper")) {
       throw errorRequired("oper", "oper");
     }
 
-    if (!hasOwn.call(expression, "exp")) {
+    if (!hasOwn.call(exp, "exp")) {
       throw errorRequired("exp", "oper");
     }
 
-    const { exp, oper } = expression;
+    const { exp: operExps, oper } = exp;
 
-    if (exp.length < 2) {
+    if (operExps.length < 2) {
       throw error("not enought operands");
     }
 
-    const resolvers = exp.map(compileExp);
+    const resolvers = compileExp(operExps);
 
-    const reduceResolvers = specialOperationTable[oper as SpecialOperator];
+    const reduceResolvers = specialOperTable[oper as SpecialOperator];
 
     if (reduceResolvers) {
       return reduceResolvers(resolvers);
     }
 
-    const reduce = operationReducerTable[oper as RegularArithmeticOperator];
+    const reduce = operTable[oper as RegularArithmeticOperator];
 
     if (!reduce) {
       throw errorInvalidType(oper, "operation");
@@ -338,19 +338,19 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  trans(expression) {
+  trans(exp) {
 
-    if (!hasOwn.call(expression, "oper")) {
+    if (!hasOwn.call(exp, "oper")) {
       throw errorRequired("oper", "trans");
     }
 
-    if (!hasOwn.call(expression, "exp")) {
+    if (!hasOwn.call(exp, "exp")) {
       throw errorRequired("exp", "trans");
     }
 
-    if (expression.oper === "typeof") {
+    if (exp.oper === "typeof") {
 
-      const resolveSafe = compileExpSafe(expression.exp, true);
+      const resolveSafe = compileExp(exp.exp, true);
 
       return (scope) => {
         const value = resolveSafe(scope);
@@ -359,13 +359,13 @@ const expressionTable: ExpressionLookupTable = {
 
     }
 
-    const transform = transformTable[expression.oper];
+    const transform = transTable[exp.oper];
 
     if (!transform) {
-      throw errorInvalidType(expression.oper, "transform operation");
+      throw errorInvalidType(exp.oper, "transform operation");
     }
 
-    const resolve = compileExp(expression.exp);
+    const resolve = compileExp(exp.exp);
 
     return (scope) => {
       return transform(
@@ -375,10 +375,10 @@ const expressionTable: ExpressionLookupTable = {
 
   },
 
-  func(expression) {
+  func(exp) {
 
     return compileFunc(
-      expression,
+      exp,
     ) as any;
 
   },
@@ -393,7 +393,7 @@ const stepTable: StatementLookupTable = {
       throw errorRequired2("set", "declare");
     }
 
-    const resolve = compileVarDeclaration(step.set);
+    const resolve = compileDecl(step.set);
 
     return (scope) => {
       resolve(scope);
@@ -407,7 +407,7 @@ const stepTable: StatementLookupTable = {
       throw errorRequired2("declare", "let");
     }
 
-    const resolve = compileVarDeclaration(step.declare);
+    const resolve = compileDecl(step.declare);
 
     return (scope) => {
       resolve(scope);
@@ -550,15 +550,15 @@ const stepTable: StatementLookupTable = {
 
 // PARAMS
 
-export function compileParam(params: FunctionParameter | FunctionParameter[]): InputArgsParser {
+function compileParam(params: FunctionParameter | FunctionParameter[]): InputArgsParser {
 
-  function compileSingle(param: FunctionParameter, index: number): ArgsLibPopulator {
+  function compileSingle(single: FunctionParameter, index: number): ArgsLibPopulator {
 
-    if (!isObj(param)) {
-      param = { id: param, type: "param" };
+    if (!isObj(single)) {
+      single = { id: single, type: "param" };
     }
 
-    const { id } = param;
+    const { id } = single;
 
     if (typeof id !== "string") {
       throw errorInvalid(id, "parameter id");
@@ -568,10 +568,10 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
       throw error("\"arguments\" can't be used as parameter id");
     }
 
-    const compileGetter = paramTable[param.type];
+    const compileGetter = paramTable[single.type];
 
     if (!compileGetter) {
-      throw errorInvalidType(param.type, "parameter");
+      throw errorInvalidType(single.type, "parameter");
     }
 
     const getValue = compileGetter(index);
@@ -665,42 +665,50 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
 // EXPRESSION
 
-function compileExpSafe<V extends any = any>(expression: Expression, safe?: boolean) {
+export function compileExp<V extends any = any>(exp: Expression, safe?: boolean): ScopeBasedResolver<V>;
+export function compileExp<V extends any = any>(exp: Expression[], safe?: boolean): Array<ScopeBasedResolver<V>>;
 
-  if (!expression || !isObj(expression)) {
-    throw errorInvalid(expression, "expression");
+export function compileExp<V extends any = any>(
+  exp: SingleOrMulti<Expression>,
+  safe?: boolean,
+): SingleOrMulti<ScopeBasedResolver<V>> {
+
+  function compileSingle(single: Expression) {
+
+    if (!single || !isObj(single)) {
+      throw errorInvalid(single, "expression");
+    }
+
+    const { type } = single;
+
+    const compile = expTable[type] as (
+      (expression: Expression, safe?: boolean) => ScopeBasedResolver<V>
+    ) | undefined;
+
+    if (!compile) {
+      throw errorInvalidType(type, "expression");
+    }
+
+    return compile(single, safe);
+
   }
 
-  const { type } = expression;
-
-  const compile = expressionTable[type] as (
-    (expression: Expression, ignoreError?: boolean) => ScopeBasedResolver<V>
-  ) | undefined;
-
-  if (!compile) {
-    throw errorInvalidType(type, "expression");
+  if (!isArray(exp)) {
+    return compileSingle(exp);
   }
 
-  return compile(expression, safe);
+  return exp.map(compileSingle);
 
-}
-
-export function compileExp<V extends any = any>(expression: Expression): ScopeBasedResolver<V> {
-  return compileExpSafe(
-    expression,
-  );
 }
 
 // SPREADABLE
 
-export function compileSpreadable<V = any>(
-  expressions: SingleOrMulti<SpreadableExpression>,
-): ScopeBasedResolver<V[]> {
+function compileSpread<V = any>(exp: SingleOrMulti<SpreadableExpression>): ScopeBasedResolver<V[]> {
 
-  function compileSingle(expression: SpreadableExpression): ScopeBasedPopulator<V[]> {
+  function compileSingle(single: SpreadableExpression): ScopeBasedPopulator<V[]> {
 
-    if (expression.type === "spread") {
-      const resolveArray = compileExp<V[]>(expression.exp);
+    if (single.type === "spread") {
+      const resolveArray = compileExp<V[]>(single.exp);
       return (scope, resolved) => {
         resolved.push.apply(
           resolved,
@@ -710,7 +718,7 @@ export function compileSpreadable<V = any>(
       };
     }
 
-    const resolveParam = compileExp(expression);
+    const resolveParam = compileExp(single);
     return (scope, resolved) => {
       resolved.push(
         resolveParam(scope),
@@ -720,12 +728,12 @@ export function compileSpreadable<V = any>(
 
   }
 
-  if (!isArray(expressions)) {
-    const populate = compileSingle(expressions);
+  if (!isArray(exp)) {
+    const populate = compileSingle(exp);
     return (scope) => populate(scope, []);
   }
 
-  const populators = expressions.map(compileSingle);
+  const populators = exp.map(compileSingle);
 
   return (scope) => populators.reduce(
     (result, populate) => populate(scope, result),
@@ -736,9 +744,9 @@ export function compileSpreadable<V = any>(
 
 // VARIABLE DECLARATION
 
-export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithValue>): ScopeBasedResolver<void> {
+function compileDecl(declare: SingleOrMulti<VariableDeclaration>): ScopeBasedResolver<void> {
 
-  function compileSingle(set: string | DeclareWithValue): ScopeBasedResolver<void> {
+  function compileSingle(set: VariableDeclaration): ScopeBasedResolver<void> {
 
     if (!isObj(set)) {
       set = {
@@ -774,11 +782,11 @@ export function compileVarDeclaration(sets: SingleOrMulti<string | DeclareWithVa
 
   }
 
-  if (!isArray(sets)) {
-    return compileSingle(sets);
+  if (!isArray(declare)) {
+    return compileSingle(declare);
   }
 
-  const resolvers = sets.map<ScopeBasedResolver<void>>(compileSingle);
+  const resolvers = declare.map<ScopeBasedResolver<void>>(compileSingle);
 
   return (scope) => {
     resolvers.forEach((resolve) => {

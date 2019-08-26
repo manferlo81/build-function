@@ -43,6 +43,8 @@ export interface DeclareWithValue extends
   Partial<WithValue<Expression>> {
 }
 
+export type VariableDeclaration = string | DeclareWithValue;
+
 // FUNCTION OPTIONS
 
 export interface FunctionOptions {
@@ -197,13 +199,13 @@ export type SpreadableExpression = Expression | SpreadExpression;
 export interface DeprecatedDeclareStatement extends
   WithType<"declare"> {
 
-  set: SingleOrMulti<string | DeclareWithValue>;
+  set: SingleOrMulti<VariableDeclaration>;
 }
 
 export interface LetStatement extends
   WithType<"let"> {
 
-  declare: SingleOrMulti<string | DeclareWithValue>;
+  declare: SingleOrMulti<VariableDeclaration>;
 }
 
 export interface IfStatement extends
