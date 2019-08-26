@@ -12,7 +12,6 @@ import {
   FunctionParameter,
   FunctionStep,
   InputArgsParser,
-  MultiTermExpressions,
   ParameterType,
   RegularArithmeticOperator,
   RegularOperator,
@@ -60,34 +59,73 @@ const paramTable: Record<
 
 const specialOperationTable: Record<
   SpecialOperator,
-  (expressions: MultiTermExpressions) => ScopeBasedResolver
+  (resolvers: ScopeBasedResolver[]) => ScopeBasedResolver
 > = {
 
-  "||": (expressions) => compileLogic(
-    expressions,
-    (left, right) => (left || right),
-    (value) => value,
-  ),
+  "||": (resolvers) => {
 
-  "&&": (expressions) => compileLogic(
-    expressions,
-    (left, right) => (left && right),
-    (value) => !value,
-  ),
+    const len = resolvers.length;
 
-  "**": (expressions) => {
+    return (scope) => {
 
-    const resolvers = expressions.map(compileExp);
+      let result;
+
+      for (let i = 0; i < len; i++) {
+
+        result = resolvers[i](scope);
+
+        if (result) {
+          break;
+        }
+
+      }
+
+      return result;
+
+    };
+
+  },
+
+  "&&": (resolvers) => {
+
+    const len = resolvers.length;
+
+    return (scope) => {
+
+      let result;
+
+      for (let i = 0; i < len; i++) {
+
+        result = resolvers[i](scope);
+
+        if (!result) {
+          break;
+        }
+
+      }
+
+      return result;
+
+    };
+
+  },
+
+  "**": (resolvers) => {
+
     const resolveLast = resolvers.pop() as ScopeBasedResolver;
 
     return (scope) => {
+
       let result = resolveLast(scope);
       let i = resolvers.length - 1;
+
       while (i >= 0) {
         result = resolvers[i](scope) ** result;
         i--;
       }
+
       return result;
+
     };
 
   },
@@ -275,24 +313,25 @@ const expressionTable: ExpressionLookupTable = {
       throw error("not enought operands");
     }
 
-    const createResolver = specialOperationTable[oper as SpecialOperator];
+    const resolvers = exp.map(compileExp);
 
-    if (createResolver) {
-      return createResolver(exp);
+    const reduceResolvers = specialOperationTable[oper as SpecialOperator];
+
+    if (reduceResolvers) {
+      return reduceResolvers(resolvers);
     }
 
-    const reducer = operationReducerTable[oper as RegularArithmeticOperator];
+    const reduce = operationReducerTable[oper as RegularArithmeticOperator];
 
-    if (!reducer) {
+    if (!reduce) {
       throw errorInvalidType(oper, "operation");
     }
 
-    const otherResolvers = exp.map(compileExp);
-    const resolveFirst = otherResolvers.shift() as ScopeBasedResolver;
+    const resolveFirst = resolvers.shift() as ScopeBasedResolver;
 
     return (scope) => {
-      return otherResolvers.reduce(
-        (total, resolve) => reducer(total, resolve(scope)),
+      return resolvers.reduce(
+        (total, resolve) => reduce(total, resolve(scope)),
         resolveFirst(scope),
       );
     };
@@ -619,38 +658,6 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
     }
 
     return func as V;
-
-  };
-
-}
-
-// LOGIC
-
-function compileLogic(
-  expressions: MultiTermExpressions,
-  compare: (left: any, right: any) => any,
-  exit: (value: any) => boolean,
-): ScopeBasedResolver {
-
-  const resolvers = expressions.map(compileExp);
-  const len = resolvers.length;
-
-  return (scope) => {
-
-    let result;
-
-    for (let i = 0; i < len; i++) {
-
-      const itemResult = resolvers[i](scope);
-      result = i ? compare(result, itemResult) : itemResult;
-
-      if (exit(result)) {
-        break;
-      }
-
-    }
-
-    return result;
 
   };
 
