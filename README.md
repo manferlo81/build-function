@@ -7,7 +7,9 @@ The way to describe and build a function using json
 ## In This Guide
 
 * [CDN](#cdn)
+* [API](#api)
 * [Expressions](#expressions)
+  * [Function Expression](#function-expression)
 * [Statements](#statements)
 * [Function Steps](#function-steps)
 * [Operations](#operations)
@@ -42,6 +44,57 @@ The way to describe and build a function using json
 ```
 
 *[more options...](https://unpkg.com/browse/build-function@latest/)*
+
+## API
+
+### Compile and Build
+
+#### `build`
+
+Creates a function from `options` using scope as outer scope.
+
+```typescript
+function build(
+  options: BuildFunctionOptions,
+  scope?: Scope,
+): Function;
+
+interface BuildFunctionOptions {
+  name?: string;
+  params?: string | ParamDescriptor | Array<string | ParamDescriptor>;
+  body?: FunctionStep | FunctionStep[];
+}
+```
+
+**`options`**
+
+**`scope`** (`optional`)
+
+Outer scope for the function. see [scope section](#scope) for more information.
+
+**`name`** (`optional`)
+
+A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
+
+**`params`** (`optional`)
+
+see [Function Expression](#function-expression) for more information.
+
+**`body`** (`optional`)
+
+see [Function Expression](#function-expression) for more information.
+
+#### `compileExp`
+
+#### `compileStep`
+
+### Scope
+
+#### `createScope`
+
+#### `findInScope`
+
+#### `setInScope`
 
 ## Expressions
 
