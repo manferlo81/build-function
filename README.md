@@ -350,9 +350,13 @@ It represents a function expression.
 ```typescript
 interface FunctionExpression {
   type: "func";
-  name?: string;
-  params?: FunctionParameter | FunctionParameter[];
+  params?: string | ParamDescriptor | Array<string | ParamDescriptor>;
   body?: FunctionStep | FunctionStep[];
+}
+
+interface ParamDescriptor {
+  id: string;
+  type: "param" | "rest";
 }
 ```
 
@@ -360,11 +364,11 @@ interface FunctionExpression {
 
 Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
 
-**`name`** (`optional`)
-
 **`params`** (`optional`)
 
 **`body`** (`optional`)
+
+A `step` or `array of steps` to be executed when the function is called. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -589,11 +593,11 @@ Expression which result will be used as condition for the `if` statement.
 
 **`then`** (`optional`)
 
-A optional `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
+A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
 
 **`otherwise`** (`optional`)
 
-A optional `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
+A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
 
 ***example***
 

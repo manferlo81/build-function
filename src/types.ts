@@ -46,9 +46,12 @@ export interface DeclareWithValue extends
 // FUNCTION OPTIONS
 
 export interface FunctionOptions {
-  name?: string;
   params?: SingleOrMulti<FunctionParameter>;
   body?: SingleOrMulti<FunctionStep>;
+}
+
+export interface NamedFunctionOptions extends FunctionOptions {
+  name?: string;
 }
 
 // PARAMETERS

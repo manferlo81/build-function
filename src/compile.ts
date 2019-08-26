@@ -340,7 +340,6 @@ const expressionTable: ExpressionLookupTable = {
 
     return compileFunc(
       expression,
-      false,
     ) as any;
 
   },
@@ -555,10 +554,10 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 
 export function compileFunc<V extends AnyFunction = AnyFunction>(
   options: FunctionOptions,
-  addToScope: boolean,
+  name?: string,
 ): ScopeBasedResolver<V> {
 
-  const { name, params, body } = options;
+  const { params, body } = options;
 
   const parseArgs: InputArgsParser | null = !params
     ? null
@@ -573,7 +572,13 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
     const func: AnyFunction = (...args: any[]): any => {
 
-      const lib = parseArgs ? { arguments: args, ...parseArgs(args) } : { arguments: args };
+      let lib: ScopeLib = {};
+
+      if (parseArgs) {
+        lib = parseArgs(args);
+      }
+
+      lib.arguments = args;
 
       const result = resolveFuncBody(
         createScope(
@@ -583,17 +588,20 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
       );
 
       if (result) {
+
         if (result.type === "throw") {
           throw result.error;
         }
+
         return result.value;
+
       }
 
     };
 
     let outerScope = scope;
 
-    if (addToScope && name) {
+    if (name) {
 
       const lib: ScopeLib = {};
       lib[name] = func;
