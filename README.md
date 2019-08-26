@@ -8,9 +8,29 @@ The way to describe and build a function using json
 
 * [CDN](#cdn)
 * [API](#api)
+  * [`build`](#build)
+  * [`compileExp`](#compileexp)
+  * [`compileStep`](#compilestep)
+  * [`createScope`](#createscope)
+  * [`findInScope`](#findinscope)
+  * [`setInScope`](#setinscope)
 * [Expressions](#expressions)
-  * [Function Expression](#function-expression)
+  * [`literal` Literal Expression](#literal-expression)
+  * [`get` Get Expression](#get-expression)
+  * [`set` Set Expression](#set-expression)
+  * [`ternary` Ternary Expression](#ternary-expression)
+  * [`oper` Operation Expression](#operation-expression)
+  * [`trans` Transform Expression](#transform-expression)
+  * [`func` Function Expression](#function-expression)
+  * [`call` Function Call Expression](#function-call-expression)
+  * [`spread` Spread Expression](#spread-expression)
 * [Statements](#statements)
+  * [`let` Variable Declaration Statement](#let-statement)
+  * [`if` If Statement](#if-statement)
+  * [`for` For Statement](#for-statement)
+  * [`break` Break Statement](#break-statement)
+  * [`return` Return Statement](#return-statement)
+  * [`throw` Throw Statement](#throw-statement)
 * [Function Steps](#function-steps)
 * [Operations](#operations)
 * [Transformations](#transformations)
@@ -47,9 +67,7 @@ The way to describe and build a function using json
 
 ## API
 
-### Compile and Build
-
-#### `build`
+### `build`
 
 Creates a function from `options` using scope as outer scope.
 
@@ -68,33 +86,45 @@ interface BuildFunctionOptions {
 
 **`options`**
 
+Function options.
+
+> ***properties***
+>
+> **`name`** (`optional`)
+>
+> A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
+>
+> **`params`** (`optional`)
+>
+> see [Function Expression](#function-expression) for more information.
+>
+> ***`body` (`optional`)***
+>
+> see [Function Expression](#function-expression) for more information.
+
 **`scope`** (`optional`)
 
-Outer scope for the function. see [scope section](#scope) for more information.
+Outer scope for the function. see [scope section](#createscope) for more information.
 
-**`name`** (`optional`)
+### `compileExp`
 
-A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
+Compiles an [expression](#expressions) into a `function`.
 
-**`params`** (`optional`)
+### `compileStep`
 
-see [Function Expression](#function-expression) for more information.
+Compiles a [function step](#function-steps) into a `function`.
 
-**`body`** (`optional`)
+### `createScope`
 
-see [Function Expression](#function-expression) for more information.
+Creates a `scope`.
 
-#### `compileExp`
+### `findInScope`
 
-#### `compileStep`
+Searches for an `id` in a `scope`.
 
-### Scope
+### `setInScope`
 
-#### `createScope`
-
-#### `findInScope`
-
-#### `setInScope`
+Sets a value into a `scope`.
 
 ## Expressions
 

@@ -61,8 +61,8 @@ export interface NamedFunctionOptions extends FunctionOptions {
 export type ParameterType = "param" | "rest";
 
 export interface ParameterDescriptor extends
-  WithType<ParameterType>,
-  WithId {
+  WithId,
+  WithType<ParameterType> {
 }
 
 export type FunctionParameter = string | ParameterDescriptor;
