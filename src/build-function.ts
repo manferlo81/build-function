@@ -1,9 +1,9 @@
 import { compileFunc } from "./compile";
 import { createScope } from "./scope";
-import { BuildFunctionOptions, Scope } from "./types";
+import { FunctionOptions, Scope } from "./types";
 
 export function build<F extends (...args: any[]) => any>(
-  options: BuildFunctionOptions,
+  options: FunctionOptions,
   scope?: Scope,
 ): F {
   return compileFunc(options, true)(scope || createScope(null)) as F;

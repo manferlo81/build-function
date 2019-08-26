@@ -6,9 +6,9 @@ import { isArray, isObj } from "./type-check";
 import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
 import {
   ArgsLibPopulator,
-  BuildFunctionOptions,
   DeclareWithValue,
   Expression,
+  FunctionOptions,
   FunctionParameter,
   FunctionStep,
   InputArgsParser,
@@ -554,7 +554,7 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 // FUNCTION
 
 export function compileFunc<V extends AnyFunction = AnyFunction>(
-  options: BuildFunctionOptions,
+  options: FunctionOptions,
   addToScope: boolean,
 ): ScopeBasedResolver<V> {
 

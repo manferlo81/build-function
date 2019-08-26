@@ -45,7 +45,7 @@ export interface DeclareWithValue extends
 
 // FUNCTION OPTIONS
 
-export interface BuildFunctionOptions {
+export interface FunctionOptions {
   name?: string;
   params?: SingleOrMulti<FunctionParameter>;
   body?: SingleOrMulti<FunctionStep>;
@@ -94,7 +94,11 @@ export interface TernaryExpression extends
   WithOtherwise<Expression> {
 }
 
-export type BooleanOperator =
+export type SpecialLogicOperator =
+  | "&&"
+  | "||";
+
+export type RegularLogicOperator =
   | "=="
   | "==="
   | "!="
@@ -103,10 +107,6 @@ export type BooleanOperator =
   | ">="
   | "<"
   | "<=";
-
-export type LogicOperator =
-  | "&&"
-  | "||";
 
 export type BitwiseOperator =
   | "&"
@@ -127,13 +127,13 @@ export type SpecialArithmeticOperator =
   | "**";
 
 export type SpecialOperator =
-  | LogicOperator
+  | SpecialLogicOperator
   | SpecialArithmeticOperator;
 
 export type RegularOperator =
+  | RegularLogicOperator
   | RegularArithmeticOperator
-  | BitwiseOperator
-  | BooleanOperator;
+  | BitwiseOperator;
 
 export type MultiTermOperator =
   | SpecialOperator
@@ -165,7 +165,7 @@ export interface TransformExpression extends
 
 export interface FunctionExpression extends
   WithType<"func">,
-  BuildFunctionOptions {
+  FunctionOptions {
 }
 
 export type Expression =
