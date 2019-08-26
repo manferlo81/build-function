@@ -521,6 +521,14 @@ export function compileParam(params: FunctionParameter | FunctionParameter[]): I
 
     const { id } = param;
 
+    if (typeof id !== "string") {
+      throw errorInvalid(id, "parameter id");
+    }
+
+    if (id === "arguments") {
+      throw error("\"arguments\" can't be used as parameter id");
+    }
+
     const compileGetter = paramTable[param.type];
 
     if (!compileGetter) {

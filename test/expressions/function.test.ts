@@ -4,11 +4,33 @@ import { rand } from "../helpers/number";
 
 describe("function expression", () => {
 
-  test("should throw on invalid parameter", () => {
+  test("should throw on invalid parameter type", () => {
 
     const expression: FunctionExpression = {
       type: "func",
       params: { id: "param1", type: "invalid" } as any,
+    };
+
+    expect(() => compileExp(expression)).toThrow();
+
+  });
+
+  test("should throw on invalid parameter id", () => {
+
+    const expression: FunctionExpression = {
+      type: "func",
+      params: 100 as any,
+    };
+
+    expect(() => compileExp(expression)).toThrow();
+
+  });
+
+  test("should throw on parameter id named arguments", () => {
+
+    const expression: FunctionExpression = {
+      type: "func",
+      params: "arguments",
     };
 
     expect(() => compileExp(expression)).toThrow();
