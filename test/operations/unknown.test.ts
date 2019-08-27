@@ -12,7 +12,7 @@ describe("unknown operation expression", () => {
       $get("b"),
     );
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 

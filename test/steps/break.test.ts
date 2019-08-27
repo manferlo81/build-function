@@ -7,7 +7,7 @@ describe("break statement step", () => {
     const step: BreakStatement = {
       type: "break",
     };
-    const resolve: () => "break" = compileStep(step, true) as any;
+    const resolve: () => "break" = compileStep(step, {}, true) as any;
 
     const result = resolve();
 
@@ -24,7 +24,7 @@ describe("break statement step", () => {
       },
     };
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, { a: 100 })).toThrow();
 
   });
 

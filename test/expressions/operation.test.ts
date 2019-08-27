@@ -14,7 +14,7 @@ describe("operation expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExp(expression as any)).toThrow();
+      expect(() => compileExp(expression as any, {})).toThrow();
 
     });
 
@@ -28,7 +28,7 @@ describe("operation expression", () => {
       $get("a"),
     );
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 

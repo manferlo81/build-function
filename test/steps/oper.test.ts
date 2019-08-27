@@ -13,10 +13,11 @@ describe("operation expression step", () => {
         $literal(100),
       ),
     );
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue = compileExp(
       $get("value"),
+      {},
     );
 
     const scope = createScope(null, {
@@ -42,10 +43,11 @@ describe("operation expression step", () => {
         $literal(100),
       ),
     );
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue = compileExp(
       $get("value"),
+      {},
     );
 
     const scope = createScope(null, {

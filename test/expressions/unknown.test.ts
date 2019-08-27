@@ -4,8 +4,8 @@ describe("unknown expression", () => {
 
   test("should throw on unknown expression", () => {
 
-    expect(() => compileExp(undefined as any)).toThrow();
-    expect(() => compileExp(null as any)).toThrow();
+    expect(() => compileExp(undefined as any, {})).toThrow();
+    expect(() => compileExp(null as any, {})).toThrow();
 
   });
 
@@ -15,7 +15,7 @@ describe("unknown expression", () => {
       type: "unknown",
     };
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 

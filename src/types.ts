@@ -296,5 +296,7 @@ export type ScopeBasedResolver<V extends any = any> = (scope: Scope) => V;
 export type ArgsLibPopulator = (input: any[], lib: ScopeLib) => ScopeLib;
 export type InputArgsParser = (input: any[]) => ScopeLib;
 
-export type StepCompiler<S extends FunctionStep> =
-  (step: S, breakable?: boolean) => ScopeBasedResolver<StepLoopResult>;
+export interface CompileCache {
+  literal?: Record<string, ScopeBasedResolver>;
+  get?: Record<string, ScopeBasedResolver>;
+}

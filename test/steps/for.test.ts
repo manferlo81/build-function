@@ -12,7 +12,7 @@ describe("for statement step", () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any)).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow();
 
     });
 
@@ -34,7 +34,7 @@ describe("for statement step", () => {
       ),
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn();
     const scope = createScope(null, { func });
@@ -66,7 +66,7 @@ describe("for statement step", () => {
       ],
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn();
     const scope = createScope(null, { func });
@@ -87,7 +87,7 @@ describe("for statement step", () => {
       type: "for",
       target: $literal(array),
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     expect(resolve.length).toBe(0);
 
@@ -122,7 +122,7 @@ describe("for statement step", () => {
       ],
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn();
     const scope = createScope(null, { func });
@@ -165,7 +165,7 @@ describe("for statement step", () => {
       ],
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn();
     const scope = createScope(null, { func });
@@ -191,7 +191,7 @@ describe("for statement step", () => {
       body: [],
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const scope = createScope(null);
 

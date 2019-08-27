@@ -12,7 +12,7 @@ describe("declare statement step", () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any)).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow();
 
     });
 
@@ -24,10 +24,11 @@ describe("declare statement step", () => {
       type: "declare",
       set: { id: "value", value: $literal(true) },
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue = compileExp(
       $get("value"),
+      {},
     );
 
     const scope = createScope(null);
@@ -50,13 +51,15 @@ describe("declare statement step", () => {
         { id: "value2", value: $literal(true) },
       ],
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue1 = compileExp(
       $get("value1"),
+      {},
     );
     const getValue2 = compileExp(
       $get("value2"),
+      {},
     );
 
     const scope = createScope(null);
@@ -81,13 +84,15 @@ describe("declare statement step", () => {
         "value2",
       ],
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue1 = compileExp(
       $get("value1"),
+      {},
     );
     const getValue2 = compileExp(
       $get("value2"),
+      {},
     );
 
     const scope = createScope(null);

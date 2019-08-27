@@ -12,7 +12,7 @@ describe("throw error statement step", () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any)).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow();
 
     });
 
@@ -24,7 +24,7 @@ describe("throw error statement step", () => {
       type: "throw",
       msg: "Error",
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const result = resolve(null as any);
 
@@ -45,7 +45,7 @@ describe("throw error statement step", () => {
         $literal(" is not valid"),
       ),
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const result = resolve(null as any) as StepThrow;
 

@@ -12,7 +12,7 @@ describe("if statement step", () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any)).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow();
 
     });
 
@@ -31,13 +31,14 @@ describe("if statement step", () => {
       ),
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const setCond = compileExp(
       $set(
         "cond",
         $literal(true),
       ),
+      {},
     );
 
     const then = jest.fn();
@@ -71,13 +72,14 @@ describe("if statement step", () => {
       ],
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const setCond = compileExp(
       $set(
         "cond",
         $literal(true),
       ),
+      {},
     );
 
     const then = jest.fn();
@@ -101,7 +103,7 @@ describe("if statement step", () => {
       condition: $get("cond"),
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     expect(resolve.length).toBe(0);
 

@@ -9,7 +9,7 @@ describe("bitwise not transform expression", () => {
       "~",
       $get("value"),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const value = 100;
 

@@ -14,7 +14,7 @@ describe("shift left operation expression", () => {
       $literal(a),
       $literal(b),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     // tslint:disable-next-line: no-bitwise
     expect(resolve(null as any)).toBe(a << b);
@@ -35,7 +35,7 @@ describe("shift left operation expression", () => {
       $literal(c),
       $literal(d),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     // tslint:disable-next-line: no-bitwise
     expect(resolve(null as any)).toBe(a << b << c << d);

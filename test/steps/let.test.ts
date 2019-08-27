@@ -7,7 +7,7 @@ describe("let statement step", () => {
 
     const invalid = { type: "let" };
 
-    expect(() => compileStep(invalid as any)).toThrow();
+    expect(() => compileStep(invalid as any, {})).toThrow();
 
   });
 
@@ -17,10 +17,11 @@ describe("let statement step", () => {
       type: "let",
       declare: { id: "value", value: $literal(true) },
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue = compileExp(
       $get("value"),
+      {},
     );
 
     const scope = createScope(null);
@@ -43,13 +44,15 @@ describe("let statement step", () => {
         { id: "value2", value: $literal(true) },
       ],
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue1 = compileExp(
       $get("value1"),
+      {},
     );
     const getValue2 = compileExp(
       $get("value2"),
+      {},
     );
 
     const scope = createScope(null);
@@ -74,13 +77,15 @@ describe("let statement step", () => {
         "value2",
       ],
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue1 = compileExp(
       $get("value1"),
+      {},
     );
     const getValue2 = compileExp(
       $get("value2"),
+      {},
     );
 
     const scope = createScope(null);
@@ -99,7 +104,7 @@ describe("let statement step", () => {
       type: "let",
       declare: "value1",
     };
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const scope = createScope(null);
 

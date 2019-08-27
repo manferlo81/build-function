@@ -9,7 +9,7 @@ describe("typeof transform expression", () => {
       "typeof",
       $literal(10),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe("number");
 
@@ -21,7 +21,7 @@ describe("typeof transform expression", () => {
       "typeof",
       $get("notinscope"),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const scope = createScope(null);
 

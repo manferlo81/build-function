@@ -11,7 +11,7 @@ describe("unknown transform expression", () => {
       $get("a"),
     );
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 

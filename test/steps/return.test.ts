@@ -12,7 +12,7 @@ describe("return statement step", () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any)).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow();
 
     });
 
@@ -25,7 +25,7 @@ describe("return statement step", () => {
       value: $get("value"),
     };
 
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const scope = createScope(null, {
       value: "result",

@@ -13,6 +13,7 @@ describe("create scope", () => {
 
     const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
+      {},
     )(getScope);
 
     expect(get("a", scope)).toBe(a);
@@ -32,6 +33,7 @@ describe("create scope", () => {
 
     const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
+      {},
     )(getScope);
 
     expect(get("a", scope)).toBe(a);
@@ -52,6 +54,7 @@ describe("create scope", () => {
 
     const get = (id: string, getScope: Scope) => compileExp(
       $get(id),
+      {},
     )(getScope);
 
     expect(() => get("a", scope)).toThrow();

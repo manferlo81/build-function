@@ -14,7 +14,7 @@ describe("power operation expression", () => {
       $literal(base),
       $literal(exp),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(base ** exp);
 
@@ -34,7 +34,7 @@ describe("power operation expression", () => {
       $literal(exp2),
       $literal(exp3),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(base ** exp1 ** exp2 ** exp3);
 

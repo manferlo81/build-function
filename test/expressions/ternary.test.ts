@@ -17,7 +17,7 @@ describe("ternary expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExp(expression as any)).toThrow();
+      expect(() => compileExp(expression as any, {})).toThrow();
 
     });
 
@@ -30,7 +30,7 @@ describe("ternary expression", () => {
       $literal("yes"),
       $literal("no"),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const negate = compileExp(
       $set(
@@ -40,6 +40,7 @@ describe("ternary expression", () => {
           $get("cond"),
         ),
       ),
+      {},
     );
 
     const scope = createScope(null, {

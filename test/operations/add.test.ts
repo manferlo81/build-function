@@ -14,7 +14,7 @@ describe("add operation expression", () => {
       $literal(a),
       $literal(b),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(a + b);
 
@@ -34,7 +34,7 @@ describe("add operation expression", () => {
       $literal(c),
       $literal(d),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(a + b + c + d);
 

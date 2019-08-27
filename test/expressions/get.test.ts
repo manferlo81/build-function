@@ -14,7 +14,7 @@ describe("get expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExp(expression as any)).toThrow();
+      expect(() => compileExp(expression as any, {})).toThrow();
 
     });
 
@@ -24,7 +24,7 @@ describe("get expression", () => {
 
     const getId = "value";
     const expression: GetExpression = $get(getId);
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const value = rand(1, 100);
     const scope = createScope(null, {
@@ -39,11 +39,23 @@ describe("get expression", () => {
   test("should throw if not found", () => {
 
     const expression: GetExpression = $get("value");
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const scope = createScope(null);
 
     expect(() => resolve(scope)).toThrow();
+
+  });
+
+  test("should cache get expression", () => {
+
+    const expression: GetExpression = $get("value");
+
+    const cache = {};
+
+    expect(
+      compileExp(expression, cache) === compileExp(expression, cache),
+    ).toBe(true);
 
   });
 

@@ -8,7 +8,7 @@ describe("call expression step", () => {
     const step: FunctionCallExpression = $call(
       $get("func"),
     );
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn();
 
@@ -30,7 +30,7 @@ describe("call expression step", () => {
       $literal(1),
       $literal(true),
     );
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const func = jest.fn(() => "ignored");
 

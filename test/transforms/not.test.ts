@@ -12,7 +12,7 @@ describe("not transform expression", () => {
       "!",
       $literal(value),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(!value);
 

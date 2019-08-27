@@ -14,7 +14,7 @@ describe("equal operation expression", () => {
       $literal(a),
       $literal(b),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     // tslint:disable-next-line: triple-equals
     expect(resolve(null as any)).toBe(a == b);
@@ -35,7 +35,7 @@ describe("equal operation expression", () => {
       $literal(c),
       $literal(d),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     // tslint:disable-next-line: triple-equals
     expect(resolve(null as any)).toBe(a == b == c == d);
@@ -49,7 +49,7 @@ describe("equal operation expression", () => {
       $literal("10"),
       $literal(10),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(true);
 

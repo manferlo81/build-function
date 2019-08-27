@@ -11,7 +11,7 @@ describe("function expression", () => {
       params: { id: "param1", type: "invalid" } as any,
     };
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 
@@ -22,7 +22,7 @@ describe("function expression", () => {
       params: 100 as any,
     };
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 
@@ -33,7 +33,7 @@ describe("function expression", () => {
       params: "arguments",
     };
 
-    expect(() => compileExp(expression)).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 
@@ -53,7 +53,7 @@ describe("function expression", () => {
         ),
       ),
     };
-    const resolve = compileExp<(a: number, b: number) => number>(expression);
+    const resolve = compileExp<(a: number, b: number) => number>(expression, {});
 
     const scope = createScope(null);
     const func = resolve(scope);
@@ -73,7 +73,7 @@ describe("function expression", () => {
         $literal(true),
       ),
     };
-    const resolve = compileExp<() => true>(expression);
+    const resolve = compileExp<() => true>(expression, {});
 
     const scope = createScope(null);
     const func = resolve(scope);
@@ -91,7 +91,7 @@ describe("function expression", () => {
         $get("param"),
       ),
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
     const scope = createScope(null);
     const func = resolve(scope);
@@ -110,7 +110,7 @@ describe("function expression", () => {
         $get("params"),
       ),
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
     const scope = createScope(null);
     const func: (...args: any[]) => any = resolve(scope);
@@ -135,7 +135,7 @@ describe("function expression", () => {
         ),
       ],
     };
-    const resolve = compileExp<(a: number, b: number, ...others: number[]) => number>(expression);
+    const resolve = compileExp<(a: number, b: number, ...others: number[]) => number>(expression, {});
 
     const scope = createScope(null);
     const func = resolve(scope);
@@ -171,7 +171,7 @@ describe("function expression", () => {
         ),
       ],
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression);
+    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
     const scope = createScope(null);
     const func = resolve(scope);
@@ -186,7 +186,7 @@ describe("function expression", () => {
     const expression: FunctionExpression = {
       type: "func",
     };
-    const resolve = compileExp<() => undefined>(expression);
+    const resolve = compileExp<() => undefined>(expression, {});
 
     const func = resolve(null as any);
 
@@ -200,7 +200,7 @@ describe("function expression", () => {
       type: "func",
       body: [],
     };
-    const resolve = compileExp<() => void>(expression);
+    const resolve = compileExp<() => void>(expression, {});
 
     const scope = createScope(null);
 
@@ -221,7 +221,7 @@ describe("function expression", () => {
         msg,
       },
     };
-    const resolve = compileExp<() => void>(expression);
+    const resolve = compileExp<() => void>(expression, {});
 
     const scope = createScope(null);
 
@@ -239,7 +239,7 @@ describe("function expression", () => {
         $get("arguments"),
       ),
     };
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const scope = createScope(null);
 

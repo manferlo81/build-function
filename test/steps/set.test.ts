@@ -9,10 +9,11 @@ describe("set expression step", () => {
       "value",
       $literal(true),
     );
-    const resolve = compileStep(step);
+    const resolve = compileStep(step, {});
 
     const getValue = compileExp(
       $get("value"),
+      {},
     );
 
     const scope = createScope(null, {

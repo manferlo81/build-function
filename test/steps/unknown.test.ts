@@ -4,8 +4,8 @@ describe("unknown step", () => {
 
   test("should throw on unknown step", () => {
 
-    expect(() => compileStep(undefined as any)).toThrow();
-    expect(() => compileStep(null as any)).toThrow();
+    expect(() => compileStep(undefined as any, {})).toThrow();
+    expect(() => compileStep(null as any, {})).toThrow();
 
   });
 
@@ -15,7 +15,7 @@ describe("unknown step", () => {
       type: "unknown",
     };
 
-    expect(() => compileStep(step as any)).toThrow();
+    expect(() => compileStep(step as any, {})).toThrow();
 
   });
 

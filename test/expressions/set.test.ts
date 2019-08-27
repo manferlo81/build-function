@@ -16,7 +16,7 @@ describe("set expression", () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExp(expression as any)).toThrow();
+      expect(() => compileExp(expression as any, {})).toThrow();
 
     });
 
@@ -30,9 +30,10 @@ describe("set expression", () => {
       id,
       $literal(value),
     );
-    const setValue = compileExp(expression);
+    const setValue = compileExp(expression, {});
     const getValue = compileExp(
       $get(id),
+      {},
     );
 
     const initial = 100;
@@ -53,7 +54,7 @@ describe("set expression", () => {
       "value",
       $literal(true),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     const scope = createScope(null);
 

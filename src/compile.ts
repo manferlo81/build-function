@@ -3,9 +3,17 @@ import { functionReturning, hasOwn } from "./helpers";
 import { createScope, findInScope, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
 
-import { AnyFunction, ExpressionLookupTable, SingleOrMulti, StatementLookupTable } from "./helper-types";
+import {
+  AnyFunction,
+  ExpressionCompiler,
+  ExpressionLookupTable,
+  SingleOrMulti,
+  StatementLookupTable,
+  StepCompiler,
+} from "./helper-types";
 import {
   ArgsLibPopulator,
+  CompileCache,
   Expression,
   FunctionOptions,
   FunctionParameter,
@@ -21,7 +29,6 @@ import {
   SpecialOperator,
   SpreadableExpression,
   StatementType,
-  StepCompiler,
   StepLoopResult,
   StepNonLoopResult,
   VariableDeclaration,
@@ -174,19 +181,41 @@ const transTable: Record<RegularTransformOperator, (value: any) => any> = {
 
 const expTable: ExpressionLookupTable = {
 
-  literal(exp) {
+  literal(exp, cache) {
 
     if (!hasOwn.call(exp, "value")) {
       throw errorRequired("value", "literal");
     }
 
-    return functionReturning(
-      exp.value,
-    );
+    const { value } = exp;
+    const valueType = typeof value;
+    const key = valueType === "string" || valueType === "number" || valueType === "boolean"
+      ? JSON.stringify(value)
+      : null;
+
+    const db = cache.literal = cache.literal || {};
+
+    let resolve: ScopeBasedResolver | undefined;
+
+    if (key) {
+      resolve = db[key];
+    }
+
+    if (!resolve) {
+
+      resolve = functionReturning(value);
+
+      if (key) {
+        db[key] = resolve;
+      }
+
+    }
+
+    return resolve;
 
   },
 
-  get(exp, safe) {
+  get(exp, cache, safe) {
 
     if (!hasOwn.call(exp, "id")) {
       throw errorRequired("id", "get");
@@ -198,24 +227,34 @@ const expTable: ExpressionLookupTable = {
 
     const { id } = exp;
 
-    return (scope) => {
+    const db = cache.get = cache.get || {};
 
-      const result = findInScope(scope, id);
+    let resolve = db[id];
 
-      if (!result) {
-        if (!safe) {
-          throw errorNotInScope(id);
+    if (!resolve) {
+
+      resolve = db[id] = (scope) => {
+
+        const result = findInScope(scope, id);
+
+        if (!result) {
+          if (!safe) {
+            throw errorNotInScope(id);
+          }
+          return;
         }
-        return;
-      }
 
-      return result.scope[result.id];
+        return result.scope[result.id];
 
-    };
+      };
+
+    }
+
+    return resolve;
 
   },
 
-  set(exp) {
+  set(exp, cache) {
 
     if (!hasOwn.call(exp, "id")) {
       throw errorRequired("id", "set");
@@ -230,7 +269,7 @@ const expTable: ExpressionLookupTable = {
     }
 
     const { id } = exp;
-    const resolveValue = compileExp(exp.value);
+    const resolveValue = compileExp(exp.value, cache);
 
     return (scope) => {
 
@@ -246,7 +285,7 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  call(exp) {
+  call(exp, cache) {
 
     if (!hasOwn.call(exp, "func")) {
       throw errorRequired("func", "call");
@@ -254,8 +293,8 @@ const expTable: ExpressionLookupTable = {
 
     const { args } = exp;
 
-    const resolveFunc = compileExp<AnyFunction>(exp.func);
-    const resolveArgs = args ? compileSpread(args) : null;
+    const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
+    const resolveArgs = args ? compileSpread(args, cache) : null;
 
     return (scope) => {
 
@@ -273,7 +312,7 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  ternary(exp) {
+  ternary(exp, cache) {
 
     if (!hasOwn.call(exp, "condition")) {
       throw errorRequired("condition", "ternary");
@@ -287,9 +326,9 @@ const expTable: ExpressionLookupTable = {
       throw errorRequired("otherwise", "ternary");
     }
 
-    const resolveCondition = compileExp(exp.condition);
-    const resolveThen = compileExp(exp.then);
-    const resolveOtherwise = compileExp(exp.otherwise);
+    const resolveCondition = compileExp(exp.condition, cache);
+    const resolveThen = compileExp(exp.then, cache);
+    const resolveOtherwise = compileExp(exp.otherwise, cache);
 
     return (scope) => resolveCondition(scope)
       ? resolveThen(scope)
@@ -297,7 +336,7 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  oper(exp) {
+  oper(exp, cache) {
 
     if (!hasOwn.call(exp, "oper")) {
       throw errorRequired("oper", "oper");
@@ -313,7 +352,7 @@ const expTable: ExpressionLookupTable = {
       throw error("not enought operands");
     }
 
-    const resolvers = compileExp(operExps);
+    const resolvers = compileExp(operExps, cache);
 
     const reduceResolvers = specialOperTable[oper as SpecialOperator];
 
@@ -338,7 +377,7 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  trans(exp) {
+  trans(exp, cache) {
 
     if (!hasOwn.call(exp, "oper")) {
       throw errorRequired("oper", "trans");
@@ -350,7 +389,7 @@ const expTable: ExpressionLookupTable = {
 
     if (exp.oper === "typeof") {
 
-      const resolveSafe = compileExp(exp.exp, true);
+      const resolveSafe = compileExp(exp.exp, cache, true);
 
       return (scope) => {
         const value = resolveSafe(scope);
@@ -365,7 +404,7 @@ const expTable: ExpressionLookupTable = {
       throw errorInvalidType(exp.oper, "transform operation");
     }
 
-    const resolve = compileExp(exp.exp);
+    const resolve = compileExp(exp.exp, cache);
 
     return (scope) => {
       return transform(
@@ -375,10 +414,11 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  func(exp) {
+  func(exp, cache) {
 
     return compileFunc(
       exp,
+      cache,
     ) as any;
 
   },
@@ -387,13 +427,13 @@ const expTable: ExpressionLookupTable = {
 
 const stepTable: StatementLookupTable = {
 
-  declare(step) {
+  declare(step, cache) {
 
     if (!hasOwn.call(step, "set")) {
       throw errorRequired2("set", "declare");
     }
 
-    const resolve = compileDecl(step.set);
+    const resolve = compileDecl(step.set, cache);
 
     return (scope) => {
       resolve(scope);
@@ -401,13 +441,13 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  let(step) {
+  let(step, cache) {
 
     if (!hasOwn.call(step, "declare")) {
       throw errorRequired2("declare", "let");
     }
 
-    const resolve = compileDecl(step.declare);
+    const resolve = compileDecl(step.declare, cache);
 
     return (scope) => {
       resolve(scope);
@@ -415,7 +455,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  if(step, breakable) {
+  if(step, cache, breakable) {
 
     if (!hasOwn.call(step, "condition")) {
       throw errorRequired2("condition", "if");
@@ -423,9 +463,9 @@ const stepTable: StatementLookupTable = {
 
     const { then, otherwise } = step;
 
-    const resolveCondition = compileExp(step.condition);
-    const resolveThen = then ? compileStep(then, breakable) : null;
-    const resolveOtherwise = otherwise ? compileStep(otherwise, breakable) : null;
+    const resolveCondition = compileExp(step.condition, cache);
+    const resolveThen = then ? compileStep(then, cache, breakable) : null;
+    const resolveOtherwise = otherwise ? compileStep(otherwise, cache, breakable) : null;
 
     if (!resolveThen && !resolveOtherwise) {
       return functionReturning();
@@ -445,7 +485,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  for(step) {
+  for(step, cache) {
 
     if (!hasOwn.call(step, "target")) {
       throw errorRequired2("target", "for");
@@ -453,14 +493,14 @@ const stepTable: StatementLookupTable = {
 
     const { body } = step;
 
-    const resolveBody = body ? compileStep(body, true) : null;
+    const resolveBody = body ? compileStep(body, cache, true) : null;
 
     if (!resolveBody) {
       return functionReturning();
     }
 
     const { index, value } = step;
-    const resolveTarget = compileExp<any[]>(step.target);
+    const resolveTarget = compileExp<any[]>(step.target, cache);
 
     return (scope): StepNonLoopResult => {
 
@@ -499,7 +539,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  break(step, breakable) {
+  break(step, cache, breakable) {
 
     if (!breakable) {
       throw error('"break" is not allowed outside loops');
@@ -511,14 +551,14 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  return(step) {
+  return(step, cache) {
 
     if (!hasOwn.call(step, "value")) {
       throw errorRequired2("value", "return");
     }
 
     const { value, type } = step;
-    const resolveValue = compileExp(value);
+    const resolveValue = compileExp(value, cache);
 
     return (scope) => ({
       type,
@@ -527,7 +567,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  throw(step) {
+  throw(step, cache) {
 
     if (!hasOwn.call(step, "msg")) {
       throw errorRequired2("msg", "throw");
@@ -535,7 +575,7 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObj(msg) ? compileExp<string>(msg) : null;
+    const resolveMessage = isObj(msg) ? compileExp<string>(msg, cache) : null;
 
     return (scope) => ({
       type,
@@ -601,6 +641,7 @@ function compileParam(params: FunctionParameter | FunctionParameter[]): InputArg
 
 export function compileFunc<V extends AnyFunction = AnyFunction>(
   options: FunctionOptions,
+  cache: CompileCache,
   name?: string,
 ): ScopeBasedResolver<V> {
 
@@ -609,7 +650,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
   const parseArgs: InputArgsParser | null = !params
     ? null
     : compileParam(params);
-  const resolveFuncBody = body ? compileStep(body) : null;
+  const resolveFuncBody = body ? compileStep(body, cache) : null;
 
   return (scope): V => {
 
@@ -665,11 +706,21 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
 // EXPRESSION
 
-export function compileExp<V extends any = any>(exp: Expression, safe?: boolean): ScopeBasedResolver<V>;
-export function compileExp<V extends any = any>(exp: Expression[], safe?: boolean): Array<ScopeBasedResolver<V>>;
+export function compileExp<V extends any = any>(
+  exp: Expression,
+  cache: CompileCache,
+  safe?: boolean,
+): ScopeBasedResolver<V>;
+
+export function compileExp<V extends any = any>(
+  exp: Expression[],
+  cache: CompileCache,
+  safe?: boolean,
+): Array<ScopeBasedResolver<V>>;
 
 export function compileExp<V extends any = any>(
   exp: SingleOrMulti<Expression>,
+  cache: CompileCache,
   safe?: boolean,
 ): SingleOrMulti<ScopeBasedResolver<V>> {
 
@@ -681,15 +732,13 @@ export function compileExp<V extends any = any>(
 
     const { type } = single;
 
-    const compile = expTable[type] as (
-      (expression: Expression, safe?: boolean) => ScopeBasedResolver<V>
-    ) | undefined;
+    const compile = expTable[type] as ExpressionCompiler<Expression> | undefined;
 
     if (!compile) {
       throw errorInvalidType(type, "expression");
     }
 
-    return compile(single, safe);
+    return compile(single, cache, safe);
 
   }
 
@@ -703,12 +752,15 @@ export function compileExp<V extends any = any>(
 
 // SPREADABLE
 
-function compileSpread<V = any>(exp: SingleOrMulti<SpreadableExpression>): ScopeBasedResolver<V[]> {
+function compileSpread<V = any>(
+  exp: SingleOrMulti<SpreadableExpression>,
+  cache: CompileCache,
+): ScopeBasedResolver<V[]> {
 
   function compileSingle(single: SpreadableExpression): ScopeBasedPopulator<V[]> {
 
     if (single.type === "spread") {
-      const resolveArray = compileExp<V[]>(single.exp);
+      const resolveArray = compileExp<V[]>(single.exp, cache);
       return (scope, resolved) => {
         resolved.push.apply(
           resolved,
@@ -718,7 +770,7 @@ function compileSpread<V = any>(exp: SingleOrMulti<SpreadableExpression>): Scope
       };
     }
 
-    const resolveParam = compileExp(single);
+    const resolveParam = compileExp(single, cache);
     return (scope, resolved) => {
       resolved.push(
         resolveParam(scope),
@@ -744,7 +796,10 @@ function compileSpread<V = any>(exp: SingleOrMulti<SpreadableExpression>): Scope
 
 // VARIABLE DECLARATION
 
-function compileDecl(declare: SingleOrMulti<VariableDeclaration>): ScopeBasedResolver<void> {
+function compileDecl(
+  declare: SingleOrMulti<VariableDeclaration>,
+  cache: CompileCache,
+): ScopeBasedResolver<void> {
 
   function compileSingle(set: VariableDeclaration): ScopeBasedResolver<void> {
 
@@ -758,7 +813,7 @@ function compileDecl(declare: SingleOrMulti<VariableDeclaration>): ScopeBasedRes
 
     let resolveValue: ScopeBasedResolver | undefined;
     if (value) {
-      resolveValue = compileExp(value);
+      resolveValue = compileExp(value, cache);
     }
 
     return (scope) => {
@@ -800,18 +855,22 @@ function compileDecl(declare: SingleOrMulti<VariableDeclaration>): ScopeBasedRes
 
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
+  cache: CompileCache,
   breakable: true,
 ): ScopeBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
+  cache: CompileCache,
   breakable?: false | undefined,
 ): ScopeBasedResolver<StepNonLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
+  cache: CompileCache,
   breakable?: boolean | undefined,
 ): ScopeBasedResolver<StepLoopResult>;
 export function compileStep<V = any>(
   steps: SingleOrMulti<FunctionStep>,
+  cache: CompileCache,
   breakable?: boolean | undefined,
 ): ScopeBasedResolver<StepLoopResult> {
 
@@ -824,10 +883,10 @@ export function compileStep<V = any>(
     const compile = stepTable[step.type as StatementType] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
-      return compile(step, breakable);
+      return compile(step, cache, breakable);
     }
 
-    const resolve = compileExp(step as Expression);
+    const resolve = compileExp(step as Expression, cache);
 
     return (scope) => {
       resolve(scope);

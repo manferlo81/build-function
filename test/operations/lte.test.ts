@@ -14,7 +14,7 @@ describe("less than or equal operation expression", () => {
       $literal(a),
       $literal(b),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     expect(resolve(null as any)).toBe(a <= b);
 
@@ -32,7 +32,7 @@ describe("less than or equal operation expression", () => {
       $literal(b),
       $literal(c),
     );
-    const resolve = compileExp(expression);
+    const resolve = compileExp(expression, {});
 
     // @ts-ignore
     expect(resolve(null as any)).toBe(a <= b <= c);

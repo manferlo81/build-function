@@ -8,7 +8,7 @@ describe("literal expression", () => {
 
     const invalid = { type: "literal" };
 
-    expect(() => compileExp(invalid as any)).toThrow();
+    expect(() => compileExp(invalid as any, {})).toThrow();
 
   });
 
@@ -16,11 +16,23 @@ describe("literal expression", () => {
 
     const value = rand(1, 20);
     const expression: LiteralExpression = $literal(value);
-    const resolve: () => number = compileExp(expression) as any;
+    const resolve: () => number = compileExp(expression, {}) as any;
 
     const result = resolve();
 
     expect(result).toBe(value);
+
+  });
+
+  test("should cache literal expression is value is native", () => {
+
+    const expression: LiteralExpression = $literal("value");
+
+    const cache = {};
+
+    expect(
+      compileExp(expression, cache) === compileExp(expression, cache),
+    ).toBe(true);
 
   });
 

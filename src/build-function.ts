@@ -8,6 +8,7 @@ export function build<F extends (...args: any[]) => any>(
 ): F {
   return compileFunc<F>(
     options,
+    {},
     options.name,
   )(
     scope || createScope(null),
