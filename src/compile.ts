@@ -590,7 +590,7 @@ const stepTable: StatementLookupTable = {
 
 // PARAMS
 
-function compileParam(params: FunctionParameter | FunctionParameter[]): InputArgsParser {
+function compileParam(params: FunctionParameter | FunctionParameter[], cache: CompileCache): InputArgsParser {
 
   function compileSingle(single: FunctionParameter, index: number): ArgsLibPopulator {
 
@@ -649,7 +649,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
   const parseArgs: InputArgsParser | null = !params
     ? null
-    : compileParam(params);
+    : compileParam(params, cache);
   const resolveFuncBody = body ? compileStep(body, cache) : null;
 
   return (scope): V => {
@@ -707,16 +707,16 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 // EXPRESSION
 
 export function compileExp<V extends any = any>(
-  exp: Expression,
-  cache: CompileCache,
-  safe?: boolean,
-): ScopeBasedResolver<V>;
-
-export function compileExp<V extends any = any>(
   exp: Expression[],
   cache: CompileCache,
   safe?: boolean,
 ): Array<ScopeBasedResolver<V>>;
+
+export function compileExp<V extends any = any>(
+  exp: Expression,
+  cache: CompileCache,
+  safe?: boolean,
+): ScopeBasedResolver<V>;
 
 export function compileExp<V extends any = any>(
   exp: SingleOrMulti<Expression>,

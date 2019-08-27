@@ -24,7 +24,7 @@ describe("break statement step", () => {
       },
     };
 
-    expect(() => compileExp(expression, { a: 100 })).toThrow();
+    expect(() => compileExp(expression, {})).toThrow();
 
   });
 
