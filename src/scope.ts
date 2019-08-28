@@ -5,7 +5,7 @@ const pre = "0$_";
 
 export function createScope(parent: Scope | null, lib?: ScopeLib | null): Scope {
 
-  const scope: Scope = parent ? { parent } : {};
+  const scope: Scope = { parent };
 
   if (lib) {
     for (const id in lib) {
@@ -23,7 +23,7 @@ export function findInScope<V = any>(scope: Scope, id: string, topOnly?: boolean
 
   const tid = pre + id;
 
-  let current: Scope | undefined = scope;
+  let current: Scope | null = scope;
 
   while (current) {
 

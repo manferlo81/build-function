@@ -281,7 +281,7 @@ export type StepLoopResult =
 export type ScopeLib = Record<string, any>;
 
 export interface Scope extends ScopeLib {
-  parent?: Scope;
+  parent: Scope | null;
 }
 
 export interface ScopeValue<V> {
