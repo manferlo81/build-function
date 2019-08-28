@@ -1,4 +1,5 @@
 import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired, errorRequired2 } from "./errors";
+import { hash } from "./hash";
 import { functionReturning, hasOwn } from "./helpers";
 import { createScope, findInScope, setInScope } from "./scope";
 import { isArray, isObj } from "./type-check";
@@ -181,37 +182,13 @@ const transTable: Record<RegularTransformOperator, (value: any) => any> = {
 
 const expTable: ExpressionLookupTable = {
 
-  literal(exp, cache) {
+  literal(exp) {
 
     if (!hasOwn.call(exp, "value")) {
       throw errorRequired("value", "literal");
     }
 
-    const { value } = exp;
-    const valueType = typeof value;
-    const key = valueType === "string" || valueType === "number" || valueType === "boolean"
-      ? JSON.stringify(value)
-      : null;
-
-    const db = cache.literal = cache.literal || {};
-
-    let resolve: ScopeBasedResolver | undefined;
-
-    if (key) {
-      resolve = db[key];
-    }
-
-    if (!resolve) {
-
-      resolve = functionReturning(value);
-
-      if (key) {
-        db[key] = resolve;
-      }
-
-    }
-
-    return resolve;
+    return functionReturning(exp.value);
 
   },
 
@@ -227,30 +204,20 @@ const expTable: ExpressionLookupTable = {
 
     const { id } = exp;
 
-    const db = cache.get = cache.get || {};
+    return (scope) => {
 
-    let resolve = db[id];
+      const result = findInScope(scope, id);
 
-    if (!resolve) {
-
-      resolve = db[id] = (scope) => {
-
-        const result = findInScope(scope, id);
-
-        if (!result) {
-          if (!safe) {
-            throw errorNotInScope(id);
-          }
-          return;
+      if (!result) {
+        if (!safe) {
+          throw errorNotInScope(id);
         }
+        return;
+      }
 
-        return result.scope[result.id];
+      return result.scope[result.id];
 
-      };
-
-    }
-
-    return resolve;
+    };
 
   },
 
@@ -726,10 +693,6 @@ export function compileExp<V extends any = any>(
 
   function compileSingle(single: Expression) {
 
-    if (!single || !isObj(single)) {
-      throw errorInvalid(single, "expression");
-    }
-
     const { type } = single;
 
     const compile = expTable[type] as ExpressionCompiler<Expression> | undefined;
@@ -742,11 +705,34 @@ export function compileExp<V extends any = any>(
 
   }
 
-  if (!isArray(exp)) {
-    return compileSingle(exp);
+  function compileCached(single: Expression) {
+
+    if (!single || !isObj(single)) {
+      throw errorInvalid(single, "expression");
+    }
+
+    if (!hash) {
+      return compileSingle(single);
+    }
+
+    const db = cache.exp || (cache.exp = {});
+    const key = hash(single);
+
+    const resolve = db[key];
+
+    if (resolve) {
+      return resolve;
+    }
+
+    return db[key] = compileSingle(single);
+
   }
 
-  return exp.map(compileSingle);
+  if (!isArray(exp)) {
+    return compileCached(exp);
+  }
+
+  return exp.map(compileCached);
 
 }
 
@@ -874,31 +860,52 @@ export function compileStep<V = any>(
   breakable?: boolean | undefined,
 ): ScopeBasedResolver<StepLoopResult> {
 
-  function compileSingle(step: FunctionStep): ScopeBasedResolver<StepLoopResult> {
+  function compileSingle(single: FunctionStep): ScopeBasedResolver<StepLoopResult> {
 
-    if (!step || !isObj(step)) {
-      throw errorInvalid(step, "step");
-    }
-
-    const compile = stepTable[step.type as StatementType] as StepCompiler<FunctionStep> | undefined;
+    const compile = stepTable[single.type as StatementType] as StepCompiler<FunctionStep> | undefined;
 
     if (compile) {
-      return compile(step, cache, breakable);
+
+      return compile(single, cache, breakable);
+
     }
 
-    const resolve = compileExp(step as Expression, cache);
+    const resolveExp = compileExp(single as Expression, cache);
 
     return (scope) => {
-      resolve(scope);
+      resolveExp(scope);
     };
 
   }
 
-  if (!isArray(steps)) {
-    return compileSingle(steps);
+  function compileCached(single: FunctionStep): ScopeBasedResolver<StepLoopResult> {
+
+    if (!single || !isObj(single)) {
+      throw errorInvalid(single, "step");
+    }
+
+    if (!hash) {
+      return compileSingle(single);
+    }
+
+    const db = cache.step || (cache.step = {});
+    const key = hash(single);
+
+    const resolve = db[key];
+
+    if (resolve) {
+      return resolve;
+    }
+
+    return db[key] = compileSingle(single);
+
   }
 
-  const resolvers = steps.map(compileSingle);
+  if (!isArray(steps)) {
+    return compileCached(steps);
+  }
+
+  const resolvers = steps.map(compileCached);
 
   return (scope): StepLoopResult => {
 

@@ -26,12 +26,13 @@ describe("literal expression", () => {
 
   test("should cache literal expression is value is native", () => {
 
-    const expression: LiteralExpression = $literal("value");
+    const expression1: LiteralExpression = $literal("value");
+    const expression2: LiteralExpression = $literal("value");
 
     const cache = {};
 
     expect(
-      compileExp(expression, cache) === compileExp(expression, cache),
+      compileExp(expression1, cache) === compileExp(expression2, cache),
     ).toBe(true);
 
   });

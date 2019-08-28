@@ -84,4 +84,25 @@ describe("call expression", () => {
 
   });
 
+  test("should cache function call expression", () => {
+
+    const expression1: FunctionCallExpression = $call(
+      $get("func"),
+      $literal(1),
+      $literal(2),
+    );
+    const expression2: FunctionCallExpression = $call(
+      $get("func"),
+      $literal(1),
+      $literal(2),
+    );
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
+
+  });
+
 });

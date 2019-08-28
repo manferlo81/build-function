@@ -105,4 +105,29 @@ describe("declare statement step", () => {
 
   });
 
+  test("should cache declare statement step", () => {
+
+    const step1: DeprecatedDeclareStatement = {
+      type: "declare",
+      set: [
+        "value1",
+        "value2",
+      ],
+    };
+    const step2: DeprecatedDeclareStatement = {
+      type: "declare",
+      set: [
+        "value1",
+        "value2",
+      ],
+    };
+
+    const cache = {};
+
+    expect(
+      compileStep(step1, cache) === compileStep(step2, cache),
+    ).toBe(true);
+
+  });
+
 });

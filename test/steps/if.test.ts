@@ -109,4 +109,43 @@ describe("if statement step", () => {
 
   });
 
+  test("should cache declare statement step", () => {
+
+    const step1: IfStatement = {
+      type: "if",
+      condition: $get("cond"),
+      then: [
+        $call(
+          $get("then"),
+        ),
+      ],
+      otherwise: [
+        $call(
+          $get("otherwise"),
+        ),
+      ],
+    };
+    const step2: IfStatement = {
+      type: "if",
+      condition: $get("cond"),
+      then: [
+        $call(
+          $get("then"),
+        ),
+      ],
+      otherwise: [
+        $call(
+          $get("otherwise"),
+        ),
+      ],
+    };
+
+    const cache = {};
+
+    expect(
+      compileStep(step1, cache) === compileStep(step2, cache),
+    ).toBe(true);
+
+  });
+
 });

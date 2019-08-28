@@ -32,4 +32,25 @@ describe("operation expression", () => {
 
   });
 
+  test("should cache operation expression", () => {
+
+    const expression1: OperationExpression = $oper(
+      "+",
+      $get("a"),
+      $literal(1),
+    );
+    const expression2: OperationExpression = $oper(
+      "+",
+      $get("a"),
+      $literal(1),
+    );
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
+
+  });
+
 });

@@ -49,12 +49,13 @@ describe("get expression", () => {
 
   test("should cache get expression", () => {
 
-    const expression: GetExpression = $get("value");
+    const expression1: GetExpression = $get("value");
+    const expression2: GetExpression = $get("value");
 
     const cache = {};
 
     expect(
-      compileExp(expression, cache) === compileExp(expression, cache),
+      compileExp(expression1, cache) === compileExp(expression2, cache),
     ).toBe(true);
 
   });

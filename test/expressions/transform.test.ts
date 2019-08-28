@@ -1,5 +1,5 @@
-import { compileExp } from "../../src";
-import { $literal } from "../helpers/expressions";
+import { compileExp, TransformExpression } from "../../src";
+import { $get, $literal, $trans } from "../helpers/expressions";
 
 describe("transform expression", () => {
 
@@ -17,6 +17,25 @@ describe("transform expression", () => {
       expect(() => compileExp(expression as any, {})).toThrow();
 
     });
+
+  });
+
+  test("should cache transform expression", () => {
+
+    const expression1: TransformExpression = $trans(
+      "!",
+      $get("a"),
+    );
+    const expression2: TransformExpression = $trans(
+      "!",
+      $get("a"),
+    );
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
 
   });
 

@@ -251,4 +251,29 @@ describe("function expression", () => {
 
   });
 
+  test("should cache function expression", () => {
+
+    const expression1: FunctionExpression = {
+      type: "func",
+      params: ["a", "b"],
+      body: $return(
+        $literal(null),
+      ),
+    };
+    const expression2: FunctionExpression = {
+      type: "func",
+      params: ["a", "b"],
+      body: $return(
+        $literal(null),
+      ),
+    };
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
+
+  });
+
 });

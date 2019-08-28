@@ -297,6 +297,6 @@ export type ArgsLibPopulator = (input: any[], lib: ScopeLib) => ScopeLib;
 export type InputArgsParser = (input: any[]) => ScopeLib;
 
 export interface CompileCache {
-  literal?: Record<string, ScopeBasedResolver>;
-  get?: Record<string, ScopeBasedResolver>;
+  exp?: Record<string, ScopeBasedResolver>;
+  step?: Record<string, ScopeBasedResolver>;
 }

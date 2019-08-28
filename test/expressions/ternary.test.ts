@@ -58,4 +58,25 @@ describe("ternary expression", () => {
 
   });
 
+  test("should cache ternary expression", () => {
+
+    const expression1: TernaryExpression = $ternary(
+      $get("cond"),
+      $literal("yes"),
+      $literal("no"),
+    );
+    const expression2: TernaryExpression = $ternary(
+      $get("cond"),
+      $literal("yes"),
+      $literal("no"),
+    );
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
+
+  });
+
 });

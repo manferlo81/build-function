@@ -62,4 +62,17 @@ describe("set expression", () => {
 
   });
 
+  test("should cache set expression", () => {
+
+    const expression1: SetExpression = $set("value", $literal(1));
+    const expression2: SetExpression = $set("value", $literal(1));
+
+    const cache = {};
+
+    expect(
+      compileExp(expression1, cache) === compileExp(expression2, cache),
+    ).toBe(true);
+
+  });
+
 });

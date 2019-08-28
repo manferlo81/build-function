@@ -113,4 +113,29 @@ describe("let statement step", () => {
 
   });
 
+  test("should cache declare statement step", () => {
+
+    const step1: LetStatement = {
+      type: "let",
+      declare: [
+        "value1",
+        "value2",
+      ],
+    };
+    const step2: LetStatement = {
+      type: "let",
+      declare: [
+        "value1",
+        "value2",
+      ],
+    };
+
+    const cache = {};
+
+    expect(
+      compileStep(step1, cache) === compileStep(step2, cache),
+    ).toBe(true);
+
+  });
+
 });
