@@ -84,47 +84,157 @@ interface BuildFunctionOptions {
 }
 ```
 
-**`options`**
+***arguments***
 
-Function options.
+* **`options`**
 
-> ***properties***
->
-> **`name`** (`optional`)
->
-> A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
->
-> **`params`** (`optional`)
->
-> see [Function Expression](#function-expression) for more information.
->
-> ***`body` (`optional`)***
->
-> see [Function Expression](#function-expression) for more information.
+  Function options.
 
-**`scope`** (`optional`)
+  * **`name`** (`optional`)
 
-Outer scope for the function. see [scope section](#createscope) for more information.
+    A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
+
+  * **`params`** (`optional`)
+  
+    see [Function Expression](#function-expression) for more information.
+
+  * ***`body` (`optional`)***
+
+    see [Function Expression](#function-expression) for more information.
+
+* **`scope`** (`optional`)
+
+  Outer scope for the function. see [scope section](#createscope) for more information.
 
 ### `compileExp`
 
 Compiles an [expression](#expressions) into a `function`.
 
+```typescript
+function compileExp(
+  expression: Expression,
+  cache: object,
+  safeGet?: boolean,
+): Resolver;
+```
+
+***arguments***
+
+* **`expression`**
+
+  [Expression](#expressions) to be compiled.
+
+* **`cache`**
+
+  Cache object.
+
+* **`safeGet`** (`optional`)
+
+  Whether or not to return `undefined` if `id` not found on a `get` expression.
+
 ### `compileStep`
 
 Compiles a [function step](#function-steps) into a `function`.
+
+```typescript
+function compileStep(
+  step: FunctionStep,
+  cache: object,
+  allowBreak?: boolean,
+): Resolver;
+```
+
+***arguments***
+
+* **`step`**
+
+  [Function step](#function-steps) to be compiled.
+
+* **`cache`**
+
+  Cache object.
+
+* **`allowBreak`** (`optional`)
+
+  Whether or not to allow [`break` statements](#break-statement).
 
 ### `createScope`
 
 Creates a `scope`.
 
+```typescript
+function createScope(
+  parent: Scope | null,
+  lib?: ScopeLib | null,
+): Scope;
+```
+
+***arguments***
+
+* **`parent`**
+
+  Parent `scope`.
+
+* **`lib`**
+
+  Variables to be added to the newly created `scope`.
+
 ### `findInScope`
 
 Searches for an `id` in a `scope`.
 
+```typescript
+function findInScope(
+  scope: Scope,
+  id: string,
+  topOnly?: boolean,
+): ScopeValue;
+
+interface ScopeValue {
+  scope: Scope;
+  id: string;
+}
+```
+
+***arguments***
+
+* **`scope`**
+
+  Top level `scope`.
+
+* **`id`**
+
+  Variable `id` to search for.
+
+* **`topOnly`** (`optional`)
+
+  Whether or not to search the top level `scope` only. Otherwise it will keep searching every parent `scope`.
+
 ### `setInScope`
 
 Sets a value into a `scope`.
+
+```typescript
+function setInScope(
+  scope: Scope,
+  id: string,
+  value: any,
+): void;
+```
+
+***arguments***
+
+* **`scope`**
+
+  The `scope` to set the variable.
+
+* **`id`**
+
+  The variable `id`.
+
+* **`value`**
+
+  The variable value.
 
 ## Expressions
 
@@ -141,13 +251,13 @@ interface LiteralExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"literal"`, it's what identifies a `literal` expression from other expressions and statements.
+  Always `"literal"`, it's what identifies a `literal` expression from other expressions and statements.
 
-**`value`**
+* **`value`**
 
-Value to be used as literal when expression is evaluated.
+  Value to be used as literal when expression is evaluated.
 
 ***example***
 
@@ -180,15 +290,15 @@ interface GetExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"get"`, it's what identifies a `get` expression from other expressions and statements.
+  Always `"get"`, it's what identifies a `get` expression from other expressions and statements.
 
-**`id`**
+* **`id`**
 
-String representing the `id` to be used when expression is resolved.
+  String representing the `id` to be used when expression is resolved.
 
-If the `id` is not present in the current virtual scope, it will throw.
+  If the `id` is not present in the current virtual scope, it will throw.
 
 ***example***
 
@@ -222,17 +332,17 @@ interface SetExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"set"`, it's what identifies a `set` expression from other expressions and statements.
+  Always `"set"`, it's what identifies a `set` expression from other expressions and statements.
 
-**`id`**
+* **`id`**
 
-String representing the `id` to be used when expression is resolved.
+  String representing the `id` to be used when expression is resolved.
 
-**`value`**
+* **`value`**
 
-Expression resolving to a value to be assigned to the corresponding `id` in the current virtual scope.
+  Expression resolving to a value to be assigned to the corresponding `id` in the current virtual scope.
 
 ***example***
 
@@ -271,21 +381,21 @@ interface TernaryExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"ternary"`, it's what identifies a `ternary` expression from other expressions and statements.
+  Always `"ternary"`, it's what identifies a `ternary` expression from other expressions and statements.
 
-**`condition`**
+* **`condition`**
 
-Expression which result will be used as condition for the `ternary` expression.
+  Expression which result will be used as condition for the `ternary` expression.
 
-**`then`**
+* **`then`**
 
-Expression which result will be used as resul for the `ternary` expression if `condition` is truthy.
+  Expression which result will be used as resul for the `ternary` expression if `condition` is truthy.
 
-**`otherwise`**
+* **`otherwise`**
 
-Expression which result will be used as resul for the `ternary` expression if `condition` is falsy.
+  Expression which result will be used as resul for the `ternary` expression if `condition` is falsy.
 
 ***example***
 
@@ -330,17 +440,17 @@ interface OperationExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"oper"`, it's what identifies an `operation` expression from other expressions and statements.
+  Always `"oper"`, it's what identifies an `operation` expression from other expressions and statements.
 
-**`oper`**
+* **`oper`**
 
-The operator to be used in the operation, see [operations](#operations) for more information.
+  The operator to be used in the operation, see [operations](#operations) for more information.
 
-**`exp`**
+* **`exp`**
 
-Array of expressions to be used in the operation, if less than 2 operators provided, it will throw at compile time.
+  Array of expressions to be used in the operation, if less than 2 operators provided, it will throw at compile time.
 
 ***example***
 
@@ -390,17 +500,17 @@ interface TransformExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"trans"`, it's what identifies a `transform` expression from other expressions and statements.
+  Always `"trans"`, it's what identifies a `transform` expression from other expressions and statements.
 
-**`oper`**
+* **`oper`**
 
-The operator to be used in the operation, see [transformations](#transformations) for more information.
+  The operator to be used in the operation, see [transformations](#transformations) for more information.
 
-**`exp`**
+* **`exp`**
 
-Expression which result will be transformed.
+  Expression which result will be transformed.
 
 ***example***
 
@@ -443,15 +553,17 @@ interface ParamDescriptor {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
+  Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
 
-**`params`** (`optional`)
+* **`params`** (`optional`)
 
-**`body`** (`optional`)
+  Function parameters.
 
-A `step` or `array of steps` to be executed when the function is called. See [function steps](#function-steps) for more information.
+* **`body`** (`optional`)
+
+  A `step` or `array of steps` to be executed when the function is called. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -504,17 +616,17 @@ interface FunctionCallExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"call"`, it's what identifies a `function call` expression from other expressions and statements.
+  Always `"call"`, it's what identifies a `function call` expression from other expressions and statements.
 
-**`func`**
+* **`func`**
 
-Expression which result will be used as function to be called.
+  Expression which result will be used as function to be called.
 
-**`args`** (`optional`)
+* **`args`** (`optional`)
 
-[`Expression`](#expressions), [`spread expression`](#spread-expression) or `array of them` to be used as `arguments` to call the function.
+  [`Expression`](#expressions), [`spread expression`](#spread-expression) or `array of them` to be used as `arguments` to call the function.
 
 ***example***
 
@@ -560,13 +672,13 @@ interface SpreadExpression {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"spread"`, it's what identifies a `spread` expression from other expressions and statements.
+  Always `"spread"`, it's what identifies a `spread` expression from other expressions and statements.
 
-**`exp`**
+* **`exp`**
 
-Expression which resolves to an array to be spread.
+  Expression which resolves to an array to be spread.
 
 ***example***
 
@@ -622,13 +734,13 @@ interface DeclareWithValue {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"let"`, it's what identifies a `let` statement from other statements and expressions.
+  Always `"let"`, it's what identifies a `let` statement from other statements and expressions.
 
-**`declare`**
+* **`declare`**
 
-An `id`, `id-value-pair` or `array of them` to be declared into the current virtual scope.
+  An `id`, `id-value-pair` or `array of them` to be declared into the current virtual scope.
 
 ***example***
 
@@ -666,21 +778,21 @@ interface IfStatement {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"if"`, it's what identifies an `if` statement from other statements and expressions.
+  Always `"if"`, it's what identifies an `if` statement from other statements and expressions.
 
-**`condition`**
+* **`condition`**
 
-Expression which result will be used as condition for the `if` statement.
+  Expression which result will be used as condition for the `if` statement.
 
-**`then`** (`optional`)
+* **`then`** (`optional`)
 
-A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
 
-**`otherwise`** (`optional`)
+* **`otherwise`** (`optional`)
 
-A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -734,25 +846,25 @@ interface ForStatement {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"for"`, it's what identifies a `for` statement from other statements and expressions.
+  Always `"for"`, it's what identifies a `for` statement from other statements and expressions.
 
-**`target`**
+* **`target`**
 
-Expression resolving to an `array-like` object, which `length` property will be used for the loop.
+  Expression resolving to an `array-like` object, which `length` property will be used for the loop.
 
-**`index`** (`optional`)
+* **`index`** (`optional`)
 
-The `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered, the loop will still run.
+  The `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
-**`value`** (`optional`)
+* **`value`** (`optional`)
 
-The `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered, the loop will still run.
+  The `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
-**`body`** (`optional`)
+* **`body`** (`optional`)
 
-A `step` or `array of steps` to be executed for every iteration. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed for every iteration. See [function steps](#function-steps) for more information.
 
 ***example***
 
@@ -805,9 +917,9 @@ interface BreakStatement {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"break"`, it's what identifies a `break` statement from other statements and expressions.
+  Always `"break"`, it's what identifies a `break` statement from other statements and expressions.
 
 ### `return` Statement
 
@@ -822,13 +934,13 @@ interface ReturnStatement {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"return"`, it's what identifies a `return` statement from other statements and expressions.
+  Always `"return"`, it's what identifies a `return` statement from other statements and expressions.
 
-**`value`**
+* **`value`**
 
-Expression which result will be used as `return` value.
+  Expression which result will be used as `return` value.
 
 ***example***
 
@@ -861,13 +973,13 @@ interface ThrowStatement {
 }
 ```
 
-**`type`**
+* **`type`**
 
-Always `"throw"`, it's what identifies a `throw` statement from other statements and expressions.
+  Always `"throw"`, it's what identifies a `throw` statement from other statements and expressions.
 
-**`msg`**
+* **`msg`**
 
-A string or Expression resolving to a string to be used as `Error` message.
+  A string or Expression resolving to a string to be used as `Error` message.
 
 ***example***
 
