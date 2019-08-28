@@ -109,7 +109,7 @@ describe("if statement step", () => {
 
   });
 
-  test("should cache declare statement step", () => {
+  test("should cache if statement step", () => {
 
     const step1: IfStatement = {
       type: "if",
@@ -141,10 +141,9 @@ describe("if statement step", () => {
     };
 
     const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
 
-    expect(
-      compileStep(step1, cache) === compileStep(step2, cache),
-    ).toBe(true);
+    expect(same).toBe(true);
 
   });
 

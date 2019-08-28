@@ -46,10 +46,9 @@ describe("operation expression", () => {
     );
 
     const cache = {};
+    const same = compileExp(expression1, cache) === compileExp(expression2, cache);
 
-    expect(
-      compileExp(expression1, cache) === compileExp(expression2, cache),
-    ).toBe(true);
+    expect(same).toBe(true);
 
   });
 

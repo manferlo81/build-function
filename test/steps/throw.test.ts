@@ -58,4 +58,22 @@ describe("throw error statement step", () => {
 
   });
 
+  test("should cache throw statement step", () => {
+
+    const step1: ThrowStatement = {
+      type: "throw",
+      msg: "value",
+    };
+    const step2: ThrowStatement = {
+      type: "throw",
+      msg: "value",
+    };
+
+    const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
+
+    expect(same).toBe(true);
+
+  });
+
 });

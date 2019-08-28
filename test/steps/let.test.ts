@@ -113,7 +113,7 @@ describe("let statement step", () => {
 
   });
 
-  test("should cache declare statement step", () => {
+  test("should cache let statement step", () => {
 
     const step1: LetStatement = {
       type: "let",
@@ -131,10 +131,9 @@ describe("let statement step", () => {
     };
 
     const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
 
-    expect(
-      compileStep(step1, cache) === compileStep(step2, cache),
-    ).toBe(true);
+    expect(same).toBe(true);
 
   });
 

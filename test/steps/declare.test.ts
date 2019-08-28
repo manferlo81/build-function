@@ -123,10 +123,9 @@ describe("declare statement step", () => {
     };
 
     const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
 
-    expect(
-      compileStep(step1, cache) === compileStep(step2, cache),
-    ).toBe(true);
+    expect(same).toBe(true);
 
   });
 

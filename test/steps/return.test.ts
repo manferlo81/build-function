@@ -37,4 +37,22 @@ describe("return statement step", () => {
 
   });
 
+  test("should cache return statement step", () => {
+
+    const step1: ReturnStatement = {
+      type: "return",
+      value: $get("value"),
+    };
+    const step2: ReturnStatement = {
+      type: "return",
+      value: $get("value"),
+    };
+
+    const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
+
+    expect(same).toBe(true);
+
+  });
+
 });

@@ -199,4 +199,32 @@ describe("for statement step", () => {
 
   });
 
+  test("should cache for statement step", () => {
+
+    const step1: ForStatement = {
+      type: "for",
+      target: $get("array"),
+      value: "value",
+      body: $call(
+        $get("func"),
+        $get("value"),
+      ),
+    };
+    const step2: ForStatement = {
+      type: "for",
+      target: $get("array"),
+      value: "value",
+      body: $call(
+        $get("func"),
+        $get("value"),
+      ),
+    };
+
+    const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
+
+    expect(same).toBe(true);
+
+  });
+
 });
