@@ -188,7 +188,17 @@ const expTable: ExpressionLookupTable = {
       throw errorRequired("value", "literal");
     }
 
-    return functionReturning(exp.value);
+    const { value } = exp;
+
+    const valueType = typeof value;
+
+    if (valueType === "string" || valueType === "number" || valueType === "boolean") {
+      return functionReturning(value);
+    }
+
+    const serialized = JSON.stringify(value);
+
+    return () => JSON.parse(serialized);
 
   },
 

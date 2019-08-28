@@ -257,7 +257,7 @@ interface LiteralExpression {
 
 * **`value`**
 
-  Value to be used as literal when expression is evaluated.
+  Value to be used as literal when expression is evaluated. This value will serialized using `JSON.stringify` and then reparsed using `JSON.parse` when expression is evaluated.
 
 ***example***
 

@@ -36,4 +36,18 @@ describe("literal expression", () => {
 
   });
 
+  test("should regenerate literal expresion on resolve", () => {
+
+    const expression: LiteralExpression = $literal({});
+
+    const resolve = compileExp(expression, {});
+
+    const obj = resolve(null as any);
+
+    obj.value = true;
+
+    expect(resolve(null as any)).not.toHaveProperty("value");
+
+  });
+
 });
