@@ -56,5 +56,8 @@
     "url": "https://github.com/manferlo81/build-function/issues"
   },
   "homepage": "https://github.com/manferlo81/build-function#readme",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "object-hash": "^1.3.1"
+  }
 }
