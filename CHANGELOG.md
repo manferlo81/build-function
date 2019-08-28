@@ -2,7 +2,7 @@
 
 ## 0.0.2
 
-***27-AUG-2019***
+***28-AUG-2019***
 
 * added badges
 * improved documentation
