@@ -1,5 +1,6 @@
-import { compileExp, compileStep, FunctionCallExpression, GetExpression } from "../src";
-import { $call, $get } from "./helpers/expressions";
+import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression } from "../src";
+import { compileDecl, compileParam } from "../src/compile";
+import { $call, $get, $literal } from "./helpers/expressions";
 
 jest.mock("object-hash", () => {
   return null;
@@ -36,6 +37,27 @@ describe("compile without cache", () => {
     const cache = {};
 
     const same = compileStep(step1, cache) === compileStep(step2, cache);
+
+    expect(same).toBe(false);
+
+  });
+
+  test("should compile function param without cache if no object-hash", () => {
+
+    const cache = {};
+    const same = compileParam("param", cache) === compileParam("param", cache);
+
+    expect(same).toBe(false);
+
+  });
+
+  test("should compile variable declaration without cache if no object-hash", () => {
+
+    const declare1: DeclareWithValue = { id: "value", value: $literal(true) };
+    const declare2: DeclareWithValue = { id: "value", value: $literal(true) };
+
+    const cache = {};
+    const same = compileDecl(declare1, cache) === compileDecl(declare2, cache);
 
     expect(same).toBe(false);
 

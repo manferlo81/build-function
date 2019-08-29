@@ -15,11 +15,13 @@ import {
 import {
   ArgsLibPopulator,
   CompileCache,
+  DeclareWithValue,
   Expression,
   FunctionOptions,
   FunctionParameter,
   FunctionStep,
   InputArgsParser,
+  ParameterDescriptor,
   ParameterType,
   RegularArithmeticOperator,
   RegularOperator,
@@ -262,33 +264,6 @@ const expTable: ExpressionLookupTable = {
 
   },
 
-  call(exp, cache) {
-
-    if (!hasOwn.call(exp, "func")) {
-      throw errorRequired("func", "call");
-    }
-
-    const { args } = exp;
-
-    const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
-    const resolveArgs = args ? compileSpread(args, cache) : null;
-
-    return (scope) => {
-
-      const func = resolveFunc(scope);
-
-      if (!resolveArgs) {
-        return func();
-      }
-
-      return func(
-        ...resolveArgs(scope),
-      );
-
-    };
-
-  },
-
   ternary(exp, cache) {
 
     if (!hasOwn.call(exp, "condition")) {
@@ -397,6 +372,33 @@ const expTable: ExpressionLookupTable = {
       exp,
       cache,
     ) as any;
+
+  },
+
+  call(exp, cache) {
+
+    if (!hasOwn.call(exp, "func")) {
+      throw errorRequired("func", "call");
+    }
+
+    const { args } = exp;
+
+    const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
+    const resolveArgs = args ? compileSpread(args, cache) : null;
+
+    return (scope) => {
+
+      const func = resolveFunc(scope);
+
+      if (!resolveArgs) {
+        return func();
+      }
+
+      return func(
+        ...resolveArgs(scope),
+      );
+
+    };
 
   },
 
@@ -565,55 +567,6 @@ const stepTable: StatementLookupTable = {
 
 };
 
-// PARAMS
-
-function compileParam(params: FunctionParameter | FunctionParameter[], cache: CompileCache): InputArgsParser {
-
-  function compileSingle(single: FunctionParameter, index: number): ArgsLibPopulator {
-
-    if (!isObj(single)) {
-      single = { id: single, type: "param" };
-    }
-
-    const { id } = single;
-
-    if (typeof id !== "string") {
-      throw errorInvalid(id, "parameter id");
-    }
-
-    if (id === "arguments") {
-      throw error("\"arguments\" can't be used as parameter id");
-    }
-
-    const compileGetter = paramTable[single.type];
-
-    if (!compileGetter) {
-      throw errorInvalidType(single.type, "parameter");
-    }
-
-    const getValue = compileGetter(index);
-
-    return (input, lib) => {
-      lib[id] = getValue(input);
-      return lib;
-    };
-
-  }
-
-  if (!isArray(params)) {
-    const populate = compileSingle(params, 0);
-    return (input) => populate(input, {});
-  }
-
-  const populators = params.map<ArgsLibPopulator>(compileSingle);
-
-  return (input) => populators.reduce<ScopeLib>(
-    (result, populate) => populate(input, result),
-    {},
-  );
-
-}
-
 // FUNCTION
 
 export function compileFunc<V extends AnyFunction = AnyFunction>(
@@ -681,6 +634,220 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
 }
 
+// PARAMS
+
+export function compileParam(params: FunctionParameter | FunctionParameter[], cache: CompileCache): InputArgsParser {
+
+  function compileSingle(single: ParameterDescriptor, index: number): ArgsLibPopulator {
+
+    const { type, id } = single;
+
+    const compileGetter = paramTable[type];
+
+    if (!compileGetter) {
+      throw errorInvalidType(type, "parameter");
+    }
+
+    const getValue = compileGetter(index);
+
+    return (input, lib) => {
+      lib[id] = getValue(input);
+      return lib;
+    };
+
+  }
+
+  const db = cache.param || (cache.param = {});
+
+  function compileCached(single: FunctionParameter, index: number): ArgsLibPopulator {
+
+    if (!isObj(single)) {
+      single = { id: single, type: "param" };
+    }
+
+    const { id } = single;
+
+    if (typeof id !== "string") {
+      throw errorInvalid(id, "parameter id");
+    }
+
+    if (id === "arguments") {
+      throw error("\"arguments\" can't be used as parameter id");
+    }
+
+    if (!hash) {
+      return compileSingle(single, index);
+    }
+
+    const key = hash(single, single.type, index);
+    const cached = db[key];
+
+    if (cached) {
+      return cached;
+    }
+
+    return db[key] = compileSingle(single, index);
+
+  }
+
+  if (!isArray(params)) {
+    const populate = compileCached(params, 0);
+    return (input) => populate(input, {});
+  }
+
+  const populators = params.map<ArgsLibPopulator>(compileCached);
+
+  return (input) => populators.reduce<ScopeLib>(
+    (result, populate) => populate(input, result),
+    {},
+  );
+
+}
+
+// VARIABLE DECLARATION
+
+export function compileDecl(
+  declare: SingleOrMulti<VariableDeclaration>,
+  cache: CompileCache,
+): ScopeBasedResolver<void> {
+
+  function compileSingle(single: DeclareWithValue): ScopeBasedResolver<void> {
+
+    const { id, value } = single;
+
+    let resolveValue: ScopeBasedResolver | undefined;
+    if (value) {
+      resolveValue = compileExp(value, cache);
+    }
+
+    return (scope) => {
+
+      if (
+        findInScope(
+          scope,
+          id,
+          true,
+        )
+      ) {
+        throw error(`"${id}" has already been declared in this scope`);
+      }
+
+      setInScope(
+        scope,
+        id,
+        resolveValue && resolveValue(scope),
+      );
+
+    };
+
+  }
+
+  const db = cache.let || (cache.let = {});
+
+  function compileCached(single: VariableDeclaration): ScopeBasedResolver<void> {
+
+    if (!isObj(single)) {
+      single = {
+        id: single,
+      };
+    }
+
+    if (!hash) {
+      return compileSingle(single);
+    }
+
+    const key = hash(single, single.id);
+    const cached = db[key];
+
+    if (cached) {
+      return cached;
+    }
+
+    return db[key] = compileSingle(single);
+
+  }
+
+  if (!isArray(declare)) {
+    return compileCached(declare);
+  }
+
+  const resolvers = declare.map<ScopeBasedResolver<void>>(compileCached);
+
+  return (scope) => {
+    resolvers.forEach((resolve) => {
+      resolve(scope);
+    });
+  };
+
+}
+
+// SPREADABLE
+
+export function compileSpread<V = any>(
+  exp: SingleOrMulti<SpreadableExpression>,
+  cache: CompileCache,
+): ScopeBasedResolver<V[]> {
+
+  function compileSingle(single: SpreadableExpression): ScopeBasedPopulator<V[]> {
+
+    if (single.type === "spread") {
+
+      const resolveArray = compileExp<V[]>(single.exp, cache);
+
+      return (scope, resolved) => {
+        resolved.push.apply(
+          resolved,
+          resolveArray(scope),
+        );
+        return resolved;
+      };
+
+    }
+
+    const resolveParam = compileExp(single, cache);
+
+    return (scope, resolved) => {
+      resolved.push(
+        resolveParam(scope),
+      );
+      return resolved;
+    };
+
+  }
+
+  const db = cache.spread || (cache.spread = {});
+
+  function compileCached(single: SpreadableExpression): ScopeBasedPopulator<V[]> {
+
+    if (!hash) {
+      return compileSingle(single);
+    }
+
+    const key = hash(single, single.type);
+    const cached = db[key];
+
+    if (cached) {
+      return cached;
+    }
+
+    return db[key] = compileSingle(single);
+
+  }
+
+  if (!isArray(exp)) {
+    const populate = compileCached(exp);
+    return (scope) => populate(scope, []);
+  }
+
+  const populators = exp.map(compileCached);
+
+  return (scope) => populators.reduce(
+    (result, populate) => populate(scope, result),
+    [] as V[],
+  );
+
+}
+
 // EXPRESSION
 
 export function compileExp<V extends any = any>(
@@ -715,6 +882,8 @@ export function compileExp<V extends any = any>(
 
   }
 
+  const db = cache.exp || (cache.exp = {});
+
   function compileCached(single: Expression) {
 
     if (!single || !isObj(single)) {
@@ -725,13 +894,11 @@ export function compileExp<V extends any = any>(
       return compileSingle(single);
     }
 
-    const db = cache.exp || (cache.exp = {});
-    const key = hash(single);
+    const key = hash(single, single.type);
+    const cached = db[key];
 
-    const resolve = db[key];
-
-    if (resolve) {
-      return resolve;
+    if (cached) {
+      return cached;
     }
 
     return db[key] = compileSingle(single);
@@ -743,107 +910,6 @@ export function compileExp<V extends any = any>(
   }
 
   return exp.map(compileCached);
-
-}
-
-// SPREADABLE
-
-function compileSpread<V = any>(
-  exp: SingleOrMulti<SpreadableExpression>,
-  cache: CompileCache,
-): ScopeBasedResolver<V[]> {
-
-  function compileSingle(single: SpreadableExpression): ScopeBasedPopulator<V[]> {
-
-    if (single.type === "spread") {
-      const resolveArray = compileExp<V[]>(single.exp, cache);
-      return (scope, resolved) => {
-        resolved.push.apply(
-          resolved,
-          resolveArray(scope),
-        );
-        return resolved;
-      };
-    }
-
-    const resolveParam = compileExp(single, cache);
-    return (scope, resolved) => {
-      resolved.push(
-        resolveParam(scope),
-      );
-      return resolved;
-    };
-
-  }
-
-  if (!isArray(exp)) {
-    const populate = compileSingle(exp);
-    return (scope) => populate(scope, []);
-  }
-
-  const populators = exp.map(compileSingle);
-
-  return (scope) => populators.reduce(
-    (result, populate) => populate(scope, result),
-    [] as V[],
-  );
-
-}
-
-// VARIABLE DECLARATION
-
-function compileDecl(
-  declare: SingleOrMulti<VariableDeclaration>,
-  cache: CompileCache,
-): ScopeBasedResolver<void> {
-
-  function compileSingle(set: VariableDeclaration): ScopeBasedResolver<void> {
-
-    if (!isObj(set)) {
-      set = {
-        id: set,
-      };
-    }
-
-    const { id, value } = set;
-
-    let resolveValue: ScopeBasedResolver | undefined;
-    if (value) {
-      resolveValue = compileExp(value, cache);
-    }
-
-    return (scope) => {
-
-      if (
-        findInScope(
-          scope,
-          id,
-          true,
-        )
-      ) {
-        throw error(`"${id}" has already been declared in this scope`);
-      }
-
-      setInScope(
-        scope,
-        id,
-        resolveValue && resolveValue(scope),
-      );
-    };
-
-  }
-
-  if (!isArray(declare)) {
-    return compileSingle(declare);
-  }
-
-  const resolvers = declare.map<ScopeBasedResolver<void>>(compileSingle);
-
-  return (scope) => {
-    resolvers.forEach((resolve) => {
-      resolve(scope);
-    });
-  };
 
 }
 
@@ -888,6 +954,8 @@ export function compileStep<V = any>(
 
   }
 
+  const db = cache.step || (cache.step = {});
+
   function compileCached(single: FunctionStep): ScopeBasedResolver<StepLoopResult> {
 
     if (!single || !isObj(single)) {
@@ -898,13 +966,11 @@ export function compileStep<V = any>(
       return compileSingle(single);
     }
 
-    const db = cache.step || (cache.step = {});
-    const key = hash(single);
+    const key = hash(single, single.type);
+    const cached = db[key];
 
-    const resolve = db[key];
-
-    if (resolve) {
-      return resolve;
+    if (cached) {
+      return cached;
     }
 
     return db[key] = compileSingle(single);

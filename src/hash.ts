@@ -1,12 +1,14 @@
 import objectHash from "object-hash";
-import { FunctionStep } from "./types";
 
-let hash: ((object: FunctionStep) => string) | undefined;
+let hash: ((object: object, ...others: any[]) => string) | undefined;
 
 if (objectHash) {
-  hash = (object: FunctionStep): string => (
-    objectHash.MD5(object.type) + objectHash.sha1(object)
+
+  hash = (object: object, ...others: any[]): string => others.reduce(
+    (main, other) => (main + objectHash.MD5(other)),
+    objectHash.sha1(object),
   );
+
 }
 
 export { hash };
