@@ -1,16 +1,16 @@
 import { compileFunc } from "./compile";
-import { createScope } from "./scope";
-import { NamedFunctionOptions, Scope } from "./types";
+import { createEnv } from "./env";
+import { Environment, NamedFunctionOptions } from "./types";
 
 export function build<F extends (...args: any[]) => any>(
   options: NamedFunctionOptions,
-  scope?: Scope,
+  env?: Environment,
 ): F {
   return compileFunc<F>(
     options,
     {},
     options.name,
   )(
-    scope || createScope(null),
+    env || createEnv(null),
   );
 }

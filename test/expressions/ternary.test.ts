@@ -1,4 +1,4 @@
-import { compileExp, createScope, TernaryExpression } from "../../src";
+import { compileExp, createEnv, TernaryExpression } from "../../src";
 import { $get, $literal, $set, $ternary, $trans } from "../helpers/expressions";
 
 describe("ternary expression", () => {
@@ -43,7 +43,7 @@ describe("ternary expression", () => {
       {},
     );
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       cond: false,
     });
 

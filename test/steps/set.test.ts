@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createScope, SetExpression } from "../../src";
+import { compileExp, compileStep, createEnv, SetExpression } from "../../src";
 import { $get, $literal, $set } from "../helpers/expressions";
 
 describe("set expression step", () => {
@@ -16,7 +16,7 @@ describe("set expression step", () => {
       {},
     );
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       value: false,
     });
 

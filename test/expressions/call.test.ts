@@ -1,4 +1,4 @@
-import { compileExp, createScope, FunctionCallExpression } from "../../src";
+import { compileExp, createEnv, FunctionCallExpression } from "../../src";
 import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call expression", () => {
@@ -21,7 +21,7 @@ describe("call expression", () => {
     const returnValue = "ok";
     const func = jest.fn(() => returnValue);
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       func,
     });
 
@@ -49,7 +49,7 @@ describe("call expression", () => {
 
     const func = jest.fn((x, y, z) => (x + y + z));
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       func,
     });
 
@@ -72,7 +72,7 @@ describe("call expression", () => {
       return true;
     });
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       func,
     });
 

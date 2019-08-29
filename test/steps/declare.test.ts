@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createScope, DeprecatedDeclareStatement } from "../../src";
+import { compileExp, compileStep, createEnv, DeprecatedDeclareStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("declare statement step", () => {
@@ -31,7 +31,7 @@ describe("declare statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     expect(() => getValue(scope)).toThrow();
 
@@ -62,7 +62,7 @@ describe("declare statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     expect(() => getValue1(scope)).toThrow();
     expect(() => getValue2(scope)).toThrow();
@@ -95,7 +95,7 @@ describe("declare statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     const result = resolve(scope);
 

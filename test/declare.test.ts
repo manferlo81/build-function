@@ -1,4 +1,4 @@
-import { createScope, DeclareWithValue, findInScope } from "../src";
+import { createEnv, DeclareWithValue, findInEnv } from "../src";
 import { compileDecl } from "../src/compile";
 import { $literal } from "./helpers/expressions";
 
@@ -9,10 +9,10 @@ describe("variable declaration", () => {
     const declare = "id";
     const resolve = compileDecl(declare, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     resolve(scope);
 
-    expect(findInScope(scope, declare)).toBeTruthy();
+    expect(findInEnv(scope, declare)).toBeTruthy();
 
   });
 

@@ -1,4 +1,4 @@
-import { compileStep, createScope, FunctionCallExpression } from "../../src";
+import { compileStep, createEnv, FunctionCallExpression } from "../../src";
 import { $call, $get, $literal } from "../helpers/expressions";
 
 describe("call function expression step", () => {
@@ -12,7 +12,7 @@ describe("call function expression step", () => {
 
     const func = jest.fn();
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       func,
     });
 
@@ -34,7 +34,7 @@ describe("call function expression step", () => {
 
     const func = jest.fn(() => "ignored");
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       func,
     });
 

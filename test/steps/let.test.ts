@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createScope, LetStatement } from "../../src";
+import { compileExp, compileStep, createEnv, LetStatement } from "../../src";
 import { $get, $literal } from "../helpers/expressions";
 
 describe("let statement step", () => {
@@ -24,7 +24,7 @@ describe("let statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     expect(() => getValue(scope)).toThrow();
 
@@ -55,7 +55,7 @@ describe("let statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     expect(() => getValue1(scope)).toThrow();
     expect(() => getValue2(scope)).toThrow();
@@ -88,7 +88,7 @@ describe("let statement step", () => {
       {},
     );
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     const result = resolve(scope);
 
@@ -106,7 +106,7 @@ describe("let statement step", () => {
     };
     const resolve = compileStep(step, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     resolve(scope);
     expect(() => resolve(scope)).toThrow();

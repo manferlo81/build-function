@@ -1,4 +1,4 @@
-import { compileStep, createScope, ForStatement } from "../../src";
+import { compileStep, createEnv, ForStatement } from "../../src";
 import { $call, $get, $if, $literal, $oper, $return } from "../helpers/expressions";
 
 describe("for statement step", () => {
@@ -37,7 +37,7 @@ describe("for statement step", () => {
     const resolve = compileStep(step, {});
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const scope = createEnv(null, { func });
 
     expect(resolve(scope)).toBeUndefined();
 
@@ -69,7 +69,7 @@ describe("for statement step", () => {
     const resolve = compileStep(step, {});
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const scope = createEnv(null, { func });
 
     expect(resolve(scope)).toBeUndefined();
 
@@ -125,7 +125,7 @@ describe("for statement step", () => {
     const resolve = compileStep(step, {});
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const scope = createEnv(null, { func });
 
     expect(resolve(scope)).toBeUndefined();
 
@@ -168,7 +168,7 @@ describe("for statement step", () => {
     const resolve = compileStep(step, {});
 
     const func = jest.fn();
-    const scope = createScope(null, { func });
+    const scope = createEnv(null, { func });
 
     expect(resolve(scope)).toEqual({
       type: "return",
@@ -193,7 +193,7 @@ describe("for statement step", () => {
 
     const resolve = compileStep(step, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     expect(() => resolve(scope)).not.toThrow();
 

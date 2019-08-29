@@ -1,4 +1,4 @@
 export { build } from "./build-function";
 export { compileExp, compileStep } from "./compile";
-export { createScope, findInScope, setInScope } from "./scope";
+export { createEnv, findInEnv, setInEnv } from "./env";
 export * from "./types";

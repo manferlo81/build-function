@@ -1,9 +1,9 @@
 import {
   CompileCache,
+  EnvBasedResolver,
   ExpresionType,
   Expression,
   FunctionStep,
-  ScopeBasedResolver,
   Statement,
   StatementType,
   StepLoopResult,
@@ -13,7 +13,7 @@ export type SingleOrMulti<T> = T | T[];
 export type AnyFunction = (...args: any[]) => any;
 
 export type ExpressionCompiler<E extends Expression> =
-  (expression: E, cache: CompileCache, safe?: boolean) => ScopeBasedResolver<any>;
+  (expression: E, cache: CompileCache, safe?: boolean) => EnvBasedResolver<any>;
 
 export type ExpressionLookupTable<E extends Expression = Expression> = {
   [K in ExpresionType]: (
@@ -24,7 +24,7 @@ export type ExpressionLookupTable<E extends Expression = Expression> = {
 };
 
 export type StepCompiler<S extends FunctionStep> =
-  (step: S, cache: CompileCache, breakable?: boolean) => ScopeBasedResolver<StepLoopResult>;
+  (step: S, cache: CompileCache, breakable?: boolean) => EnvBasedResolver<StepLoopResult>;
 
 export type StatementLookupTable<S extends Statement = Statement> = {
   [K in StatementType]: (

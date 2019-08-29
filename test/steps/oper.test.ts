@@ -1,4 +1,4 @@
-import { compileExp, compileStep, createScope, OperationExpression } from "../../src";
+import { compileExp, compileStep, createEnv, OperationExpression } from "../../src";
 import { $get, $literal, $oper, $set } from "../helpers/expressions";
 
 describe("operation expression step", () => {
@@ -20,7 +20,7 @@ describe("operation expression step", () => {
       {},
     );
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       value: 0,
     });
 
@@ -50,7 +50,7 @@ describe("operation expression step", () => {
       {},
     );
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       value: 0,
     });
 

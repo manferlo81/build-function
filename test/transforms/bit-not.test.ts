@@ -1,4 +1,4 @@
-import { compileExp, createScope, TransformExpression } from "../../src";
+import { compileExp, createEnv, TransformExpression } from "../../src";
 import { $get, $trans } from "../helpers/expressions";
 
 describe("bitwise not transform expression", () => {
@@ -13,7 +13,7 @@ describe("bitwise not transform expression", () => {
 
     const value = 100;
 
-    const scope = createScope(null, {
+    const scope = createEnv(null, {
       value,
     });
 

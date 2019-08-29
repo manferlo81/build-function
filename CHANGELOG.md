@@ -2,7 +2,7 @@
 
 ## 0.0.2
 
-***28-AUG-2019***
+***29-AUG-2019***
 
 * added badges
 * improved documentation
@@ -12,6 +12,7 @@
 * deprecated `declare` statement in favor of newly added `let` statement
 * implemented cache
 * `literal` and `get` expresions cache.
+* using environment instead of scope
 
 ## 0.0.1
 

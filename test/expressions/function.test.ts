@@ -1,4 +1,4 @@
-import { compileExp, createScope, FunctionExpression } from "../../src";
+import { compileExp, createEnv, FunctionExpression } from "../../src";
 import { $get, $if, $literal, $oper, $return, $set } from "../helpers/expressions";
 import { rand } from "../helpers/number";
 
@@ -55,7 +55,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<(a: number, b: number) => number>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func = resolve(scope);
 
     const a = rand(1, 50);
@@ -75,7 +75,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<() => true>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func = resolve(scope);
 
     expect(func()).toBe(true);
@@ -93,7 +93,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func = resolve(scope);
     const param = {};
 
@@ -112,7 +112,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func: (...args: any[]) => any = resolve(scope);
     const params = [1, 2, 3];
 
@@ -137,7 +137,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<(a: number, b: number, ...others: number[]) => number>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func = resolve(scope);
 
     const a = rand(1, 50);
@@ -173,7 +173,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<(param: any) => true | undefined>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
     const func = resolve(scope);
 
     expect(func(true)).toBe(true);
@@ -202,7 +202,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<() => void>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     const func = resolve(scope);
 
@@ -223,7 +223,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp<() => void>(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     const func = resolve(scope);
 
@@ -241,7 +241,7 @@ describe("function expression", () => {
     };
     const resolve = compileExp(expression, {});
 
-    const scope = createScope(null);
+    const scope = createEnv(null);
 
     const func = resolve(scope);
 

@@ -23,7 +23,7 @@ export const errorInvalidType = errorFmt<(obj: any, what: string) => Error>(
 );
 
 export const errorNotInScope = errorFmt<(id: string) => Error>(
-  "\"$0\" can't be found in this scope",
+  "\"$0\" can't be found in this environment",
 );
 
 const msgRequired = '"$0" is required in a "$1"';

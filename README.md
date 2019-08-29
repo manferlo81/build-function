@@ -11,16 +11,16 @@ The way to describe and build a function using json
   * [`build`](#build)
   * [`compileExp`](#compileexp)
   * [`compileStep`](#compilestep)
-  * [`createScope`](#createscope)
-  * [`findInScope`](#findinscope)
-  * [`setInScope`](#setinscope)
+  * [`createEnv`](#createenv)
+  * [`findInEnv`](#findinenv)
+  * [`setInEnv`](#setinenv)
 * [Expressions](#expressions)
   * [`literal` Literal Expression](#literal-expression)
   * [`get` Get Expression](#get-expression)
   * [`set` Set Expression](#set-expression)
   * [`ternary` Ternary Expression](#ternary-expression)
   * [`oper` Operation Expression](#operation-expression)
-  * [`trans` Transform Expression](#transform-expression)
+  * [`trans` Transform Expression](#trnsform-expression)
   * [`func` Function Expression](#function-expression)
   * [`call` Function Call Expression](#function-call-expression)
   * [`spread` Spread Expression](#spread-expression)
@@ -33,7 +33,7 @@ The way to describe and build a function using json
   * [`throw` Throw Statement](#throw-statement)
 * [Function Steps](#function-steps)
 * [Operations](#operations)
-* [Transformations](#transformations)
+* [Transformations](#transforations)
 
 ## CDN
 
@@ -69,12 +69,12 @@ The way to describe and build a function using json
 
 ### `build`
 
-Creates a function from `options` using scope as outer scope.
+Creates a function from `options` using `env` as outer `environment`.
 
 ```typescript
 function build(
   options: BuildFunctionOptions,
-  scope?: Scope,
+  env?: Environment,
 ): Function;
 
 interface BuildFunctionOptions {
@@ -92,19 +92,19 @@ interface BuildFunctionOptions {
 
   * **`name`** (`optional`)
 
-    A `name`for the `function`, if provided it will be registered to the `scope` so you can call the function recursively.
+    A `name` for the `function`, if provided it will be registered to the `environment` so you can call the function recursively.
 
   * **`params`** (`optional`)
   
     see [Function Expression](#function-expression) for more information.
 
-  * ***`body` (`optional`)***
+  * **`body`** (`optional`)
 
     see [Function Expression](#function-expression) for more information.
 
-* **`scope`** (`optional`)
+* **`env`** (`optional`)
 
-  Outer scope for the function. see [scope section](#createscope) for more information.
+  Outer `environment` for the function. see [environment section](#createenv) for more information.
 
 ### `compileExp`
 
@@ -115,7 +115,7 @@ function compileExp(
   expression: Expression,
   cache: object,
   safeGet?: boolean,
-): Resolver;
+): (env: Environment) => any;
 ```
 
 ***arguments***
@@ -130,7 +130,7 @@ function compileExp(
 
 * **`safeGet`** (`optional`)
 
-  Whether or not to return `undefined` if `id` not found on a `get` expression.
+  Whether or not to return `undefined` if `id` not found on a `get` expression. If `safeGet` is falsy `get` expression will throw if `id` not present in the `environment`.
 
 ### `compileStep`
 
@@ -141,7 +141,7 @@ function compileStep(
   step: FunctionStep,
   cache: object,
   allowBreak?: boolean,
-): Resolver;
+): (env: Environment) => StepResult;
 ```
 
 ***arguments***
@@ -158,49 +158,49 @@ function compileStep(
 
   Whether or not to allow [`break` statements](#break-statement).
 
-### `createScope`
+### `createEnv`
 
-Creates a `scope`.
+Creates a new `environment` with `parent` as parent environment.
 
 ```typescript
-function createScope(
-  parent: Scope | null,
-  lib?: ScopeLib | null,
-): Scope;
+function createEnv(
+  parent: Environment | null,
+  lib?: EnvironmentLib | null,
+): Environment;
 ```
 
 ***arguments***
 
 * **`parent`**
 
-  Parent `scope`.
+  Parent `environment`.
 
 * **`lib`**
 
-  Variables to be added to the newly created `scope`.
+  Variables to be added to the newly created `environment`.
 
-### `findInScope`
+### `findInEnv`
 
-Searches for an `id` in a `scope`.
+Searches for an `id` in an `environment`.
 
 ```typescript
-function findInScope(
-  scope: Scope,
+function findInEnv(
+  env: Environment,
   id: string,
   topOnly?: boolean,
-): ScopeValue;
+): EnvFound | void;
 
-interface ScopeValue {
-  scope: Scope;
+interface EnvFound {
+  env: Environment;
   id: string;
 }
 ```
 
 ***arguments***
 
-* **`scope`**
+* **`env`**
 
-  Top level `scope`.
+  The `environment`.
 
 * **`id`**
 
@@ -208,15 +208,15 @@ interface ScopeValue {
 
 * **`topOnly`** (`optional`)
 
-  Whether or not to search the top level `scope` only. Otherwise it will keep searching every parent `scope`.
+  Whether or not to search the top level `environment` only. Otherwise it will keep searching every parent `environment`.
 
-### `setInScope`
+### `setInEnv`
 
-Sets a value into a `scope`.
+Sets a value into an `environment`.
 
 ```typescript
-function setInScope(
-  scope: Scope,
+function setInEnv(
+  env: Environment,
   id: string,
   value: any,
 ): void;
@@ -224,9 +224,9 @@ function setInScope(
 
 ***arguments***
 
-* **`scope`**
+* **`env`**
 
-  The `scope` to set the variable.
+  The `environment` to set the variable.
 
 * **`id`**
 
@@ -279,7 +279,7 @@ return true;
 
 ### Get Expression
 
-Gets a value of the variable identified by the `id` from the current virtual scope. If the variable if not found, it will throw, unless it is inside a `typeof` transform operation.
+Gets a value of the variable identified by the `id` from the current virtual environment. If the variable if not found, it will throw, unless it is inside a `typeof` trnsform operation.
 
 ***syntax***
 
@@ -298,7 +298,7 @@ interface GetExpression {
 
   String representing the `id` to be used when expression is resolved.
 
-  If the `id` is not present in the current virtual scope, it will throw.
+  If the `id` is not present in the current virtual environment, it will throw.
 
 ***example***
 
@@ -320,7 +320,7 @@ return expression;
 
 ### Set Expression
 
-It sets a value to the variable identified by the `id` in the current virtual scope. If the variable has not been declared prevoiusly, it will throw.
+It sets a value to the variable identified by the `id` in the current virtual environment. If the variable has not been declared prevoiusly, it will throw.
 
 ***syntax***
 
@@ -342,7 +342,7 @@ interface SetExpression {
 
 * **`value`**
 
-  Expression resolving to a value to be assigned to the corresponding `id` in the current virtual scope.
+  Expression resolving to a value to be assigned to the corresponding `id` in the current virtual environment.
 
 ***example***
 
@@ -488,7 +488,7 @@ Every operation expression acts like its operands has been grouped inside parent
 
 ### Transform Expression
 
-It performs a transform operation to another expression, see [transformations](#transformations) for supported operators and information.
+It performs a trnsform operation to another expression, see [transforations](#transforations) for supported operators and information.
 
 ***syntax***
 
@@ -502,11 +502,11 @@ interface TransformExpression {
 
 * **`type`**
 
-  Always `"trans"`, it's what identifies a `transform` expression from other expressions and statements.
+  Always `"trans"`, it's what identifies a `trnsform` expression from other expressions and statements.
 
 * **`oper`**
 
-  The operator to be used in the operation, see [transformations](#transformations) for more information.
+  The operator to be used in the operation, see [transforations](#transforations) for more information.
 
 * **`exp`**
 
@@ -559,7 +559,7 @@ interface ParamDescriptor {
 
 * **`params`** (`optional`)
 
-  Function parameters.
+  String representing the the param `id`, `object` representing param `id` and `type`, or an `array of them` representing multiple parameters.
 
 * **`body`** (`optional`)
 
@@ -622,7 +622,7 @@ interface FunctionCallExpression {
 
 * **`func`**
 
-  Expression which result will be used as function to be called.
+  Expression which resolves to a function to be called.
 
 * **`args`** (`optional`)
 
@@ -718,7 +718,7 @@ return func(100, ...others);
 
 ### `let` Statement
 
-Declares variables into the current virtual scope.
+Declares variables into the current virtual environment.
 
 ***syntax***
 
@@ -740,7 +740,7 @@ interface DeclareWithValue {
 
 * **`declare`**
 
-  An `id`, `id-value-pair` or `array of them` to be declared into the current virtual scope.
+  An `id`, `id-value-pair` or `array of them` to be declared into the current virtual environment.
 
 ***example***
 
@@ -750,7 +750,10 @@ interface DeclareWithValue {
   "declare": [
     "a",
     {
-      "id": "b",
+      "id": "b"
+    },
+    {
+      "id": "c",
       "value": 10
     }
   ]
@@ -760,7 +763,7 @@ interface DeclareWithValue {
 *... is equivalent to...*
 
 ```javascript
-let a, b = 10;
+let a, b, c = 10;
 ```
 
 ### `if` Statement
@@ -856,11 +859,11 @@ interface ForStatement {
 
 * **`index`** (`optional`)
 
-  The `id` to be registered inside the loop body virtual scope containing the current iteration index, if not specified it won't be registered, the loop will still run.
+  The `id` to be registered inside the loop body virtual environment containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
 * **`value`** (`optional`)
 
-  The `id` to be registered inside the loop body virtual scope containing the current iteration value, if not specified it won't be registered, the loop will still run.
+  The `id` to be registered inside the loop body virtual environment containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
 * **`body`** (`optional`)
 
@@ -1052,7 +1055,7 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 ## Transformations
 
-Transformations are defined using the [Transform Expression](#transform-expression).
+Transformations are defined using the [Transform Expression](#trnsform-expression).
 
 ### Supported Transform Operators
 

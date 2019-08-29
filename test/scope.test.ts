@@ -1,4 +1,4 @@
-import { compileExp, createScope } from "../src";
+import { compileExp, createEnv } from "../src";
 import { $get } from "./helpers/expressions";
 import { rand } from "./helpers/number";
 
@@ -17,7 +17,7 @@ describe("create scope", () => {
 
     const a = rand(0, 10);
     const b = rand(0, 10);
-    const scope = createScope(null, { a, b });
+    const scope = createEnv(null, { a, b });
 
     expect(resolveA(scope)).toBe(a);
     expect(resolveB(scope)).toBe(b);
@@ -37,8 +37,8 @@ describe("create scope", () => {
 
     const a = rand(0, 10);
     const b = rand(0, 10);
-    const parent = createScope(null, { a });
-    const scope = createScope(parent, { b });
+    const parent = createEnv(null, { a });
+    const scope = createEnv(parent, { b });
 
     expect(scope.parent).toBe(parent);
 
@@ -64,7 +64,7 @@ describe("create scope", () => {
       { b },
     );
 
-    const scope = createScope(null, lib);
+    const scope = createEnv(null, lib);
 
     expect(() => resolveA(scope)).toThrow();
     expect(resolveB(scope)).toBe(b);

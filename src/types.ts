@@ -278,28 +278,28 @@ export type StepLoopResult =
 
 // SCOPE
 
-export type ScopeLib = Record<string, any>;
+export type EnvLib = Record<string, any>;
 
-export interface Scope extends ScopeLib {
-  parent: Scope | null;
+export interface Environment extends EnvLib {
+  parent: Environment | null;
 }
 
-export interface ScopeValue<V> {
-  scope: Scope;
+export interface EnvFound<V> {
+  env: Environment;
   id: string;
 }
 
 // GENERAL
 
-export type ScopeBasedPopulator<R> = (scope: Scope, target: R) => R;
-export type ScopeBasedResolver<V extends any = any> = (scope: Scope) => V;
-export type ArgsLibPopulator = (input: any[], lib: ScopeLib) => ScopeLib;
-export type InputArgsParser = (input: any[]) => ScopeLib;
+export type EnvBasedPopulator<R> = (env: Environment, target: R) => R;
+export type EnvBasedResolver<V extends any = any> = (env: Environment) => V;
+export type ArgsLibPopulator = (input: any[], lib: EnvLib) => EnvLib;
+export type InputArgsParser = (input: any[]) => EnvLib;
 
 export interface CompileCache {
   param?: Record<string, ArgsLibPopulator>;
-  let?: Record<string, ScopeBasedResolver<void>>;
-  spread?: Record<string, ScopeBasedPopulator<any[]>>;
-  exp?: Record<string, ScopeBasedResolver>;
-  step?: Record<string, ScopeBasedResolver>;
+  let?: Record<string, EnvBasedResolver<void>>;
+  spread?: Record<string, EnvBasedPopulator<any[]>>;
+  exp?: Record<string, EnvBasedResolver>;
+  step?: Record<string, EnvBasedResolver>;
 }
