@@ -394,8 +394,9 @@ const expTable: ExpressionLookupTable = {
         return func();
       }
 
-      return func(
-        ...resolveArgs(scope),
+      return func.apply(
+        null,
+        resolveArgs(scope),
       );
 
     };
