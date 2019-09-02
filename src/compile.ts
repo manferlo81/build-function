@@ -674,8 +674,6 @@ export function compileParam(
 
   function compileMulti(): ArgsLibPopulator {
 
-    const populators = norm.map<ArgsLibPopulator>(compileCached);
-
     return (input, lib) => {
 
       for (let i = 0; i < len; i++) {
@@ -731,19 +729,17 @@ export function compileParam(
   }
 
   const norm = params.map<ParameterDescriptor>(normalize);
+  const populators = norm.map<ArgsLibPopulator>(compileCached);
 
   if (len === 1) {
-    return compileCached(norm[0], 0);
+    return populators[0];
   }
 
   if (!hash) {
     return compileMulti();
   }
 
-  const mkey = hash(
-    norm,
-    norm.length,
-  );
+  const mkey = hash(norm, norm.length);
   const mcached = db[mkey];
 
   if (mcached) {
@@ -806,14 +802,10 @@ export function compileDecl(
 
   function compileMulti(): EnvBasedResolver<void> {
 
-    const resolvers = norm.map<EnvBasedResolver<void>>(compileCached);
-
     return (env) => {
-
       for (let i = 0; i < len; i++) {
         resolvers[i](env);
       }
-
     };
 
   }
@@ -852,9 +844,10 @@ export function compileDecl(
   }
 
   const norm = decl.map(normalize);
+  const resolvers = norm.map<EnvBasedResolver<void>>(compileCached);
 
   if (len === 1) {
-    return compileCached(norm[0]);
+    return resolvers[0];
   }
 
   if (!hash) {
@@ -1045,6 +1038,25 @@ export function compileStep<V = any>(
 
   }
 
+  function compileMulti(): EnvBasedResolver<StepLoopResult> {
+
+    return (env): StepLoopResult => {
+
+      for (let i = 0; i < len; i++) {
+
+        const resolveStep = resolvers[i];
+        const result = resolveStep(env);
+
+        if (result) {
+          return result;
+        }
+
+      }
+
+    };
+
+  }
+
   const db = cache.step || (cache.step = {});
 
   function compileCached(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
@@ -1072,21 +1084,29 @@ export function compileStep<V = any>(
     return compileCached(steps);
   }
 
+  const len = steps.length;
+
+  if (!len) {
+    return functionReturning();
+  }
+
   const resolvers = steps.map(compileCached);
 
-  return (env): StepLoopResult => {
+  if (len === 1) {
+    return resolvers[0];
+  }
 
-    for (let i = 0, len = resolvers.length; i < len; i++) {
+  if (!hash) {
+    return compileMulti();
+  }
 
-      const resolveStep = resolvers[i];
-      const result = resolveStep(env);
+  const mkey = hash(steps, steps.length);
+  const mcached = db[mkey];
 
-      if (result) {
-        return result;
-      }
+  if (mcached) {
+    return mcached;
+  }
 
-    }
-
-  };
+  return db[mkey] = compileMulti();
 
 }

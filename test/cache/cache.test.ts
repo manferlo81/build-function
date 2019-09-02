@@ -1,5 +1,5 @@
-import { CompileCache, compileExp, compileStep, ForStatement, TernaryExpression } from "../src";
-import { $call, $get, $literal } from "./helpers/expressions";
+import { CompileCache, compileExp, compileStep, TernaryExpression } from "../../src";
+import { $get, $literal } from "../helpers/expressions";
 
 describe("compile with cache", () => {
 
@@ -47,38 +47,6 @@ describe("compile with cache", () => {
     expect(same).toBe(true);
     expect(cache.exp && Object.keys(cache.exp).length).toBe(4);
     expect(cache.step && Object.keys(cache.step).length).toBe(1);
-
-  });
-
-  test("should cache statement step", () => {
-
-    const step1: ForStatement = {
-      type: "for",
-      target: $get("array"),
-      value: "value",
-      body: $call(
-        $get("func"),
-        $get("value"),
-        $get("array"),
-      ),
-    };
-    const step2: ForStatement = {
-      type: "for",
-      target: $get("array"),
-      value: "value",
-      body: $call(
-        $get("func"),
-        $get("value"),
-        $get("array"),
-      ),
-    };
-
-    const cache: CompileCache = {};
-    const same = compileStep(step1, cache) === compileStep(step2, cache);
-
-    expect(same).toBe(true);
-    expect(cache.exp && Object.keys(cache.exp).length).toBe(4);
-    expect(cache.step && Object.keys(cache.step).length).toBe(2);
 
   });
 

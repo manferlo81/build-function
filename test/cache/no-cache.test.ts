@@ -1,6 +1,6 @@
-import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression, VariableDeclaration } from "../src";
-import { compileDecl, compileParam } from "../src/compile";
-import { $call, $get, $literal } from "./helpers/expressions";
+import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression, VariableDeclaration } from "../../src";
+import { compileDecl, compileParam } from "../../src/compile";
+import { $call, $get, $literal } from "../helpers/expressions";
 
 jest.mock("object-hash", () => {
   return null;
@@ -14,14 +14,13 @@ describe("compile without cache", () => {
     const exp2: GetExpression = $get("value");
 
     const cache = {};
-
     const same = compileExp(exp1, cache) === compileExp(exp2, cache);
 
     expect(same).toBe(false);
 
   });
 
-  test("should compile step without cache if no object-hash", () => {
+  test("should compile single step without cache if no object-hash", () => {
 
     const step1: FunctionCallExpression = $call(
       $get("func"),
@@ -35,7 +34,40 @@ describe("compile without cache", () => {
     );
 
     const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
 
+    expect(same).toBe(false);
+
+  });
+
+  test("should compile multiple steps without cache if no object-hash", () => {
+
+    const step1: FunctionCallExpression[] = [
+      $call(
+        $get("func1"),
+        $get("a"),
+        $get("b"),
+      ),
+      $call(
+        $get("func2"),
+        $get("a"),
+        $get("b"),
+      ),
+    ];
+    const step2: FunctionCallExpression[] = [
+      $call(
+        $get("func1"),
+        $get("a"),
+        $get("b"),
+      ),
+      $call(
+        $get("func2"),
+        $get("a"),
+        $get("b"),
+      ),
+    ];
+
+    const cache = {};
     const same = compileStep(step1, cache) === compileStep(step2, cache);
 
     expect(same).toBe(false);
