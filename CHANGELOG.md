@@ -1,5 +1,11 @@
 # build-function changelog
 
+## 0.0.3
+
+***02-SEP-2019***
+
+* dependencies updated
+
 ## 0.0.2
 
 ***29-AUG-2019***
