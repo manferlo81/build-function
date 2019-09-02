@@ -414,6 +414,10 @@ const stepTable: StatementLookupTable = {
 
     const resolve = compileDecl(step.set, cache);
 
+    if (!resolve) {
+      return functionReturning();
+    }
+
     return (env) => {
       resolve(env);
     };
@@ -427,6 +431,10 @@ const stepTable: StatementLookupTable = {
     }
 
     const resolve = compileDecl(step.declare, cache);
+
+    if (!resolve) {
+      return functionReturning();
+    }
 
     return (env) => {
       resolve(env);
@@ -641,6 +649,10 @@ export function compileParam(
   cache: CompileCache,
 ): ArgsLibPopulator | null {
 
+  function normalize(single: FunctionParameter): ParameterDescriptor {
+    return isObj(single) ? single : { id: single, type: "param" };
+  }
+
   function compileSingle(single: ParameterDescriptor, index: number): ArgsLibPopulator {
 
     const { type, id } = single;
@@ -660,9 +672,9 @@ export function compileParam(
 
   }
 
-  function compileMulti(p: ParameterDescriptor[]): ArgsLibPopulator {
+  function compileMulti(): ArgsLibPopulator {
 
-    const populators = p.map<ArgsLibPopulator>(compileCached);
+    const populators = norm.map<ArgsLibPopulator>(compileCached);
 
     return (input, lib) => {
 
@@ -707,7 +719,7 @@ export function compileParam(
 
   if (!isArray(params)) {
     return compileCached(
-      isObj(params) ? params : { id: params, type: "param" },
+      normalize(params),
       0,
     );
   }
@@ -718,25 +730,19 @@ export function compileParam(
     return null;
   }
 
-  const desc = params.map<ParameterDescriptor>(
-    (param) => isObj(param) ? param : { id: param, type: "param" },
-  );
+  const norm = params.map<ParameterDescriptor>(normalize);
 
   if (len === 1) {
-    const param = params[0];
-    return compileCached(
-      isObj(param) ? param : { id: param, type: "param" },
-      0,
-    );
+    return compileCached(norm[0], 0);
   }
 
   if (!hash) {
-    return compileMulti(desc);
+    return compileMulti();
   }
 
   const mkey = hash(
-    desc,
-    desc.length,
+    norm,
+    norm.length,
   );
   const mcached = db[mkey];
 
@@ -744,16 +750,28 @@ export function compileParam(
     return mcached;
   }
 
-  return db[mkey] = compileMulti(desc);
+  return db[mkey] = compileMulti();
 
 }
 
 // VARIABLE DECLARATION
 
 export function compileDecl(
-  declare: SingleOrMulti<VariableDeclaration>,
+  decl: SingleOrMulti<VariableDeclaration>,
   cache: CompileCache,
-): EnvBasedResolver<void> {
+): EnvBasedResolver<void> | null {
+
+  function normalize(single: VariableDeclaration): DeclareWithValue {
+
+    const obj = isObj(single) ? { id: single.id, value: single.value } : { id: single };
+
+    if (hasOwn.call(obj, "value") && typeof obj.value === "undefined") {
+      delete obj.value;
+    }
+
+    return obj;
+
+  }
 
   function compileSingle(single: DeclareWithValue): EnvBasedResolver<void> {
 
@@ -786,15 +804,23 @@ export function compileDecl(
 
   }
 
+  function compileMulti(): EnvBasedResolver<void> {
+
+    const resolvers = norm.map<EnvBasedResolver<void>>(compileCached);
+
+    return (env) => {
+
+      for (let i = 0; i < len; i++) {
+        resolvers[i](env);
+      }
+
+    };
+
+  }
+
   const db = cache.let || (cache.let = {});
 
-  function compileCached(single: VariableDeclaration): EnvBasedResolver<void> {
-
-    if (!isObj(single)) {
-      single = {
-        id: single,
-      };
-    }
+  function compileCached(single: DeclareWithValue): EnvBasedResolver<void> {
 
     if (!hash) {
       return compileSingle(single);
@@ -811,17 +837,38 @@ export function compileDecl(
 
   }
 
-  if (!isArray(declare)) {
-    return compileCached(declare);
+  if (!isArray(decl)) {
+    return compileCached(
+      normalize(
+        decl,
+      ),
+    );
   }
 
-  const resolvers = declare.map<EnvBasedResolver<void>>(compileCached);
+  const len = decl.length;
 
-  return (env) => {
-    resolvers.forEach((resolve) => {
-      resolve(env);
-    });
-  };
+  if (!len) {
+    return null;
+  }
+
+  const norm = decl.map(normalize);
+
+  if (len === 1) {
+    return compileCached(norm[0]);
+  }
+
+  if (!hash) {
+    return compileMulti();
+  }
+
+  const mkey = hash(norm, norm.length);
+  const mcached = db[mkey];
+
+  if (mcached) {
+    return mcached;
+  }
+
+  return db[mkey] = compileMulti();
 
 }
 

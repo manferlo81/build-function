@@ -129,4 +129,19 @@ describe("declare statement step", () => {
 
   });
 
+  test("should compile declare statement step with empty array", () => {
+
+    const step: DeprecatedDeclareStatement = {
+      type: "declare",
+      set: [],
+    };
+    const resolve = compileStep(step, {});
+
+    const scope = createEnv(null);
+    const result = resolve(scope);
+
+    expect(result).toBeUndefined();
+
+  });
+
 });

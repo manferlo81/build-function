@@ -1,4 +1,4 @@
-import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression } from "../src";
+import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression, VariableDeclaration } from "../src";
 import { compileDecl, compileParam } from "../src/compile";
 import { $call, $get, $literal } from "./helpers/expressions";
 
@@ -60,10 +60,22 @@ describe("compile without cache", () => {
 
   });
 
-  test("should compile variable declaration without cache if no object-hash", () => {
+  test("should compile single variable declaration without cache if no object-hash", () => {
 
     const declare1: DeclareWithValue = { id: "value", value: $literal(true) };
     const declare2: DeclareWithValue = { id: "value", value: $literal(true) };
+
+    const cache = {};
+    const same = compileDecl(declare1, cache) === compileDecl(declare2, cache);
+
+    expect(same).toBe(false);
+
+  });
+
+  test("should compile multiple variable declarations without cache if no object-hash", () => {
+
+    const declare1: VariableDeclaration[] = ["a", "b"];
+    const declare2: VariableDeclaration[] = ["a", "b"];
 
     const cache = {};
     const same = compileDecl(declare1, cache) === compileDecl(declare2, cache);

@@ -24,7 +24,7 @@ describe("compile function parameters", () => {
   test("should cache single parameter from 1 item array", () => {
 
     const param1: ParameterDescriptor = { id: "param", type: "param" };
-    const param2: ParameterDescriptor[] = [{ id: "param", type: "param" }];
+    const param2: [ParameterDescriptor] = [{ id: "param", type: "param" }];
 
     const cache = {};
     const same = compileParam(param1, cache) === compileParam(param2, cache);

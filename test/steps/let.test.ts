@@ -98,6 +98,21 @@ describe("let statement step", () => {
 
   });
 
+  test("should compile let statement step with empty array", () => {
+
+    const step: LetStatement = {
+      type: "let",
+      declare: [],
+    };
+    const resolve = compileStep(step, {});
+
+    const scope = createEnv(null);
+    const result = resolve(scope);
+
+    expect(result).toBeUndefined();
+
+  });
+
   test("should throw if already been declared", () => {
 
     const step: LetStatement = {
