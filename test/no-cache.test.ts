@@ -42,10 +42,19 @@ describe("compile without cache", () => {
 
   });
 
-  test("should compile function param without cache if no object-hash", () => {
+  test("should compile single function parameter without cache if no object-hash", () => {
 
     const cache = {};
     const same = compileParam("param", cache) === compileParam("param", cache);
+
+    expect(same).toBe(false);
+
+  });
+
+  test("should compile multiple function parameters without cache if no object-hash", () => {
+
+    const cache = {};
+    const same = compileParam(["a", "b"], cache) === compileParam(["a", "b"], cache);
 
     expect(same).toBe(false);
 

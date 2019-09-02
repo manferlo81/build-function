@@ -294,7 +294,6 @@ export interface EnvFound<V> {
 export type EnvBasedPopulator<R> = (env: Environment, target: R) => R;
 export type EnvBasedResolver<V extends any = any> = (env: Environment) => V;
 export type ArgsLibPopulator = (input: any[], lib: EnvLib) => EnvLib;
-export type InputArgsParser = (input: any[]) => EnvLib;
 
 export interface CompileCache {
   param?: Record<string, ArgsLibPopulator>;

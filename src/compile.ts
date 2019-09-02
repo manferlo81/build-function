@@ -23,7 +23,6 @@ import {
   FunctionOptions,
   FunctionParameter,
   FunctionStep,
-  InputArgsParser,
   ParameterDescriptor,
   ParameterType,
   RegularArithmeticOperator,
@@ -578,7 +577,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
   const { params, body } = options;
 
-  const parseArgs: InputArgsParser | null = !params
+  const parseArgs: ArgsLibPopulator | null = !params
     ? null
     : compileParam(params, cache);
   const resolveFuncBody = body ? compileStep(body, cache) : null;
@@ -594,7 +593,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
       let lib: EnvLib = {};
 
       if (parseArgs) {
-        lib = parseArgs(args);
+        lib = parseArgs(args, {});
       }
 
       lib.arguments = args;
@@ -637,7 +636,10 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
 // PARAMS
 
-export function compileParam(params: FunctionParameter | FunctionParameter[], cache: CompileCache): InputArgsParser {
+export function compileParam(
+  params: FunctionParameter | FunctionParameter[],
+  cache: CompileCache,
+): ArgsLibPopulator | null {
 
   function compileSingle(single: ParameterDescriptor, index: number): ArgsLibPopulator {
 
@@ -658,13 +660,25 @@ export function compileParam(params: FunctionParameter | FunctionParameter[], ca
 
   }
 
+  function compileMulti(p: ParameterDescriptor[]): ArgsLibPopulator {
+
+    const populators = p.map<ArgsLibPopulator>(compileCached);
+
+    return (input, lib) => {
+
+      for (let i = 0; i < len; i++) {
+        populators[i](input, lib);
+      }
+
+      return lib;
+
+    };
+
+  }
+
   const db = cache.param || (cache.param = {});
 
-  function compileCached(single: FunctionParameter, index: number): ArgsLibPopulator {
-
-    if (!isObj(single)) {
-      single = { id: single, type: "param" };
-    }
+  function compileCached(single: ParameterDescriptor, index: number): ArgsLibPopulator {
 
     const { id } = single;
 
@@ -692,16 +706,45 @@ export function compileParam(params: FunctionParameter | FunctionParameter[], ca
   }
 
   if (!isArray(params)) {
-    const populate = compileCached(params, 0);
-    return (input) => populate(input, {});
+    return compileCached(
+      isObj(params) ? params : { id: params, type: "param" },
+      0,
+    );
   }
 
-  const populators = params.map<ArgsLibPopulator>(compileCached);
+  const len = params.length;
 
-  return (input) => populators.reduce<EnvLib>(
-    (result, populate) => populate(input, result),
-    {},
+  if (!len) {
+    return null;
+  }
+
+  const desc = params.map<ParameterDescriptor>(
+    (param) => isObj(param) ? param : { id: param, type: "param" },
   );
+
+  if (len === 1) {
+    const param = params[0];
+    return compileCached(
+      isObj(param) ? param : { id: param, type: "param" },
+      0,
+    );
+  }
+
+  if (!hash) {
+    return compileMulti(desc);
+  }
+
+  const mkey = hash(
+    desc,
+    desc.length,
+  );
+  const mcached = db[mkey];
+
+  if (mcached) {
+    return mcached;
+  }
+
+  return db[mkey] = compileMulti(desc);
 
 }
 
