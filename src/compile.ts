@@ -1,7 +1,7 @@
 import { createEnv, findInEnv, setInEnv } from "./env";
-import { error, errorInvalid, errorInvalidType, errorNotInScope, errorRequired, errorRequired2 } from "./errors";
+import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from "./errors";
 import { hash } from "./hash";
-import { functionReturning, hasOwn } from "./helpers";
+import { hasOwn, returning } from "./helpers";
 import { isArray, isObj } from "./type-check";
 
 import {
@@ -187,7 +187,7 @@ const expTable: ExpressionLookupTable = {
   literal(exp) {
 
     if (!hasOwn.call(exp, "value")) {
-      throw errorRequired("value", "literal");
+      throw errorExpReq("value", "literal");
     }
 
     const { value } = exp;
@@ -195,7 +195,7 @@ const expTable: ExpressionLookupTable = {
     const valueType = typeof value;
 
     if (valueType === "string" || valueType === "number" || valueType === "boolean") {
-      return functionReturning(value);
+      return returning(value);
     }
 
     const serialized = JSON.stringify(value);
@@ -207,7 +207,7 @@ const expTable: ExpressionLookupTable = {
   get(exp, cache, safe) {
 
     if (!hasOwn.call(exp, "id")) {
-      throw errorRequired("id", "get");
+      throw errorExpReq("id", "get");
     }
 
     if (typeof exp.id !== "string") {
@@ -222,7 +222,7 @@ const expTable: ExpressionLookupTable = {
 
       if (!result) {
         if (!safe) {
-          throw errorNotInScope(id);
+          throw errorNotInEnv(id);
         }
         return;
       }
@@ -236,11 +236,11 @@ const expTable: ExpressionLookupTable = {
   set(exp, cache) {
 
     if (!hasOwn.call(exp, "id")) {
-      throw errorRequired("id", "set");
+      throw errorExpReq("id", "set");
     }
 
     if (!hasOwn.call(exp, "value")) {
-      throw errorRequired("value", "set");
+      throw errorExpReq("value", "set");
     }
 
     if (typeof exp.id !== "string") {
@@ -255,7 +255,7 @@ const expTable: ExpressionLookupTable = {
       const result = findInEnv(env, id);
 
       if (!result) {
-        throw errorNotInScope(id);
+        throw errorNotInEnv(id);
       }
 
       return result.env[result.id] = resolveValue(env);
@@ -267,15 +267,15 @@ const expTable: ExpressionLookupTable = {
   ternary(exp, cache) {
 
     if (!hasOwn.call(exp, "condition")) {
-      throw errorRequired("condition", "ternary");
+      throw errorExpReq("condition", "ternary");
     }
 
     if (!hasOwn.call(exp, "then")) {
-      throw errorRequired("then", "ternary");
+      throw errorExpReq("then", "ternary");
     }
 
     if (!hasOwn.call(exp, "otherwise")) {
-      throw errorRequired("otherwise", "ternary");
+      throw errorExpReq("otherwise", "ternary");
     }
 
     const resolveCondition = compileExp(exp.condition, cache);
@@ -291,11 +291,11 @@ const expTable: ExpressionLookupTable = {
   oper(exp, cache) {
 
     if (!hasOwn.call(exp, "oper")) {
-      throw errorRequired("oper", "oper");
+      throw errorExpReq("oper", "oper");
     }
 
     if (!hasOwn.call(exp, "exp")) {
-      throw errorRequired("exp", "oper");
+      throw errorExpReq("exp", "oper");
     }
 
     const { exp: operExps, oper } = exp;
@@ -332,11 +332,11 @@ const expTable: ExpressionLookupTable = {
   trans(exp, cache) {
 
     if (!hasOwn.call(exp, "oper")) {
-      throw errorRequired("oper", "trans");
+      throw errorExpReq("oper", "trans");
     }
 
     if (!hasOwn.call(exp, "exp")) {
-      throw errorRequired("exp", "trans");
+      throw errorExpReq("exp", "trans");
     }
 
     if (exp.oper === "typeof") {
@@ -378,7 +378,7 @@ const expTable: ExpressionLookupTable = {
   call(exp, cache) {
 
     if (!hasOwn.call(exp, "func")) {
-      throw errorRequired("func", "call");
+      throw errorExpReq("func", "call");
     }
 
     const { args } = exp;
@@ -410,13 +410,13 @@ const stepTable: StatementLookupTable = {
   declare(step, cache) {
 
     if (!hasOwn.call(step, "set")) {
-      throw errorRequired2("set", "declare");
+      throw errorStmnReq("set", "declare");
     }
 
     const resolve = compileDecl(step.set, cache);
 
     if (!resolve) {
-      return functionReturning();
+      return returning();
     }
 
     return (env) => {
@@ -428,13 +428,13 @@ const stepTable: StatementLookupTable = {
   let(step, cache) {
 
     if (!hasOwn.call(step, "declare")) {
-      throw errorRequired2("declare", "let");
+      throw errorStmnReq("declare", "let");
     }
 
     const resolve = compileDecl(step.declare, cache);
 
     if (!resolve) {
-      return functionReturning();
+      return returning();
     }
 
     return (env) => {
@@ -446,7 +446,7 @@ const stepTable: StatementLookupTable = {
   if(step, cache, breakable) {
 
     if (!hasOwn.call(step, "condition")) {
-      throw errorRequired2("condition", "if");
+      throw errorStmnReq("condition", "if");
     }
 
     const { then, otherwise } = step;
@@ -456,7 +456,7 @@ const stepTable: StatementLookupTable = {
     const resolveOtherwise = otherwise && compileStep(otherwise, cache, breakable);
 
     if (!resolveThen && !resolveOtherwise) {
-      return functionReturning();
+      return returning();
     }
 
     return (env) => {
@@ -476,7 +476,7 @@ const stepTable: StatementLookupTable = {
   for(step, cache) {
 
     if (!hasOwn.call(step, "target")) {
-      throw errorRequired2("target", "for");
+      throw errorStmnReq("target", "for");
     }
 
     const { body } = step;
@@ -484,7 +484,7 @@ const stepTable: StatementLookupTable = {
     const resolveBody = body && compileStep(body, cache, true);
 
     if (!resolveBody) {
-      return functionReturning();
+      return returning();
     }
 
     const { index, value } = step;
@@ -533,7 +533,7 @@ const stepTable: StatementLookupTable = {
       throw error('"break" is not allowed outside loops');
     }
 
-    return functionReturning(
+    return returning(
       step.type,
     );
 
@@ -542,7 +542,7 @@ const stepTable: StatementLookupTable = {
   return(step, cache) {
 
     if (!hasOwn.call(step, "value")) {
-      throw errorRequired2("value", "return");
+      throw errorStmnReq("value", "return");
     }
 
     const { value, type } = step;
@@ -563,7 +563,7 @@ const stepTable: StatementLookupTable = {
     const resolveCatch = resolveBody && catchSteps && compileStep(catchSteps, cache);
 
     if (!resolveBody) {
-      return functionReturning();
+      return returning();
     }
 
     function catchIt(env: Environment, msg: string, id?: string) {
@@ -611,7 +611,7 @@ const stepTable: StatementLookupTable = {
   throw(step, cache) {
 
     if (!hasOwn.call(step, "msg")) {
-      throw errorRequired2("msg", "throw");
+      throw errorStmnReq("msg", "throw");
     }
 
     const { type, msg } = step;
@@ -643,7 +643,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
   return (env): V => {
 
     if (!resolveFuncBody) {
-      return functionReturning() as V;
+      return returning() as V;
     }
 
     const func: AnyFunction = (...args: any[]): any => {
@@ -1137,7 +1137,7 @@ export function compileStep<V = any>(
   const len = steps.length;
 
   if (!len) {
-    return functionReturning();
+    return returning();
   }
 
   const resolvers = steps.map(compileCached);

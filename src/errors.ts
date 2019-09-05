@@ -22,16 +22,16 @@ export const errorInvalidType = errorFmt<(obj: any, what: string) => Error>(
   `${msgInvalid} type`,
 );
 
-export const errorNotInScope = errorFmt<(id: string) => Error>(
+export const errorNotInEnv = errorFmt<(id: string) => Error>(
   "\"$0\" can't be found in this environment",
 );
 
 const msgRequired = '"$0" is required in a "$1"';
 
-export const errorRequired = errorFmt<(key: string, type: string) => Error>(
+export const errorExpReq = errorFmt<(key: string, type: string) => Error>(
   `${msgRequired} expression`,
 );
 
-export const errorRequired2 = errorFmt<(key: string, type: string) => Error>(
+export const errorStmnReq = errorFmt<(key: string, type: string) => Error>(
   `${msgRequired} statement`,
 );

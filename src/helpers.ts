@@ -1,6 +1,6 @@
-export function functionReturning<V>(value: V): () => V;
-export function functionReturning(): () => undefined;
-export function functionReturning<V>(value?: V): () => V | undefined {
+export function returning<V>(value: V): () => V;
+export function returning(): () => undefined;
+export function returning<V>(value?: V): () => V | undefined {
   return () => value;
 }
 
