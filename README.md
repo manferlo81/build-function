@@ -1,8 +1,8 @@
 # build-function
 
-[![CircleCI](https://circleci.com/gh/manferlo81/build-function.svg?style=svg)](https://circleci.com/gh/manferlo81/build-function) [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/build-function/badge?style=rounded)](https://www.jsdelivr.com/package/npm/build-function) [![Known Vulnerabilities](https://snyk.io//test/github/manferlo81/build-function/badge.svg?targetFile=package.json)](https://snyk.io//test/github/manferlo81/build-function?targetFile=package.json)
+[![CircleCI](https://circleci.com/gh/manferlo81/build-function.svg?style=svg)](https://circleci.com/gh/manferlo81/build-function) [![Dependabot](https://badgen.net/dependabot/manferlo81/build-function?icon=dependabot)](https://github.com/manferlo81/build-function) [![npm](https://badgen.net/npm/v/build-function)](https://www.npmjs.com/package/build-function) [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/build-function/badge?style=rounded)](https://www.jsdelivr.com/package/npm/build-function) [![Known Vulnerabilities](https://snyk.io//test/github/manferlo81/build-function/badge.svg?targetFile=package.json)](https://snyk.io//test/github/manferlo81/build-function?targetFile=package.json) [![License](https://badgen.net/npm/license/build-function)](LICENSE)
 
-The way to describe and build a function using json
+The way to describe and build simple functions using JSON
 
 ## In This Guide
 
@@ -90,19 +90,19 @@ interface BuildFunctionOptions {
 
   Function options.
 
-  * **`name`** (`optional`)
+  * **`name`** (*`optional`*)
 
     A `name` for the `function`, if provided it will be registered to the `environment` so you can call the function recursively.
 
-  * **`params`** (`optional`)
+  * **`params`** (*`optional`*)
   
     see [Function Expression](#function-expression) for more information.
 
-  * **`body`** (`optional`)
+  * **`body`** (*`optional`*)
 
     see [Function Expression](#function-expression) for more information.
 
-* **`env`** (`optional`)
+* **`env`** (*`optional`*)
 
   Outer `environment` for the function. see [environment section](#createenv) for more information.
 
@@ -134,7 +134,7 @@ function compileExp(
 
   Cache object.
 
-* **`safeGet`** (`optional`)
+* **`safeGet`** (*`optional`*)
 
   Whether or not to return `undefined` if `id` not found on a `get` expression. If `safeGet` is falsy `get` expression will throw if `id` not present in the `environment`.
 
@@ -160,7 +160,7 @@ function compileStep(
 
   Cache object.
 
-* **`allowBreak`** (`optional`)
+* **`allowBreak`** (*`optional`*)
 
   Whether or not to allow [`break` statements](#break-statement).
 
@@ -212,7 +212,7 @@ interface EnvFound {
 
   Variable `id` to search for.
 
-* **`topOnly`** (`optional`)
+* **`topOnly`** (*`optional`*)
 
   Whether or not to search the top level `environment` only. Otherwise it will keep searching every parent `environment`.
 
@@ -561,11 +561,11 @@ interface ParamDescriptor {
 
   Always `"func"`, it's what identifies a `function` expression from other expressions and statements.
 
-* **`params`** (`optional`)
+* **`params`** (*`optional`*)
 
   String representing the the param `id`, `object` representing param `id` and `type`, or an `array of them` representing multiple parameters.
 
-* **`body`** (`optional`)
+* **`body`** (*`optional`*)
 
   A `step` or `array of steps` to be executed when the function is called. See [function steps](#steps) for more information.
 
@@ -619,7 +619,7 @@ interface FunctionCallExpression {
 
   Expression which resolves to a function to be called.
 
-* **`args`** (`optional`)
+* **`args`** (*`optional`*)
 
   [`Expression`](#expressions), [`spread expression`](#spread-expression) or `array of them` to be used as `arguments` to call the function.
 
@@ -778,11 +778,11 @@ interface IfStatement {
 
   Expression which result will be used as condition for the `if` statement.
 
-* **`then`** (`optional`)
+* **`then`** (*`optional`*)
 
   A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#steps) for more information.
 
-* **`otherwise`** (`optional`)
+* **`otherwise`** (*`optional`*)
 
   A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#steps) for more information.
 
@@ -846,15 +846,15 @@ interface ForStatement {
 
   Expression resolving to an `array-like` object, which `length` property will be used for the loop.
 
-* **`index`** (`optional`)
+* **`index`** (*`optional`*)
 
   The `id` to be registered inside the loop body virtual environment containing the current iteration index, if not specified it won't be registered, the loop will still run.
 
-* **`value`** (`optional`)
+* **`value`** (*`optional`*)
 
   The `id` to be registered inside the loop body virtual environment containing the current iteration value, if not specified it won't be registered, the loop will still run.
 
-* **`body`** (`optional`)
+* **`body`** (*`optional`*)
 
   A `step` or `array of steps` to be executed for every iteration. See [function steps](#steps) for more information.
 
