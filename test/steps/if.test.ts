@@ -5,16 +5,9 @@ describe("if statement step", () => {
 
   test("should throw on invalid if statement step", () => {
 
-    const base = { type: "if" };
-    const invalid = [
-      base,
-    ];
+    const invalid = { type: "if" };
 
-    invalid.forEach((step) => {
-
-      expect(() => compileStep(step as any, {})).toThrow();
-
-    });
+    expect(() => compileStep(invalid as any, {})).toThrow();
 
   });
 

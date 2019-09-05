@@ -4,6 +4,10 @@
 
 The way to describe and build simple functions using JSON
 
+## Motivation
+
+I need to allow the end user to create some simple function using a JSON file (mostly math based functions), but without allowing them to access the global scope. This module allow them to declare and run functions, but in an enclosed environment provided by the developer.
+
 ## In This Guide
 
 * [CDN](#cdn)
@@ -30,6 +34,7 @@ The way to describe and build simple functions using JSON
   * [`for` For Statement](#for-statement)
   * [`break` Break Statement](#break-statement)
   * [`return` Return Statement](#return-statement)
+  * [`try` Try Statement](#try-statement)
   * [`throw` Throw Statement](#throw-statement)
 * [Steps](#steps)
 * [Operations](#operations)
@@ -952,6 +957,86 @@ interface ReturnStatement {
 return result;
 ```
 
+### `try` Statement
+
+It represents a `try` statement.
+
+***syntax***
+
+```typescript
+interface TryStatement {
+  type: "try";
+  body?: Step | Step[];
+  error?: string;
+  catch?: Step | Step[];
+}
+```
+
+* **`type`**
+
+  Always `"try"`, it's what identifies a `try` statement from other statements and expressions.
+
+* **`body`** (*`optional`*)
+
+  A `step` or `array of steps` to be executed inside `try` block.
+
+* **`error`** (*`optional`*)
+
+  The `id` to be registered inside the `catch` block virtual environment containing the error message, if not specified it won't be registered.
+
+* **`catch`** (*`optional`*)
+
+   A `step` or `array of steps` to be executed inside `catch` block.
+
+   If `error` option provided you can access the error message using a [`get` expression](#get-expression).
+
+***example***
+
+```json
+{
+  "type": "try",
+  "body": {
+    "type": "call",
+    "func": {
+      "type": "get",
+      "id": "test"
+    },
+    "args": [
+      {
+        "type": "get",
+        "id": "a"
+      },
+      {
+        "type": "get",
+        "id": "b"
+      }
+    ]
+  },
+  "error": "err",
+  "catch": {
+    "type": "call",
+    "func": {
+      "type": "get",
+      "id": "log"
+    },
+    "args": {
+      "type": "get",
+      "id": "err"
+    }
+  }
+}
+```
+
+*... is equivalent to...*
+
+```javascript
+try {
+  test(a, b);
+} catch (err) {
+  log(err);
+}
+```
+
 ### `throw` Statement
 
 It represents a `throw` statement.
@@ -971,7 +1056,7 @@ interface ThrowStatement {
 
 * **`msg`**
 
-  A `string` or [`Expression`](#expressions) resolving to a `string` to be used as `Error` message.
+  A `string` or [`Expression`](#expressions) resolving to a `string` to be used as error message.
 
 ***example***
 

@@ -233,6 +233,12 @@ export interface ReturnStatement extends
   WithValue<Expression> {
 }
 
+export interface TryStatement extends WithType<"try"> {
+  body?: SingleOrMulti<FunctionStep>;
+  error?: string;
+  catch?: SingleOrMulti<FunctionStep>;
+}
+
 export interface ThrowStatement extends
   WithType<"throw"> {
 
@@ -246,6 +252,7 @@ export type Statement =
   | ForStatement
   | BreakStatement
   | ReturnStatement
+  | TryStatement
   | ThrowStatement;
 
 export type StatementType = Statement["type"];
@@ -264,7 +271,7 @@ export interface StepReturn extends
 export interface StepThrow extends
   WithType<"throw"> {
 
-  error: Error;
+  error: string;
 }
 
 export type StepNonLoopResult =

@@ -6,6 +6,7 @@
 
 * dependencies updated
 * fixed: broken links on README
+* implemented `try` statement
 
 ## 0.0.2
 

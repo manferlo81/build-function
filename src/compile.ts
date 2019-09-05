@@ -18,6 +18,7 @@ import {
   DeclareWithValue,
   EnvBasedPopulator,
   EnvBasedResolver,
+  Environment,
   EnvLib,
   Expression,
   FunctionOptions,
@@ -383,7 +384,7 @@ const expTable: ExpressionLookupTable = {
     const { args } = exp;
 
     const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
-    const resolveArgs = args ? compileSpread(args, cache) : null;
+    const resolveArgs = args && compileSpread(args, cache);
 
     return (env) => {
 
@@ -451,8 +452,8 @@ const stepTable: StatementLookupTable = {
     const { then, otherwise } = step;
 
     const resolveCondition = compileExp(step.condition, cache);
-    const resolveThen = then ? compileStep(then, cache, breakable) : null;
-    const resolveOtherwise = otherwise ? compileStep(otherwise, cache, breakable) : null;
+    const resolveThen = then && compileStep(then, cache, breakable);
+    const resolveOtherwise = otherwise && compileStep(otherwise, cache, breakable);
 
     if (!resolveThen && !resolveOtherwise) {
       return functionReturning();
@@ -480,7 +481,7 @@ const stepTable: StatementLookupTable = {
 
     const { body } = step;
 
-    const resolveBody = body ? compileStep(body, cache, true) : null;
+    const resolveBody = body && compileStep(body, cache, true);
 
     if (!resolveBody) {
       return functionReturning();
@@ -554,6 +555,59 @@ const stepTable: StatementLookupTable = {
 
   },
 
+  try(step, cache) {
+
+    const { body, error: errorId, catch: catchSteps } = step;
+
+    const resolveBody = body && compileStep(body, cache);
+    const resolveCatch = resolveBody && catchSteps && compileStep(catchSteps, cache);
+
+    if (!resolveBody) {
+      return functionReturning();
+    }
+
+    function catchIt(env: Environment, msg: string, id?: string) {
+      if (resolveCatch) {
+        const lib: EnvLib = {};
+        if (id) {
+          lib[id] = msg;
+        }
+        return resolveCatch(
+          createEnv(env, lib),
+        );
+      }
+    }
+
+    return (env) => {
+      try {
+
+        const result = resolveBody(
+          createEnv(env),
+        );
+
+        if (!result || result.type !== "throw") {
+          return result;
+        }
+
+        return catchIt(
+          env,
+          result.error,
+          errorId,
+        );
+
+      } catch (e) {
+
+        return catchIt(
+          env,
+          `${e.message || e}`,
+          errorId,
+        );
+
+      }
+    };
+
+  },
+
   throw(step, cache) {
 
     if (!hasOwn.call(step, "msg")) {
@@ -562,13 +616,11 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObj(msg) ? compileExp<string>(msg, cache) : null;
+    const resolveMessage = isObj(msg) && compileExp<string>(msg, cache);
 
     return (env) => ({
       type,
-      error: error(
-        resolveMessage ? resolveMessage(env) : `${msg}`,
-      ),
+      error: resolveMessage ? resolveMessage(env) : `${msg}`,
     });
 
   },
@@ -585,10 +637,8 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
 
   const { params, body } = options;
 
-  const parseArgs: ArgsLibPopulator | null = !params
-    ? null
-    : compileParam(params, cache);
-  const resolveFuncBody = body ? compileStep(body, cache) : null;
+  const parseArgs = params && compileParam(params, cache);
+  const resolveFuncBody = body && compileStep(body, cache);
 
   return (env): V => {
 
@@ -601,7 +651,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
       let lib: EnvLib = {};
 
       if (parseArgs) {
-        lib = parseArgs(args, {});
+        lib = parseArgs(args, lib);
       }
 
       lib.arguments = args;

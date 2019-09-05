@@ -1,28 +1,23 @@
 import { compileStep, StepThrow, ThrowStatement } from "../../src";
-import { $literal, $oper } from "../helpers/expressions";
+import { $literal } from "../helpers/expressions";
 
 describe("throw error statement step", () => {
 
   test("should throw on invalid throw error statement step", () => {
 
-    const base = { type: "throw" };
-    const invalid = [
-      base,
-    ];
+    const invalid = { type: "throw" };
 
-    invalid.forEach((step) => {
-
-      expect(() => compileStep(step as any, {})).toThrow();
-
-    });
+    expect(() => compileStep(invalid as any, {})).toThrow();
 
   });
 
   test("should compile throw error statement step using string message", () => {
 
+    const errorMessage = "error message";
+
     const step: ThrowStatement = {
       type: "throw",
-      msg: "Error",
+      msg: errorMessage,
     };
     const resolve = compileStep(step, {});
 
@@ -30,20 +25,18 @@ describe("throw error statement step", () => {
 
     expect(result).toEqual({
       type: "throw",
-      error: expect.any(Error),
+      error: errorMessage,
     });
 
   });
 
   test("should compile throw error statement step using expression message", () => {
 
+    const errorMessage = "error message";
+
     const step: ThrowStatement = {
       type: "throw",
-      msg: $oper(
-        "+",
-        $literal(5),
-        $literal(" is not valid"),
-      ),
+      msg: $literal(errorMessage),
     };
     const resolve = compileStep(step, {});
 
@@ -51,10 +44,8 @@ describe("throw error statement step", () => {
 
     expect(result).toEqual({
       type: "throw",
-      error: expect.any(Error),
+      error: errorMessage,
     });
-
-    expect(result.error.message).toBe("5 is not valid");
 
   });
 
