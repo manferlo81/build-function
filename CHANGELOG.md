@@ -2,9 +2,10 @@
 
 ## 0.0.3
 
-***02-SEP-2019***
+***05-SEP-2019***
 
 * dependencies updated
+* fixed: broken links on README
 
 ## 0.0.2
 

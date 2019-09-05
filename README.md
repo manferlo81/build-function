@@ -20,7 +20,7 @@ The way to describe and build a function using json
   * [`set` Set Expression](#set-expression)
   * [`ternary` Ternary Expression](#ternary-expression)
   * [`oper` Operation Expression](#operation-expression)
-  * [`trans` Transform Expression](#trnsform-expression)
+  * [`trans` Transform Expression](#transform-expression)
   * [`func` Function Expression](#function-expression)
   * [`call` Function Call Expression](#function-call-expression)
   * [`spread` Spread Expression](#spread-expression)
@@ -31,9 +31,9 @@ The way to describe and build a function using json
   * [`break` Break Statement](#break-statement)
   * [`return` Return Statement](#return-statement)
   * [`throw` Throw Statement](#throw-statement)
-* [Function Steps](#function-steps)
+* [Steps](#steps)
 * [Operations](#operations)
-* [Transformations](#transforations)
+* [Transformations](#transformations)
 
 ## CDN
 
@@ -80,7 +80,7 @@ function build(
 interface BuildFunctionOptions {
   name?: string;
   params?: string | ParamDescriptor | Array<string | ParamDescriptor>;
-  body?: FunctionStep | FunctionStep[];
+  body?: Step | Step[];
 }
 ```
 
@@ -108,7 +108,7 @@ interface BuildFunctionOptions {
 
 ### `compileExp`
 
-Compiles an [expression](#expressions) into a `function`.
+Compiles an [`expression` or `array of expressions`](#expressions) into a `function` or `array of functions`.
 
 ```typescript
 function compileExp(
@@ -116,13 +116,19 @@ function compileExp(
   cache: object,
   safeGet?: boolean,
 ): (env: Environment) => any;
+
+function compileExp(
+  expression: Array<Expression>,
+  cache: object,
+  safeGet?: boolean,
+): Array<(env: Environment) => any>;
 ```
 
 ***arguments***
 
 * **`expression`**
 
-  [Expression](#expressions) to be compiled.
+  [`Expression` or `array of Expressions`](#expressions) to be compiled.
 
 * **`cache`**
 
@@ -134,11 +140,11 @@ function compileExp(
 
 ### `compileStep`
 
-Compiles a [function step](#function-steps) into a `function`.
+Compiles a [`step` or `array of steps`](#steps) into a `function`.
 
 ```typescript
 function compileStep(
-  step: FunctionStep,
+  step: Step | Step[],
   cache: object,
   allowBreak?: boolean,
 ): (env: Environment) => StepResult;
@@ -148,7 +154,7 @@ function compileStep(
 
 * **`step`**
 
-  [Function step](#function-steps) to be compiled.
+  [`Step` or `array of steps`](#steps) to be compiled.
 
 * **`cache`**
 
@@ -257,24 +263,21 @@ interface LiteralExpression {
 
 * **`value`**
 
-  Value to be used as literal when expression is evaluated. This value will serialized using `JSON.stringify` and then reparsed using `JSON.parse` when expression is evaluated.
+  Value to be used as literal when expression is evaluated. This value will be serialized using `JSON.stringify` and then reparsed using `JSON.parse` when expression is evaluated, it allows to resolve to a fresh object or array when expresion is evaluated.
 
 ***example***
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "literal",
-    "value": true
-  }
+  "type": "literal",
+  "value": [1, 2]
 }
 ```
 
 *... is equivalent to...*
 
 ```javascript
-return true;
+[1, 2]
 ```
 
 ### Get Expression
@@ -304,23 +307,20 @@ interface GetExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "get",
-    "id": "expression"
-  }
+  "type": "get",
+  "id": "current"
 }
 ```
 
 *... is equivalent to...*
 
 ```javascript
-return expression;
+current
 ```
 
 ### Set Expression
 
-It sets a value to the variable identified by the `id` in the current virtual environment. If the variable has not been declared prevoiusly, it will throw.
+It sets a value to the variable identified by the `id` in the current virtual environment. If the variable has not been declared prevoiusly, it will throw. The expression will resolve to the value being set.
 
 ***syntax***
 
@@ -348,13 +348,14 @@ interface SetExpression {
 
 ```json
 {
-  "type": "return",
+  "type": "set",
+  "id": "a",
   "value": {
     "type": "set",
-    "id": "result",
+    "id": "b",
     "value": {
       "type": "literal",
-      "value": 10
+      "value": true
     }
   }
 }
@@ -363,8 +364,10 @@ interface SetExpression {
 *... is equivalent to...*
 
 ```javascript
-return result = 10;
+a = b = true
 ```
+
+Note that `set` expressions resolve to the value being set so they can be chained together.
 
 ### Ternary Expression
 
@@ -401,20 +404,17 @@ interface TernaryExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "ternary",
-    "condition": {
-      "type": "get",
-      "id": "value",
-      "then": {
-        "type": "literal",
-        "value": "yes"
-      },
-      "otherwise": {
-        "type": "literal",
-        "value": "no"
-      }
+  "type": "ternary",
+  "condition": {
+    "type": "get",
+    "id": "value",
+    "then": {
+      "type": "literal",
+      "value": "yes"
+    },
+    "otherwise": {
+      "type": "literal",
+      "value": "no"
     }
   }
 }
@@ -423,7 +423,7 @@ interface TernaryExpression {
 *... is equivalent to...*
 
 ```javascript
-return value ? "yes" : "no";
+value ? "yes" : "no"
 ```
 
 ### Operation Expression
@@ -456,39 +456,46 @@ interface OperationExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "oper",
-    "oper": "+",
-    "exp": [
-      {
-        "type": "get",
-        "id": "value"
-      },
-      {
-        "type": "literal",
-        "value": 2
-      },
-      {
-        "type": "literal",
-        "value": 5
-      }
-    ]
-  }
+  "type": "oper",
+  "oper": "*",
+  "exp": [
+    {
+      "type": "literal",
+      "value": "15"
+    },
+    {
+      "type": "oper",
+      "oper": "+",
+      "exp": [
+        {
+          "type": "get",
+          "id": "value"
+        },
+        {
+          "type": "literal",
+          "value": 2
+        },
+        {
+          "type": "literal",
+          "value": 5
+        }
+      ]
+    }
+  ]
 }
 ```
 
 *... is equivalent to...*
 
 ```javascript
-return value + 2 + 5;
+15 * (value + 2 + 5)
 ```
 
-Every operation expression acts like its operands has been grouped inside parentheses, so the order of operations don't apply.
+Every operation expression acts like its operands has been grouped inside parentheses, so the order of operations doesn't apply.
 
 ### Transform Expression
 
-It performs a trnsform operation to another expression, see [transforations](#transforations) for supported operators and information.
+It performs a transform operation to another expression, see [transformations](#transformations) for supported operators and information.
 
 ***syntax***
 
@@ -506,7 +513,7 @@ interface TransformExpression {
 
 * **`oper`**
 
-  The operator to be used in the operation, see [transforations](#transforations) for more information.
+  The operator to be used in the operation, see [transformations](#transformations) for more information.
 
 * **`exp`**
 
@@ -516,14 +523,11 @@ interface TransformExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "trans",
-    "oper": "typeof",
-    "exp": {
-      "type": "get",
-      "id": "value"
-    }
+  "type": "trans",
+  "oper": "typeof",
+  "exp": {
+    "type": "get",
+    "id": "value"
   }
 }
 ```
@@ -531,7 +535,7 @@ interface TransformExpression {
 *... is equivalent to...*
 
 ```javascript
-return typeof value;
+typeof value
 ```
 
 ### Function Expression
@@ -544,7 +548,7 @@ It represents a function expression.
 interface FunctionExpression {
   type: "func";
   params?: string | ParamDescriptor | Array<string | ParamDescriptor>;
-  body?: FunctionStep | FunctionStep[];
+  body?: Step | Step[];
 }
 
 interface ParamDescriptor {
@@ -563,31 +567,22 @@ interface ParamDescriptor {
 
 * **`body`** (`optional`)
 
-  A `step` or `array of steps` to be executed when the function is called. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed when the function is called. See [function steps](#steps) for more information.
 
 ***example***
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "func",
-    "params": ["a", "b"],
-    "body": {
-      "type": "return",
-      "value": {
-        "type": "oper",
-        "oper": "+",
-        "exp": [
-          {
-            "type": "get",
-            "id": "a"
-          },
-          {
-            "type": "get",
-            "id": "b"
-          }
-        ]
+  "type": "func",
+  "params": "obj",
+  "body": {
+    "type": "return",
+    "value": {
+      "type": "trans",
+      "oper": "!",
+      "exp": {
+        "type": "get",
+        "id": "obj"
       }
     }
   }
@@ -597,9 +592,9 @@ interface ParamDescriptor {
 *... is equivalent to...*
 
 ```javascript
-return function (a, b) {
-  return a + b;
-};
+function (obj) {
+  return !obj;
+}
 ```
 
 ### Function Call Expression
@@ -632,31 +627,28 @@ interface FunctionCallExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "call",
-    "func": {
-      "type": "get",
-      "id": "concat"
+  "type": "call",
+  "func": {
+    "type": "get",
+    "id": "concat"
+  },
+  "args": [
+    {
+      "type": "literal",
+      "value": "Hello "
     },
-    "args": [
-      {
-        "type": "literal",
-        "value": "Hello "
-      },
-      {
-        "type": "get",
-        "id": "name"
-      }
-    ]
-  }
+    {
+      "type": "get",
+      "id": "name"
+    }
+  ]
 }
 ```
 
 *... is equivalent to...*
 
 ```javascript
-return concat("Hello ", name);
+concat("Hello ", name)
 ```
 
 ### Spread Expression
@@ -684,34 +676,31 @@ interface SpreadExpression {
 
 ```json
 {
-  "type": "return",
-  "value": {
-    "type": "call",
-    "func": {
-      "type": "get",
-      "id": "func"
+  "type": "call",
+  "func": {
+    "type": "get",
+    "id": "func"
+  },
+  "args": [
+    {
+      "type": "literal",
+      "value": 100
     },
-    "args": [
-      {
-        "type": "literal",
-        "value": 100
-      },
-      {
-        "type": "spread",
-        "exp": {
-          "type": "get",
-          "id": "others"
-        }
+    {
+      "type": "spread",
+      "exp": {
+        "type": "get",
+        "id": "others"
       }
-    ]
-  }
+    }
+  ]
 }
 ```
 
 *... is equivalent to...*
 
 ```javascript
-return func(100, ...others);
+func(100, ...others)
 ```
 
 ## Statements
@@ -776,8 +765,8 @@ Declares an `if` statement.
 interface IfStatement {
   type: "if";
   condition: Expression;
-  then?: FunctionStep | FunctionStep[];
-  otherwise?: FunctionStep | FunctionStep[];
+  then?: Step | Step[];
+  otherwise?: Step | Step[];
 }
 ```
 
@@ -791,11 +780,11 @@ interface IfStatement {
 
 * **`then`** (`optional`)
 
-  A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed if `condition` resolves to a truthy value. See [function steps](#steps) for more information.
 
 * **`otherwise`** (`optional`)
 
-  A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed if `condition` resolves to a falsy value. See [function steps](#steps) for more information.
 
 ***example***
 
@@ -845,7 +834,7 @@ interface ForStatement {
   target: Expression;
   index?: string;
   value?: string;
-  body?: FunctionStep | FunctionStep[];
+  body?: Step | Step[];
 }
 ```
 
@@ -867,7 +856,7 @@ interface ForStatement {
 
 * **`body`** (`optional`)
 
-  A `step` or `array of steps` to be executed for every iteration. See [function steps](#function-steps) for more information.
+  A `step` or `array of steps` to be executed for every iteration. See [function steps](#steps) for more information.
 
 ***example***
 
@@ -982,7 +971,7 @@ interface ThrowStatement {
 
 * **`msg`**
 
-  A string or Expression resolving to a string to be used as `Error` message.
+  A `string` or [`Expression`](#expressions) resolving to a `string` to be used as `Error` message.
 
 ***example***
 
@@ -999,9 +988,9 @@ interface ThrowStatement {
 throw new Error("Unknown Error");
 ```
 
-## Function Steps
+## Steps
 
-Any [statement](#statements) or [expression](#expressions) is considered a function step.
+Any [statement](#statements) or [expression](#expressions) is considered a step.
 
 ## Operations
 
@@ -1055,7 +1044,7 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 
 ## Transformations
 
-Transformations are defined using the [Transform Expression](#trnsform-expression).
+Transformations are defined using the [Transform Expression](#transform-expression).
 
 ### Supported Transform Operators
 
