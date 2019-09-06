@@ -8,6 +8,10 @@ The way to describe and build simple functions using JSON
 
 I need to allow the end user to create some simple function using a JSON file (mostly math based functions), but without allowing them to access the global scope. This module allow them to declare and run functions, but in an enclosed environment provided by the developer.
 
+## Performance Notice
+
+Functions built with this module are very slow, despite the fact that we pre-compile and cache every expression and statement. Use it only when performance is not an issue.
+
 ## In This Guide
 
 * [CDN](#cdn)
