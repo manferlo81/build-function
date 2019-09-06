@@ -18,7 +18,6 @@ import {
   DeclareWithValue,
   EnvBasedPopulator,
   EnvBasedResolver,
-  Environment,
   EnvLib,
   Expression,
   FunctionOptions,
@@ -566,44 +565,38 @@ const stepTable: StatementLookupTable = {
       return returning();
     }
 
-    function catchIt(env: Environment, msg: string, id?: string) {
-      if (resolveCatch) {
-        const lib: EnvLib = {};
-        if (id) {
-          lib[id] = msg;
-        }
-        return resolveCatch(
-          createEnv(env, lib),
-        );
-      }
-    }
-
     return (env) => {
+
       try {
 
         const result = resolveBody(
           createEnv(env),
         );
 
-        if (!result || result.type !== "throw") {
-          return result;
+        if (result && result.type === "throw") {
+          throw result.error;
         }
 
-        return catchIt(
-          env,
-          result.error,
-          errorId,
-        );
+        return result;
 
-      } catch (e) {
+      } catch (err) {
 
-        return catchIt(
-          env,
-          `${e.message || e}`,
-          errorId,
-        );
+        if (resolveCatch) {
+
+          const lib: EnvLib = {};
+
+          if (errorId) {
+            lib[errorId] = `${err.message || err}`;
+          }
+
+          return resolveCatch(
+            createEnv(env, lib),
+          );
+
+        }
 
       }
+
     };
 
   },
