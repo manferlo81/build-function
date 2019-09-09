@@ -318,12 +318,21 @@ const expTable: ExpressionLookupTable = {
     }
 
     const resolveFirst = resolvers.shift() as EnvBasedResolver;
+    const len = resolvers.length;
 
     return (env) => {
-      return resolvers.reduce(
-        (total, resolve) => reduce(total, resolve(env)),
-        resolveFirst(env),
-      );
+
+      let result = resolveFirst(env);
+
+      for (let i = 0; i < len; i++) {
+        result = reduce(
+          result,
+          resolvers[i](env),
+        );
+      }
+
+      return result;
+
     };
 
   },
@@ -911,9 +920,19 @@ export function compileDecl(
 // SPREADABLE
 
 export function compileSpread<V = any>(
+  exp: [],
+  cache: CompileCache,
+): null;
+
+export function compileSpread<V = any>(
   exp: SingleOrMulti<SpreadableExpression>,
   cache: CompileCache,
-): EnvBasedPopulator<V[]> {
+): EnvBasedPopulator<V[]>;
+
+export function compileSpread<V = any>(
+  exp: SingleOrMulti<SpreadableExpression>,
+  cache: CompileCache,
+): EnvBasedPopulator<V[]> | null {
 
   function compileSingle(single: SpreadableExpression): EnvBasedPopulator<V[]> {
 
@@ -943,10 +962,17 @@ export function compileSpread<V = any>(
   }
 
   function compileMulti(): EnvBasedPopulator<V[]> {
-    return (env, input) => populators.reduce(
-      (result, populate) => populate(env, result),
-      input,
-    );
+
+    return (env, input) => {
+
+      for (let i = 0; i < len; i++) {
+        populators[i](env, input);
+      }
+
+      return input;
+
+    };
+
   }
 
   const db = cache.spread || (cache.spread = {});
@@ -972,9 +998,15 @@ export function compileSpread<V = any>(
     return compileCached(exp);
   }
 
+  const len = exp.length;
+
+  if (!len) {
+    return null;
+  }
+
   const populators = exp.map(compileCached);
 
-  if (populators.length === 1) {
+  if (len === 1) {
     return populators[0];
   }
 

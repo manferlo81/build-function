@@ -21,6 +21,14 @@ describe("spread expression", () => {
 
   });
 
+  test("should return null on empty array", () => {
+
+    const resolve = compileSpread([], {});
+
+    expect(resolve).toBeNull();
+
+  });
+
   test("should cache single spread expression", () => {
 
     const exp1: SpreadableExpression = {
