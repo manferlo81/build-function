@@ -17,11 +17,49 @@ describe("spread expression", () => {
 
     const resolve = compileSpread(expressions, {});
 
-    expect(resolve(null as any)).toEqual([0, ...array]);
+    expect(resolve(null as any, [])).toEqual([0, ...array]);
 
   });
 
-  test("should compile spread expression with cache", () => {
+  test("should cache single spread expression", () => {
+
+    const exp1: SpreadableExpression = {
+      type: "spread",
+      exp: $literal([1, 2, 3]),
+    };
+    const exp2: SpreadableExpression = {
+      type: "spread",
+      exp: $literal([1, 2, 3]),
+    };
+
+    const cache = {};
+    const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
+
+    expect(same).toEqual(true);
+
+  });
+
+  test("should cache single & multi spread expression", () => {
+
+    const exp1: SpreadableExpression = {
+      type: "spread",
+      exp: $literal([1, 2, 3]),
+    };
+    const exp2: SpreadableExpression[] = [
+      {
+        type: "spread",
+        exp: $literal([1, 2, 3]),
+      },
+    ];
+
+    const cache = {};
+    const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
+
+    expect(same).toEqual(true);
+
+  });
+
+  test("should cache multiple spread expression", () => {
 
     const exp1: SpreadableExpression[] = [
       $literal(0),
@@ -41,8 +79,7 @@ describe("spread expression", () => {
     const cache = {};
     const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
 
-    // FIXME: it should be true
-    expect(same).toEqual(false);
+    expect(same).toEqual(true);
 
   });
 

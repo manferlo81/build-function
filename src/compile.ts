@@ -395,7 +395,7 @@ const expTable: ExpressionLookupTable = {
 
       return func.apply(
         null,
-        resolveArgs(env),
+        resolveArgs(env, []),
       );
 
     };
@@ -913,7 +913,7 @@ export function compileDecl(
 export function compileSpread<V = any>(
   exp: SingleOrMulti<SpreadableExpression>,
   cache: CompileCache,
-): EnvBasedResolver<V[]> {
+): EnvBasedPopulator<V[]> {
 
   function compileSingle(single: SpreadableExpression): EnvBasedPopulator<V[]> {
 
@@ -942,6 +942,13 @@ export function compileSpread<V = any>(
 
   }
 
+  function compileMulti(): EnvBasedPopulator<V[]> {
+    return (env, input) => populators.reduce(
+      (result, populate) => populate(env, result),
+      input,
+    );
+  }
+
   const db = cache.spread || (cache.spread = {});
 
   function compileCached(single: SpreadableExpression): EnvBasedPopulator<V[]> {
@@ -962,16 +969,27 @@ export function compileSpread<V = any>(
   }
 
   if (!isArray(exp)) {
-    const populate = compileCached(exp);
-    return (env) => populate(env, []);
+    return compileCached(exp);
   }
 
   const populators = exp.map(compileCached);
 
-  return (env) => populators.reduce(
-    (result, populate) => populate(env, result),
-    [] as V[],
-  );
+  if (populators.length === 1) {
+    return populators[0];
+  }
+
+  if (!hash) {
+    return compileMulti();
+  }
+
+  const mkey = hash(exp, exp.length);
+  const mcached = db[mkey];
+
+  if (mcached) {
+    return mcached;
+  }
+
+  return db[mkey] = compileMulti();
 
 }
 
