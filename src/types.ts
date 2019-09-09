@@ -1,50 +1,5 @@
 import { SingleOrMulti } from "./helper-types";
 
-// EXTENDABLE
-
-interface WithType<T extends string> {
-  type: T;
-}
-
-interface WithId {
-  id: string;
-}
-
-interface WithValue<V> {
-  value: V;
-}
-
-interface WithConditions {
-  condition: Expression;
-}
-
-interface WithThen<T> {
-  then: T;
-}
-
-interface WithOtherwise<O> {
-  otherwise: O;
-}
-
-interface WithOperation<O> {
-  oper: O;
-}
-
-interface WithExpressions<E> {
-  exp: E;
-}
-
-// COMMON
-
-export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
-
-export interface DeclareWithValue extends
-  WithId,
-  Partial<WithValue<Expression>> {
-}
-
-export type VariableDeclaration = string | DeclareWithValue;
-
 // FUNCTION OPTIONS
 
 export interface FunctionOptions {
@@ -60,48 +15,43 @@ export interface NamedFunctionOptions extends FunctionOptions {
 
 export type ParameterType = "param" | "rest";
 
-export interface ParameterDescriptor extends
-  WithId,
-  WithType<ParameterType> {
+export interface ParameterDescriptor {
+  id: string;
+  type: ParameterType;
 }
 
 export type FunctionParameter = string | ParameterDescriptor;
 
 // EXPRESSIONS
 
-export interface LiteralExpression extends
-  WithType<"literal">,
-  WithValue<any> {
+export interface LiteralExpression {
+  type: "literal";
+  value: any;
 }
 
-export interface GetExpression extends
-  WithType<"get">,
-  WithId {
+export interface GetExpression {
+  type: "get";
+  id: string;
 }
 
-export interface SetExpression extends
-  WithType<"set">,
-  WithId,
-  WithValue<Expression> {
+export interface SetExpression {
+  type: "set";
+  id: string;
+  value: Expression;
 }
 
-export interface FunctionCallExpression extends
-  WithType<"call"> {
-
+export interface FunctionCallExpression {
+  type: "call";
   func: Expression;
   args?: SingleOrMulti<SpreadableExpression>;
 }
 
-export interface TernaryExpression extends
-  WithType<"ternary">,
-  WithConditions,
-  WithThen<Expression>,
-  WithOtherwise<Expression> {
+export interface TernaryExpression {
+  type: "ternary";
+  condition: Expression;
+  then: Expression;
+  otherwise: Expression;
 }
-
-export type SpecialLogicOperator =
-  | "&&"
-  | "||";
 
 export type RegularLogicOperator =
   | "=="
@@ -113,13 +63,9 @@ export type RegularLogicOperator =
   | "<"
   | "<=";
 
-export type BitwiseOperator =
-  | "&"
-  | "|"
-  | "^"
-  | "<<"
-  | ">>"
-  | ">>>";
+export type SpecialLogicOperator =
+  | "&&"
+  | "||";
 
 export type RegularArithmeticOperator =
   | "+"
@@ -130,6 +76,14 @@ export type RegularArithmeticOperator =
 
 export type SpecialArithmeticOperator =
   | "**";
+
+export type BitwiseOperator =
+  | "&"
+  | "|"
+  | "^"
+  | "<<"
+  | ">>"
+  | ">>>";
 
 export type SpecialOperator =
   | SpecialLogicOperator
@@ -144,33 +98,34 @@ export type MultiTermOperator =
   | SpecialOperator
   | RegularOperator;
 
-export interface OperationExpression extends
-  WithType<"oper">,
-  WithOperation<MultiTermOperator>,
-  WithExpressions<MultiTermExpressions> {
-}
+export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
 
-export type SpecialTransformOperator =
-  | "typeof";
+export interface OperationExpression {
+  type: "oper";
+  oper: MultiTermOperator;
+  exp: MultiTermExpressions;
+}
 
 export type RegularTransformOperator =
   | "!"
   | "!!"
   | "~";
 
+export type SpecialTransformOperator =
+  | "typeof";
+
 export type TransformOperator =
   | SpecialTransformOperator
   | RegularTransformOperator;
 
-export interface TransformExpression extends
-  WithType<"trans">,
-  WithOperation<TransformOperator>,
-  WithExpressions<Expression> {
+export interface TransformExpression {
+  type: "trans";
+  oper: TransformOperator;
+  exp: Expression;
 }
 
-export interface FunctionExpression extends
-  WithType<"func">,
-  FunctionOptions {
+export interface FunctionExpression extends FunctionOptions {
+  type: "func";
 }
 
 export type Expression =
@@ -185,9 +140,9 @@ export type Expression =
 
 export type ExpresionType = Expression["type"];
 
-export interface SpreadExpression extends
-  WithType<"spread">,
-  WithExpressions<Expression> {
+export interface SpreadExpression {
+  type: "spread";
+  exp: Expression;
 }
 
 // ARGUMENTS
@@ -196,52 +151,56 @@ export type SpreadableExpression = Expression | SpreadExpression;
 
 // STATEMENTS
 
-export interface DeprecatedDeclareStatement extends
-  WithType<"declare"> {
+export interface DeclareWithValue {
+  id: string;
+  value?: Expression;
+}
 
+export type VariableDeclaration = string | DeclareWithValue;
+
+export interface DeprecatedDeclareStatement {
+  type: "declare";
   set: SingleOrMulti<VariableDeclaration>;
 }
 
-export interface LetStatement extends
-  WithType<"let"> {
-
+export interface LetStatement {
+  type: "let";
   declare: SingleOrMulti<VariableDeclaration>;
 }
 
-export interface IfStatement extends
-  WithType<"if">,
-  WithConditions,
-  Partial<WithThen<SingleOrMulti<FunctionStep>>>,
-  Partial<WithOtherwise<SingleOrMulti<FunctionStep>>> {
+export interface IfStatement {
+  type: "if";
+  condition: Expression;
+  then?: SingleOrMulti<FunctionStep>;
+  otherwise?: SingleOrMulti<FunctionStep>;
 }
 
-export interface ForStatement extends
-  WithType<"for"> {
-
+export interface ForStatement {
+  type: "for";
   target: Expression;
   value?: string;
   index?: string;
   body?: SingleOrMulti<FunctionStep>;
 }
 
-export interface BreakStatement extends
-  WithType<"break"> {
+export interface BreakStatement {
+  type: "break";
 }
 
-export interface ReturnStatement extends
-  WithType<"return">,
-  WithValue<Expression> {
+export interface ReturnStatement {
+  type: "return";
+  value: Expression;
 }
 
-export interface TryStatement extends WithType<"try"> {
+export interface TryStatement {
+  type: "try";
   body?: SingleOrMulti<FunctionStep>;
   error?: string;
   catch?: SingleOrMulti<FunctionStep>;
 }
 
-export interface ThrowStatement extends
-  WithType<"throw"> {
-
+export interface ThrowStatement {
+  type: "throw";
   msg: string | Expression;
 }
 
@@ -263,15 +222,14 @@ export type FunctionStep =
   | Statement
   | Expression;
 
-export interface StepReturn extends
-  WithType<"return">,
-  WithValue<Expression> {
+export interface StepReturn {
+  type: "return";
+  value: Expression;
 }
 
-export interface StepThrow extends
-  WithType<"throw"> {
-
-  error: string;
+export interface StepThrow {
+  type: "throw";
+  msg: string;
 }
 
 export type StepNonLoopResult =

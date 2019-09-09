@@ -574,7 +574,7 @@ const stepTable: StatementLookupTable = {
         );
 
         if (result && result.type === "throw") {
-          throw result.error;
+          throw result.msg;
         }
 
         return result;
@@ -613,7 +613,7 @@ const stepTable: StatementLookupTable = {
 
     return (env) => ({
       type,
-      error: resolveMessage ? resolveMessage(env) : `${msg}`,
+      msg: resolveMessage ? resolveMessage(env) : `${msg}`,
     });
 
   },
@@ -659,7 +659,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
       if (result) {
 
         if (result.type === "throw") {
-          throw result.error;
+          throw result.msg;
         }
 
         return result.value;

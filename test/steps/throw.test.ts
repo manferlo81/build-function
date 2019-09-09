@@ -25,7 +25,7 @@ describe("throw error statement step", () => {
 
     expect(result).toEqual({
       type: "throw",
-      error: errorMessage,
+      msg: errorMessage,
     });
 
   });
@@ -44,7 +44,7 @@ describe("throw error statement step", () => {
 
     expect(result).toEqual({
       type: "throw",
-      error: errorMessage,
+      msg: errorMessage,
     });
 
   });
