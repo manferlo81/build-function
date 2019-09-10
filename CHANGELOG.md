@@ -1,8 +1,8 @@
 # build-function changelog
 
-## 0.0.3
+## 0.1.0
 
-***05-SEP-2019***
+***10-SEP-2019***
 
 * dependencies updated
 * fixed: broken links on README
