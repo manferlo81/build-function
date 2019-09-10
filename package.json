@@ -1,6 +1,6 @@
 {
   "name": "build-function",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "The way to describe and build simple functions using JSON",
   "keywords": [
     "build",
