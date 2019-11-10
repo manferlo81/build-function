@@ -20,7 +20,7 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf dist types coverage node_modules/.cache/bundlib node_modules/.cache/jest",
+    "clean": "rimraf dist types coverage node_modules/.cache/bundlib node_modules/.cache/jest",
     "lint": "eslint src/**/*.ts __test__/**/*.ts",
     "dev": "bundlib -dw",
     "build": "bundlib -d",
@@ -42,6 +42,7 @@
     "eslint": "^6.6.0",
     "husky": "^3.0.9",
     "jest": "^24.8.0",
+    "rimraf": "^3.0.0",
     "ts-jest": "^24.1.0",
     "typescript": "^3.7.2"
   },
