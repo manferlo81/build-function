@@ -6,6 +6,7 @@ describe("unknown operation expression", () => {
   test("should compile unknown operation expression", () => {
 
     const expression: OperationExpression = $oper(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       "?",
       $get("a"),

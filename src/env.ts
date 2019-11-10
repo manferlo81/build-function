@@ -3,6 +3,10 @@ import { EnvFound, Environment, EnvLib } from "./types";
 
 const pre = "0$_";
 
+export function setInEnv<V>(env: Environment, id: string, value: V): void {
+  env[pre + id] = value;
+}
+
 export function createEnv(parent: Environment | null, lib?: EnvLib | null): Environment {
 
   const env: Environment = { parent };
@@ -42,8 +46,4 @@ export function findInEnv<V = any>(env: Environment, id: string, topOnly?: boole
 
   }
 
-}
-
-export function setInEnv<V>(env: Environment, id: string, value: V): void {
-  env[pre + id] = value;
 }

@@ -68,7 +68,7 @@ describe("call expression", () => {
     );
     const resolve = compileExp(expression, {});
 
-    const func = jest.fn((...args: any[]) => {
+    const func = jest.fn(() => {
       return true;
     });
 

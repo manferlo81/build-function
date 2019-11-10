@@ -26,7 +26,7 @@ describe("break statement step", () => {
 
   });
 
-  test('should throw if "break" outside loop', () => {
+  test("should throw if \"break\" outside loop", () => {
 
     const expression: FunctionExpression = {
       type: "func",

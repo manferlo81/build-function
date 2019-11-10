@@ -12,7 +12,7 @@ export function errorFmt<F>(template: string): any {
   );
 }
 
-const msgInvalid = '"$0" is not a valid $1';
+const msgInvalid = "\"$0\" is not a valid $1";
 
 export const errorInvalid = errorFmt<(obj: any, what: string) => Error>(
   msgInvalid,
@@ -26,7 +26,7 @@ export const errorNotInEnv = errorFmt<(id: string) => Error>(
   "\"$0\" can't be found in this environment",
 );
 
-const msgRequired = '"$0" is required in a "$1"';
+const msgRequired = "\"$0\" is required in a \"$1\"";
 
 export const errorExpReq = errorFmt<(key: string, type: string) => Error>(
   `${msgRequired} expression`,

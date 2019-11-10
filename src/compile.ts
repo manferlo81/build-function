@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 import { createEnv, findInEnv, setInEnv } from "./env";
 import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from "./errors";
 import { hash } from "./hash";
@@ -210,7 +212,7 @@ const expTable: ExpressionLookupTable = {
     }
 
     if (typeof exp.id !== "string") {
-      throw error('A "get" expression "id" must be a string');
+      throw error("A \"get\" expression \"id\" must be a string");
     }
 
     const { id } = exp;
@@ -243,7 +245,7 @@ const expTable: ExpressionLookupTable = {
     }
 
     if (typeof exp.id !== "string") {
-      throw error('A "set" expression "id" must be a string');
+      throw error("A \"set\" expression \"id\" must be a string");
     }
 
     const { id } = exp;
@@ -402,6 +404,7 @@ const expTable: ExpressionLookupTable = {
         return func();
       }
 
+      // eslint-disable-next-line prefer-spread
       return func.apply(
         null,
         resolveArgs(env, []),
@@ -538,7 +541,7 @@ const stepTable: StatementLookupTable = {
   break(step, cache, breakable) {
 
     if (!breakable) {
-      throw error('"break" is not allowed outside loops');
+      throw error("\"break\" is not allowed outside loops");
     }
 
     return returning(
@@ -941,6 +944,7 @@ export function compileSpread<V = any>(
       const resolveArray = compileExp<V[]>(single.exp, cache);
 
       return (env, resolved) => {
+        // eslint-disable-next-line prefer-spread
         resolved.push.apply(
           resolved,
           resolveArray(env),

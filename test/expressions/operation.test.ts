@@ -22,6 +22,7 @@ describe("operation expression", () => {
 
   test("should throw if less than 2 operands", () => {
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const expression: OperationExpression = $oper(
       "+",
