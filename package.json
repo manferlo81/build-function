@@ -21,7 +21,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist types coverage node_modules/.cache/bundlib node_modules/.cache/jest",
-    "lint": "eslint src/**/*.ts test/**/*.ts",
+    "lint": "eslint src/**/*.ts __test__/**/*.ts",
     "dev": "bundlib -dw",
     "build": "bundlib -d",
     "test": "jest --color -w 3",
@@ -49,9 +49,6 @@
     "dist",
     "types"
   ],
-  "directories": {
-    "test": "test"
-  },
   "author": {
     "name": "Manuel Fernandez",
     "email": "manferlo81@gmail.com"
