@@ -23,7 +23,7 @@ commands:
 
 jobs:
 
-  unit_test:
+  test_and_build:
     executor: node
     steps:
       - checkout
@@ -41,6 +41,9 @@ jobs:
       - run:
           name: Test
           command: npm test
+      - run:
+          name: Build
+          command: npm run build
       - persist_to_workspace:
           root: *working_directory
           paths: .
@@ -53,13 +56,10 @@ jobs:
       - codecov/upload:
           file: coverage/*.json
 
-  build_and_publish:
+  publish_to_npm:
     executor: node
     steps:
       - attach_workspace: *attach_workspace
-      - run:
-          name: Build
-          command: npm run build
       - npm_publish
 
 workflows:
@@ -68,7 +68,7 @@ workflows:
   workflow:
     jobs:
 
-      - unit_test:
+      - test_and_build:
           filters:
             tags:
               only: /.*/
@@ -77,15 +77,15 @@ workflows:
 
       - upload_coverage:
           requires:
-            - unit_test
+            - test_and_build
           filters:
             branches:
               only: /master/
 
-      - build_and_publish:
+      - publish_to_npm:
           context: npm
           requires:
-            - unit_test
+            - test_and_build
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
