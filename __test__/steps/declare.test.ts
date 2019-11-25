@@ -1,147 +1,147 @@
-import { compileExp, compileStep, createEnv, DeprecatedDeclareStatement } from "../../src";
-import { $get, $literal } from "../helpers/expressions";
+import { compileExp, compileStep, createEnv, DeprecatedDeclareStatement } from '../../src'
+import { $get, $literal } from '../helpers/expressions'
 
-describe("declare statement step", () => {
+describe('declare statement step', () => {
 
-  test("should throw on invalid declare statement step", () => {
+  test('should throw on invalid declare statement step', () => {
 
-    const base = { type: "declare" };
+    const base = { type: 'declare' }
     const invalid = [
       base,
-    ];
+    ]
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any, {})).toThrow();
+      expect(() => compileStep(step as any, {})).toThrow()
 
-    });
+    })
 
-  });
+  })
 
-  test("should compile single declare statement step with single value", () => {
+  test('should compile single declare statement step with single value', () => {
 
     const step: DeprecatedDeclareStatement = {
-      type: "declare",
-      set: { id: "value", value: $literal(true) },
-    };
-    const resolve = compileStep(step, {});
+      type: 'declare',
+      set: { id: 'value', value: $literal(true) },
+    }
+    const resolve = compileStep(step, {})
 
     const getValue = compileExp(
-      $get("value"),
+      $get('value'),
       {},
-    );
+    )
 
-    const scope = createEnv(null);
+    const scope = createEnv(null)
 
-    expect(() => getValue(scope)).toThrow();
+    expect(() => getValue(scope)).toThrow()
 
-    const result = resolve(scope);
+    const result = resolve(scope)
 
-    expect(result).toBeUndefined();
-    expect(getValue(scope)).toBe(true);
+    expect(result).toBeUndefined()
+    expect(getValue(scope)).toBe(true)
 
-  });
+  })
 
-  test("should compile multiple declare statement step with multiple values", () => {
+  test('should compile multiple declare statement step with multiple values', () => {
 
     const step: DeprecatedDeclareStatement = {
-      type: "declare",
+      type: 'declare',
       set: [
-        { id: "value1", value: $literal(true) },
-        { id: "value2", value: $literal(true) },
+        { id: 'value1', value: $literal(true) },
+        { id: 'value2', value: $literal(true) },
       ],
-    };
-    const resolve = compileStep(step, {});
+    }
+    const resolve = compileStep(step, {})
 
     const getValue1 = compileExp(
-      $get("value1"),
+      $get('value1'),
       {},
-    );
+    )
     const getValue2 = compileExp(
-      $get("value2"),
+      $get('value2'),
       {},
-    );
+    )
 
-    const scope = createEnv(null);
+    const scope = createEnv(null)
 
-    expect(() => getValue1(scope)).toThrow();
-    expect(() => getValue2(scope)).toThrow();
+    expect(() => getValue1(scope)).toThrow()
+    expect(() => getValue2(scope)).toThrow()
 
-    const result = resolve(scope);
+    const result = resolve(scope)
 
-    expect(result).toBeUndefined();
-    expect(getValue1(scope)).toBe(true);
-    expect(getValue2(scope)).toBe(true);
+    expect(result).toBeUndefined()
+    expect(getValue1(scope)).toBe(true)
+    expect(getValue2(scope)).toBe(true)
 
-  });
+  })
 
-  test("should compile declare statement step without value", () => {
+  test('should compile declare statement step without value', () => {
 
     const step: DeprecatedDeclareStatement = {
-      type: "declare",
+      type: 'declare',
       set: [
-        "value1",
-        "value2",
+        'value1',
+        'value2',
       ],
-    };
-    const resolve = compileStep(step, {});
+    }
+    const resolve = compileStep(step, {})
 
     const getValue1 = compileExp(
-      $get("value1"),
+      $get('value1'),
       {},
-    );
+    )
     const getValue2 = compileExp(
-      $get("value2"),
+      $get('value2'),
       {},
-    );
+    )
 
-    const scope = createEnv(null);
+    const scope = createEnv(null)
 
-    const result = resolve(scope);
+    const result = resolve(scope)
 
-    expect(result).toBeUndefined();
-    expect(getValue1(scope)).toBeUndefined();
-    expect(getValue2(scope)).toBeUndefined();
+    expect(result).toBeUndefined()
+    expect(getValue1(scope)).toBeUndefined()
+    expect(getValue2(scope)).toBeUndefined()
 
-  });
+  })
 
-  test("should cache declare statement step", () => {
+  test('should cache declare statement step', () => {
 
     const step1: DeprecatedDeclareStatement = {
-      type: "declare",
+      type: 'declare',
       set: [
-        "value1",
-        "value2",
+        'value1',
+        'value2',
       ],
-    };
+    }
     const step2: DeprecatedDeclareStatement = {
-      type: "declare",
+      type: 'declare',
       set: [
-        "value1",
-        "value2",
+        'value1',
+        'value2',
       ],
-    };
+    }
 
-    const cache = {};
-    const same = compileStep(step1, cache) === compileStep(step2, cache);
+    const cache = {}
+    const same = compileStep(step1, cache) === compileStep(step2, cache)
 
-    expect(same).toBe(true);
+    expect(same).toBe(true)
 
-  });
+  })
 
-  test("should compile declare statement step with empty array", () => {
+  test('should compile declare statement step with empty array', () => {
 
     const step: DeprecatedDeclareStatement = {
-      type: "declare",
+      type: 'declare',
       set: [],
-    };
-    const resolve = compileStep(step, {});
+    }
+    const resolve = compileStep(step, {})
 
-    const scope = createEnv(null);
-    const result = resolve(scope);
+    const scope = createEnv(null)
+    const result = resolve(scope)
 
-    expect(result).toBeUndefined();
+    expect(result).toBeUndefined()
 
-  });
+  })
 
-});
+})

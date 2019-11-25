@@ -1,4 +1,4 @@
-import { SingleOrMulti } from "./helper-types";
+import { SingleOrMulti } from './helper-types'
 
 // FUNCTION OPTIONS
 
@@ -13,7 +13,7 @@ export interface NamedFunctionOptions extends FunctionOptions {
 
 // PARAMETERS
 
-export type ParameterType = "param" | "rest";
+export type ParameterType = 'param' | 'rest';
 
 export interface ParameterDescriptor {
   id: string;
@@ -25,65 +25,65 @@ export type FunctionParameter = string | ParameterDescriptor;
 // EXPRESSIONS
 
 export interface LiteralExpression {
-  type: "literal";
+  type: 'literal';
   value: any;
 }
 
 export interface GetExpression {
-  type: "get";
+  type: 'get';
   id: string;
 }
 
 export interface SetExpression {
-  type: "set";
+  type: 'set';
   id: string;
   value: Expression;
 }
 
 export interface FunctionCallExpression {
-  type: "call";
+  type: 'call';
   func: Expression;
   args?: SingleOrMulti<SpreadableExpression>;
 }
 
 export interface TernaryExpression {
-  type: "ternary";
+  type: 'ternary';
   condition: Expression;
   then: Expression;
   otherwise: Expression;
 }
 
 export type RegularLogicOperator =
-  | "=="
-  | "==="
-  | "!="
-  | "!=="
-  | ">"
-  | ">="
-  | "<"
-  | "<=";
+  | '=='
+  | '==='
+  | '!='
+  | '!=='
+  | '>'
+  | '>='
+  | '<'
+  | '<=';
 
 export type SpecialLogicOperator =
-  | "&&"
-  | "||";
+  | '&&'
+  | '||';
 
 export type RegularArithmeticOperator =
-  | "+"
-  | "-"
-  | "*"
-  | "/"
-  | "%";
+  | '+'
+  | '-'
+  | '*'
+  | '/'
+  | '%';
 
 export type SpecialArithmeticOperator =
-  | "**";
+  | '**';
 
 export type BitwiseOperator =
-  | "&"
-  | "|"
-  | "^"
-  | "<<"
-  | ">>"
-  | ">>>";
+  | '&'
+  | '|'
+  | '^'
+  | '<<'
+  | '>>'
+  | '>>>';
 
 export type SpecialOperator =
   | SpecialLogicOperator
@@ -101,31 +101,31 @@ export type MultiTermOperator =
 export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
 
 export interface OperationExpression {
-  type: "oper";
+  type: 'oper';
   oper: MultiTermOperator;
   exp: MultiTermExpressions;
 }
 
 export type RegularTransformOperator =
-  | "!"
-  | "!!"
-  | "~";
+  | '!'
+  | '!!'
+  | '~';
 
 export type SpecialTransformOperator =
-  | "typeof";
+  | 'typeof';
 
 export type TransformOperator =
   | SpecialTransformOperator
   | RegularTransformOperator;
 
 export interface TransformExpression {
-  type: "trans";
+  type: 'trans';
   oper: TransformOperator;
   exp: Expression;
 }
 
 export interface FunctionExpression extends FunctionOptions {
-  type: "func";
+  type: 'func';
 }
 
 export type Expression =
@@ -138,10 +138,10 @@ export type Expression =
   | TransformExpression
   | FunctionExpression;
 
-export type ExpresionType = Expression["type"];
+export type ExpresionType = Expression['type'];
 
 export interface SpreadExpression {
-  type: "spread";
+  type: 'spread';
   exp: Expression;
 }
 
@@ -159,24 +159,24 @@ export interface DeclareWithValue {
 export type VariableDeclaration = string | DeclareWithValue;
 
 export interface DeprecatedDeclareStatement {
-  type: "declare";
+  type: 'declare';
   set: SingleOrMulti<VariableDeclaration>;
 }
 
 export interface LetStatement {
-  type: "let";
+  type: 'let';
   declare: SingleOrMulti<VariableDeclaration>;
 }
 
 export interface IfStatement {
-  type: "if";
+  type: 'if';
   condition: Expression;
   then?: SingleOrMulti<FunctionStep>;
   otherwise?: SingleOrMulti<FunctionStep>;
 }
 
 export interface ForStatement {
-  type: "for";
+  type: 'for';
   target: Expression;
   value?: string;
   index?: string;
@@ -184,23 +184,23 @@ export interface ForStatement {
 }
 
 export interface BreakStatement {
-  type: "break";
+  type: 'break';
 }
 
 export interface ReturnStatement {
-  type: "return";
+  type: 'return';
   value: Expression;
 }
 
 export interface TryStatement {
-  type: "try";
+  type: 'try';
   body?: SingleOrMulti<FunctionStep>;
   error?: string;
   catch?: SingleOrMulti<FunctionStep>;
 }
 
 export interface ThrowStatement {
-  type: "throw";
+  type: 'throw';
   msg: string | Expression;
 }
 
@@ -214,7 +214,7 @@ export type Statement =
   | TryStatement
   | ThrowStatement;
 
-export type StatementType = Statement["type"];
+export type StatementType = Statement['type'];
 
 // STEPS
 
@@ -223,12 +223,12 @@ export type FunctionStep =
   | Expression;
 
 export interface StepReturn {
-  type: "return";
+  type: 'return';
   value: Expression;
 }
 
 export interface StepThrow {
-  type: "throw";
+  type: 'throw';
   msg: string;
 }
 
@@ -238,7 +238,7 @@ export type StepNonLoopResult =
   | void;
 
 export type StepLoopResult =
-  | "break"
+  | 'break'
   | StepNonLoopResult;
 
 // SCOPE

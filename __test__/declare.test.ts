@@ -1,27 +1,27 @@
-import { createEnv, findInEnv } from "../src";
-import { compileDecl } from "../src/compile";
+import { createEnv, findInEnv } from '../src'
+import { compileDecl } from '../src/compile'
 
-describe("variable declaration", () => {
+describe('variable declaration', () => {
 
-  test("should return null if empty array", () => {
+  test('should return null if empty array', () => {
 
-    expect(compileDecl([], {})).toBeNull();
+    expect(compileDecl([], {})).toBeNull()
 
-  });
+  })
 
-  test("should compile declaration", () => {
+  test('should compile declaration', () => {
 
-    const declare = "id";
-    const resolve = compileDecl(declare, {});
+    const declare = 'id'
+    const resolve = compileDecl(declare, {})
 
-    const scope = createEnv(null);
+    const scope = createEnv(null)
 
     if (resolve) {
-      resolve(scope);
+      resolve(scope)
     }
 
-    expect(findInEnv(scope, declare)).toBeTruthy();
+    expect(findInEnv(scope, declare)).toBeTruthy()
 
-  });
+  })
 
-});
+})

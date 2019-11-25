@@ -1,11 +1,11 @@
-import { compileParam } from "../src/compile";
+import { compileParam } from '../src/compile'
 
-describe("compile function parameters", () => {
+describe('compile function parameters', () => {
 
-  test("should return null on empty array", () => {
+  test('should return null on empty array', () => {
 
-    expect(compileParam([], {})).toBeNull();
+    expect(compileParam([], {})).toBeNull()
 
-  });
+  })
 
-});
+})

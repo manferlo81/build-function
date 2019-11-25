@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-import { createEnv, findInEnv, setInEnv } from "./env";
-import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from "./errors";
-import { hash } from "./hash";
-import { hasOwn, returning } from "./helpers";
-import { isArray, isObj } from "./type-check";
+import { createEnv, findInEnv, setInEnv } from './env'
+import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from './errors'
+import { hash } from './hash'
+import { hasOwn, returning } from './helpers'
+import { isArray, isObj } from './type-check'
 
 import {
   AnyFunction,
@@ -13,7 +13,7 @@ import {
   SingleOrMulti,
   StatementLookupTable,
   StepCompiler,
-} from "./helper-types";
+} from './helper-types'
 import {
   ArgsLibPopulator,
   CompileCache,
@@ -36,7 +36,7 @@ import {
   StepLoopResult,
   StepNonLoopResult,
   VariableDeclaration,
-} from "./types";
+} from './types'
 
 // LOOKUP TABLES
 
@@ -49,330 +49,330 @@ const paramTable: Record<
 
     return (input) => {
 
-      const arg: any[] = [];
-      const len = input.length;
+      const arg: any[] = []
+      const len = input.length
 
       for (let i = index; i < len; i++) {
         arg.push(
           input[i],
-        );
+        )
       }
 
-      return arg;
+      return arg
 
-    };
+    }
 
   },
 
   param: (index) => (input) => input[index],
 
-};
+}
 
 const specialOperTable: Record<
   SpecialOperator,
   (resolvers: EnvBasedResolver[]) => EnvBasedResolver
 > = {
 
-  "||": (resolvers) => {
+  '||': (resolvers) => {
 
-    const len = resolvers.length;
+    const len = resolvers.length
 
     return (env) => {
 
-      let result;
+      let result
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env);
+        result = resolvers[i](env)
 
         if (result) {
-          break;
+          break
         }
 
       }
 
-      return result;
+      return result
 
-    };
+    }
 
   },
 
-  "&&": (resolvers) => {
+  '&&': (resolvers) => {
 
-    const len = resolvers.length;
+    const len = resolvers.length
 
     return (env) => {
 
-      let result;
+      let result
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env);
+        result = resolvers[i](env)
 
         if (!result) {
-          break;
+          break
         }
 
       }
 
-      return result;
+      return result
 
-    };
+    }
 
   },
 
-  "**": (resolvers) => {
+  '**': (resolvers) => {
 
-    const resolveLast = resolvers.pop() as EnvBasedResolver;
+    const resolveLast = resolvers.pop() as EnvBasedResolver
 
     return (env) => {
 
-      let result = resolveLast(env);
-      let i = resolvers.length - 1;
+      let result = resolveLast(env)
+      let i = resolvers.length - 1
 
       while (i >= 0) {
-        result = resolvers[i](env) ** result;
-        i--;
+        result = resolvers[i](env) ** result
+        i--
       }
 
-      return result;
+      return result
 
-    };
+    }
 
   },
 
-};
+}
 
 const operTable: Record<
   RegularOperator,
   (total: any, value: any) => any
 > = {
-  "+": (total, value) => (total + value),
-  "-": (total, value) => (total - value),
-  "*": (total, value) => (total * value),
-  "/": (total, value) => (total / value),
-  "%": (total, value) => (total % value),
+  '+': (total, value) => (total + value),
+  '-': (total, value) => (total - value),
+  '*': (total, value) => (total * value),
+  '/': (total, value) => (total / value),
+  '%': (total, value) => (total % value),
   // tslint:disable-next-line: no-bitwise
-  "&": (total, value) => (total & value),
+  '&': (total, value) => (total & value),
   // tslint:disable-next-line: no-bitwise
-  "|": (total, value) => (total | value),
+  '|': (total, value) => (total | value),
   // tslint:disable-next-line: no-bitwise
-  "^": (total, value) => (total ^ value),
+  '^': (total, value) => (total ^ value),
   // tslint:disable-next-line: no-bitwise
-  "<<": (total, value) => (total << value),
+  '<<': (total, value) => (total << value),
   // tslint:disable-next-line: no-bitwise
-  ">>": (total, value) => (total >> value),
+  '>>': (total, value) => (total >> value),
   // tslint:disable-next-line: no-bitwise
-  ">>>": (total, value) => (total >>> value),
+  '>>>': (total, value) => (total >>> value),
   // tslint:disable-next-line: triple-equals
-  "==": (total, value) => (total == value),
-  "===": (total, value) => (total === value),
+  '==': (total, value) => (total == value),
+  '===': (total, value) => (total === value),
   // tslint:disable-next-line: triple-equals
-  "!=": (total, value) => (total != value),
-  "!==": (total, value) => (total !== value),
-  ">": (total, value) => (total > value),
-  "<": (total, value) => (total < value),
-  ">=": (total, value) => (total >= value),
-  "<=": (total, value) => (total <= value),
-};
+  '!=': (total, value) => (total != value),
+  '!==': (total, value) => (total !== value),
+  '>': (total, value) => (total > value),
+  '<': (total, value) => (total < value),
+  '>=': (total, value) => (total >= value),
+  '<=': (total, value) => (total <= value),
+}
 
 const transTable: Record<RegularTransformOperator, (value: any) => any> = {
-  "!": (value) => !value,
-  "!!": (value) => !!value,
+  '!': (value) => !value,
+  '!!': (value) => !!value,
   // tslint:disable-next-line: no-bitwise
-  "~": (value) => ~value,
-};
+  '~': (value) => ~value,
+}
 
 const expTable: ExpressionLookupTable = {
 
   literal(exp) {
 
-    if (!hasOwn.call(exp, "value")) {
-      throw errorExpReq("value", "literal");
+    if (!hasOwn.call(exp, 'value')) {
+      throw errorExpReq('value', 'literal')
     }
 
-    const { value } = exp;
+    const { value } = exp
 
-    const valueType = typeof value;
+    const valueType = typeof value
 
-    if (valueType === "string" || valueType === "number" || valueType === "boolean") {
-      return returning(value);
+    if (valueType === 'string' || valueType === 'number' || valueType === 'boolean') {
+      return returning(value)
     }
 
-    const serialized = JSON.stringify(value);
+    const serialized = JSON.stringify(value)
 
-    return () => JSON.parse(serialized);
+    return () => JSON.parse(serialized)
 
   },
 
   get(exp, cache, safe) {
 
-    if (!hasOwn.call(exp, "id")) {
-      throw errorExpReq("id", "get");
+    if (!hasOwn.call(exp, 'id')) {
+      throw errorExpReq('id', 'get')
     }
 
-    if (typeof exp.id !== "string") {
-      throw error("A \"get\" expression \"id\" must be a string");
+    if (typeof exp.id !== 'string') {
+      throw error('A "get" expression "id" must be a string')
     }
 
-    const { id } = exp;
+    const { id } = exp
 
     return (env) => {
 
-      const result = findInEnv(env, id);
+      const result = findInEnv(env, id)
 
       if (!result) {
         if (!safe) {
-          throw errorNotInEnv(id);
+          throw errorNotInEnv(id)
         }
-        return;
+        return
       }
 
-      return result.env[result.id];
+      return result.env[result.id]
 
-    };
+    }
 
   },
 
   set(exp, cache) {
 
-    if (!hasOwn.call(exp, "id")) {
-      throw errorExpReq("id", "set");
+    if (!hasOwn.call(exp, 'id')) {
+      throw errorExpReq('id', 'set')
     }
 
-    if (!hasOwn.call(exp, "value")) {
-      throw errorExpReq("value", "set");
+    if (!hasOwn.call(exp, 'value')) {
+      throw errorExpReq('value', 'set')
     }
 
-    if (typeof exp.id !== "string") {
-      throw error("A \"set\" expression \"id\" must be a string");
+    if (typeof exp.id !== 'string') {
+      throw error('A "set" expression "id" must be a string')
     }
 
-    const { id } = exp;
-    const resolveValue = compileExp(exp.value, cache);
+    const { id } = exp
+    const resolveValue = compileExp(exp.value, cache)
 
     return (env) => {
 
-      const result = findInEnv(env, id);
+      const result = findInEnv(env, id)
 
       if (!result) {
-        throw errorNotInEnv(id);
+        throw errorNotInEnv(id)
       }
 
-      return result.env[result.id] = resolveValue(env);
+      return result.env[result.id] = resolveValue(env)
 
-    };
+    }
 
   },
 
   ternary(exp, cache) {
 
-    if (!hasOwn.call(exp, "condition")) {
-      throw errorExpReq("condition", "ternary");
+    if (!hasOwn.call(exp, 'condition')) {
+      throw errorExpReq('condition', 'ternary')
     }
 
-    if (!hasOwn.call(exp, "then")) {
-      throw errorExpReq("then", "ternary");
+    if (!hasOwn.call(exp, 'then')) {
+      throw errorExpReq('then', 'ternary')
     }
 
-    if (!hasOwn.call(exp, "otherwise")) {
-      throw errorExpReq("otherwise", "ternary");
+    if (!hasOwn.call(exp, 'otherwise')) {
+      throw errorExpReq('otherwise', 'ternary')
     }
 
-    const resolveCondition = compileExp(exp.condition, cache);
-    const resolveThen = compileExp(exp.then, cache);
-    const resolveOtherwise = compileExp(exp.otherwise, cache);
+    const resolveCondition = compileExp(exp.condition, cache)
+    const resolveThen = compileExp(exp.then, cache)
+    const resolveOtherwise = compileExp(exp.otherwise, cache)
 
     return (env) => resolveCondition(env)
       ? resolveThen(env)
-      : resolveOtherwise(env);
+      : resolveOtherwise(env)
 
   },
 
   oper(exp, cache) {
 
-    if (!hasOwn.call(exp, "oper")) {
-      throw errorExpReq("oper", "oper");
+    if (!hasOwn.call(exp, 'oper')) {
+      throw errorExpReq('oper', 'oper')
     }
 
-    if (!hasOwn.call(exp, "exp")) {
-      throw errorExpReq("exp", "oper");
+    if (!hasOwn.call(exp, 'exp')) {
+      throw errorExpReq('exp', 'oper')
     }
 
-    const { exp: operExps, oper } = exp;
+    const { exp: operExps, oper } = exp
 
     if (operExps.length < 2) {
-      throw error("not enought operands");
+      throw error('not enought operands')
     }
 
-    const resolvers = compileExp(operExps, cache);
+    const resolvers = compileExp(operExps, cache)
 
-    const reduceResolvers = specialOperTable[oper as SpecialOperator];
+    const reduceResolvers = specialOperTable[oper as SpecialOperator]
 
     if (reduceResolvers) {
-      return reduceResolvers(resolvers);
+      return reduceResolvers(resolvers)
     }
 
-    const reduce = operTable[oper as RegularArithmeticOperator];
+    const reduce = operTable[oper as RegularArithmeticOperator]
 
     if (!reduce) {
-      throw errorInvalidType(oper, "operation");
+      throw errorInvalidType(oper, 'operation')
     }
 
-    const resolveFirst = resolvers.shift() as EnvBasedResolver;
-    const len = resolvers.length;
+    const resolveFirst = resolvers.shift() as EnvBasedResolver
+    const len = resolvers.length
 
     return (env) => {
 
-      let result = resolveFirst(env);
+      let result = resolveFirst(env)
 
       for (let i = 0; i < len; i++) {
         result = reduce(
           result,
           resolvers[i](env),
-        );
+        )
       }
 
-      return result;
+      return result
 
-    };
+    }
 
   },
 
   trans(exp, cache) {
 
-    if (!hasOwn.call(exp, "oper")) {
-      throw errorExpReq("oper", "trans");
+    if (!hasOwn.call(exp, 'oper')) {
+      throw errorExpReq('oper', 'trans')
     }
 
-    if (!hasOwn.call(exp, "exp")) {
-      throw errorExpReq("exp", "trans");
+    if (!hasOwn.call(exp, 'exp')) {
+      throw errorExpReq('exp', 'trans')
     }
 
-    if (exp.oper === "typeof") {
+    if (exp.oper === 'typeof') {
 
-      const resolveSafe = compileExp(exp.exp, cache, true);
+      const resolveSafe = compileExp(exp.exp, cache, true)
 
       return (env) => {
-        const value = resolveSafe(env);
-        return typeof value;
-      };
+        const value = resolveSafe(env)
+        return typeof value
+      }
 
     }
 
-    const transform = transTable[exp.oper];
+    const transform = transTable[exp.oper]
 
     if (!transform) {
-      throw errorInvalidType(exp.oper, "transform operation");
+      throw errorInvalidType(exp.oper, 'transform operation')
     }
 
-    const resolve = compileExp(exp.exp, cache);
+    const resolve = compileExp(exp.exp, cache)
 
     return (env) => {
       return transform(
         resolve(env),
-      );
-    };
+      )
+    }
 
   },
 
@@ -381,200 +381,200 @@ const expTable: ExpressionLookupTable = {
     return compileFunc(
       exp,
       cache,
-    ) as any;
+    ) as any
 
   },
 
   call(exp, cache) {
 
-    if (!hasOwn.call(exp, "func")) {
-      throw errorExpReq("func", "call");
+    if (!hasOwn.call(exp, 'func')) {
+      throw errorExpReq('func', 'call')
     }
 
-    const { args } = exp;
+    const { args } = exp
 
-    const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
-    const resolveArgs = args && compileSpread(args, cache);
+    const resolveFunc = compileExp<AnyFunction>(exp.func, cache)
+    const resolveArgs = args && compileSpread(args, cache)
 
     return (env) => {
 
-      const func = resolveFunc(env);
+      const func = resolveFunc(env)
 
       if (!resolveArgs) {
-        return func();
+        return func()
       }
 
       // eslint-disable-next-line prefer-spread
       return func.apply(
         null,
         resolveArgs(env, []),
-      );
+      )
 
-    };
+    }
 
   },
 
-};
+}
 
 const stepTable: StatementLookupTable = {
 
   declare(step, cache) {
 
-    if (!hasOwn.call(step, "set")) {
-      throw errorStmnReq("set", "declare");
+    if (!hasOwn.call(step, 'set')) {
+      throw errorStmnReq('set', 'declare')
     }
 
-    const resolve = compileDecl(step.set, cache);
+    const resolve = compileDecl(step.set, cache)
 
     if (!resolve) {
-      return returning();
+      return returning()
     }
 
     return (env) => {
-      resolve(env);
-    };
+      resolve(env)
+    }
 
   },
 
   let(step, cache) {
 
-    if (!hasOwn.call(step, "declare")) {
-      throw errorStmnReq("declare", "let");
+    if (!hasOwn.call(step, 'declare')) {
+      throw errorStmnReq('declare', 'let')
     }
 
-    const resolve = compileDecl(step.declare, cache);
+    const resolve = compileDecl(step.declare, cache)
 
     if (!resolve) {
-      return returning();
+      return returning()
     }
 
     return (env) => {
-      resolve(env);
-    };
+      resolve(env)
+    }
 
   },
 
   if(step, cache, breakable) {
 
-    if (!hasOwn.call(step, "condition")) {
-      throw errorStmnReq("condition", "if");
+    if (!hasOwn.call(step, 'condition')) {
+      throw errorStmnReq('condition', 'if')
     }
 
-    const { then, otherwise } = step;
+    const { then, otherwise } = step
 
-    const resolveCondition = compileExp(step.condition, cache);
-    const resolveThen = then && compileStep(then, cache, breakable);
-    const resolveOtherwise = otherwise && compileStep(otherwise, cache, breakable);
+    const resolveCondition = compileExp(step.condition, cache)
+    const resolveThen = then && compileStep(then, cache, breakable)
+    const resolveOtherwise = otherwise && compileStep(otherwise, cache, breakable)
 
     if (!resolveThen && !resolveOtherwise) {
-      return returning();
+      return returning()
     }
 
     return (env) => {
 
-      const resolveSteps = resolveCondition(env) ? resolveThen : resolveOtherwise;
+      const resolveSteps = resolveCondition(env) ? resolveThen : resolveOtherwise
 
       if (resolveSteps) {
         return resolveSteps(
           createEnv(env),
-        );
+        )
       }
 
-    };
+    }
 
   },
 
   for(step, cache) {
 
-    if (!hasOwn.call(step, "target")) {
-      throw errorStmnReq("target", "for");
+    if (!hasOwn.call(step, 'target')) {
+      throw errorStmnReq('target', 'for')
     }
 
-    const { body } = step;
+    const { body } = step
 
-    const resolveBody = body && compileStep(body, cache, true);
+    const resolveBody = body && compileStep(body, cache, true)
 
     if (!resolveBody) {
-      return returning();
+      return returning()
     }
 
-    const { index, value } = step;
-    const resolveTarget = compileExp<any[]>(step.target, cache);
+    const { index, value } = step
+    const resolveTarget = compileExp<any[]>(step.target, cache)
 
     return (env): StepNonLoopResult => {
 
-      const array = resolveTarget(env);
-      const len = array.length;
+      const array = resolveTarget(env)
+      const len = array.length
 
-      let i = 0;
+      let i = 0
 
       while (i < len) {
 
-        const lib: EnvLib = {};
+        const lib: EnvLib = {}
 
         if (index) {
-          lib[index] = i;
+          lib[index] = i
         }
         if (value) {
-          lib[value] = array[i];
+          lib[value] = array[i]
         }
 
         const result = resolveBody(
           createEnv(env, lib),
-        );
+        )
 
         if (result) {
-          if (result === "break") {
-            return;
+          if (result === 'break') {
+            return
           }
-          return result;
+          return result
         }
 
-        i++;
+        i++
 
       }
 
-    };
+    }
 
   },
 
   break(step, cache, breakable) {
 
     if (!breakable) {
-      throw error("\"break\" is not allowed outside loops");
+      throw error('"break" is not allowed outside loops')
     }
 
     return returning(
       step.type,
-    );
+    )
 
   },
 
   return(step, cache) {
 
-    if (!hasOwn.call(step, "value")) {
-      throw errorStmnReq("value", "return");
+    if (!hasOwn.call(step, 'value')) {
+      throw errorStmnReq('value', 'return')
     }
 
-    const { value, type } = step;
-    const resolveValue = compileExp(value, cache);
+    const { value, type } = step
+    const resolveValue = compileExp(value, cache)
 
     return (env) => ({
       type,
       value: resolveValue(env),
-    });
+    })
 
   },
 
   try(step, cache) {
 
-    const { body, error: errorId, catch: catchSteps } = step;
+    const { body, error: errorId, catch: catchSteps } = step
 
-    const resolveBody = body && compileStep(body, cache);
-    const resolveCatch = resolveBody && catchSteps && compileStep(catchSteps, cache);
+    const resolveBody = body && compileStep(body, cache)
+    const resolveCatch = resolveBody && catchSteps && compileStep(catchSteps, cache)
 
     if (!resolveBody) {
-      return returning();
+      return returning()
     }
 
     return (env) => {
@@ -583,54 +583,54 @@ const stepTable: StatementLookupTable = {
 
         const result = resolveBody(
           createEnv(env),
-        );
+        )
 
-        if (result && result.type === "throw") {
-          throw result.msg;
+        if (result && result.type === 'throw') {
+          throw result.msg
         }
 
-        return result;
+        return result
 
       } catch (err) {
 
         if (resolveCatch) {
 
-          const lib: EnvLib = {};
+          const lib: EnvLib = {}
 
           if (errorId) {
-            lib[errorId] = `${err.message || err}`;
+            lib[errorId] = `${err.message || err}`
           }
 
           return resolveCatch(
             createEnv(env, lib),
-          );
+          )
 
         }
 
       }
 
-    };
+    }
 
   },
 
   throw(step, cache) {
 
-    if (!hasOwn.call(step, "msg")) {
-      throw errorStmnReq("msg", "throw");
+    if (!hasOwn.call(step, 'msg')) {
+      throw errorStmnReq('msg', 'throw')
     }
 
-    const { type, msg } = step;
+    const { type, msg } = step
 
-    const resolveMessage = isObj(msg) && compileExp<string>(msg, cache);
+    const resolveMessage = isObj(msg) && compileExp<string>(msg, cache)
 
     return (env) => ({
       type,
       msg: resolveMessage ? resolveMessage(env) : `${msg}`,
-    });
+    })
 
   },
 
-};
+}
 
 // FUNCTION
 
@@ -640,60 +640,60 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
   name?: string,
 ): EnvBasedResolver<V> {
 
-  const { params, body } = options;
+  const { params, body } = options
 
-  const parseArgs = params && compileParam(params, cache);
-  const resolveFuncBody = body && compileStep(body, cache);
+  const parseArgs = params && compileParam(params, cache)
+  const resolveFuncBody = body && compileStep(body, cache)
 
   return (env): V => {
 
     if (!resolveFuncBody) {
-      return returning() as V;
+      return returning() as V
     }
 
     const func: AnyFunction = (...args: any[]): any => {
 
-      let lib: EnvLib = {};
+      let lib: EnvLib = {}
 
       if (parseArgs) {
-        lib = parseArgs(args, lib);
+        lib = parseArgs(args, lib)
       }
 
-      lib.arguments = args;
+      lib.arguments = args
 
       const result = resolveFuncBody(
         createEnv(
           outerScope,
           lib,
         ),
-      );
+      )
 
       if (result) {
 
-        if (result.type === "throw") {
-          throw result.msg;
+        if (result.type === 'throw') {
+          throw result.msg
         }
 
-        return result.value;
+        return result.value
 
       }
 
-    };
+    }
 
-    let outerScope = env;
+    let outerScope = env
 
     if (name) {
 
-      const lib: EnvLib = {};
-      lib[name] = func;
+      const lib: EnvLib = {}
+      lib[name] = func
 
-      outerScope = createEnv(outerScope, lib);
+      outerScope = createEnv(outerScope, lib)
 
     }
 
-    return func as V;
+    return func as V
 
-  };
+  }
 
 }
 
@@ -705,25 +705,25 @@ export function compileParam(
 ): ArgsLibPopulator | null {
 
   function normalize(single: FunctionParameter): ParameterDescriptor {
-    return isObj(single) ? single : { id: single, type: "param" };
+    return isObj(single) ? single : { id: single, type: 'param' }
   }
 
   function compileSingle(single: ParameterDescriptor, index: number): ArgsLibPopulator {
 
-    const { type, id } = single;
+    const { type, id } = single
 
-    const compileGetter = paramTable[type];
+    const compileGetter = paramTable[type]
 
     if (!compileGetter) {
-      throw errorInvalidType(type, "parameter");
+      throw errorInvalidType(type, 'parameter')
     }
 
-    const getValue = compileGetter(index);
+    const getValue = compileGetter(index)
 
     return (input, lib) => {
-      lib[id] = getValue(input);
-      return lib;
-    };
+      lib[id] = getValue(input)
+      return lib
+    }
 
   }
 
@@ -732,41 +732,41 @@ export function compileParam(
     return (input, lib) => {
 
       for (let i = 0; i < len; i++) {
-        populators[i](input, lib);
+        populators[i](input, lib)
       }
 
-      return lib;
+      return lib
 
-    };
+    }
 
   }
 
-  const db = cache.param || (cache.param = {});
+  const db = cache.param || (cache.param = {})
 
   function compileCached(single: ParameterDescriptor, index: number): ArgsLibPopulator {
 
-    const { id } = single;
+    const { id } = single
 
-    if (typeof id !== "string") {
-      throw errorInvalid(id, "parameter id");
+    if (typeof id !== 'string') {
+      throw errorInvalid(id, 'parameter id')
     }
 
-    if (id === "arguments") {
-      throw error("\"arguments\" can't be used as parameter id");
+    if (id === 'arguments') {
+      throw error('"arguments" can\'t be used as parameter id')
     }
 
     if (!hash) {
-      return compileSingle(single, index);
+      return compileSingle(single, index)
     }
 
-    const key = hash(single, single.type, index);
-    const cached = db[key];
+    const key = hash(single, single.type, index)
+    const cached = db[key]
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    return db[key] = compileSingle(single, index);
+    return db[key] = compileSingle(single, index)
 
   }
 
@@ -774,34 +774,34 @@ export function compileParam(
     return compileCached(
       normalize(params),
       0,
-    );
+    )
   }
 
-  const len = params.length;
+  const len = params.length
 
   if (!len) {
-    return null;
+    return null
   }
 
-  const norm = params.map<ParameterDescriptor>(normalize);
-  const populators = norm.map<ArgsLibPopulator>(compileCached);
+  const norm = params.map<ParameterDescriptor>(normalize)
+  const populators = norm.map<ArgsLibPopulator>(compileCached)
 
   if (len === 1) {
-    return populators[0];
+    return populators[0]
   }
 
   if (!hash) {
-    return compileMulti();
+    return compileMulti()
   }
 
-  const mkey = hash(norm, norm.length);
-  const mcached = db[mkey];
+  const mkey = hash(norm, norm.length)
+  const mcached = db[mkey]
 
   if (mcached) {
-    return mcached;
+    return mcached
   }
 
-  return db[mkey] = compileMulti();
+  return db[mkey] = compileMulti()
 
 }
 
@@ -814,23 +814,23 @@ export function compileDecl(
 
   function normalize(single: VariableDeclaration): DeclareWithValue {
 
-    const obj = isObj(single) ? { id: single.id, value: single.value } : { id: single };
+    const obj = isObj(single) ? { id: single.id, value: single.value } : { id: single }
 
-    if (hasOwn.call(obj, "value") && typeof obj.value === "undefined") {
-      delete obj.value;
+    if (hasOwn.call(obj, 'value') && typeof obj.value === 'undefined') {
+      delete obj.value
     }
 
-    return obj;
+    return obj
 
   }
 
   function compileSingle(single: DeclareWithValue): EnvBasedResolver<void> {
 
-    const { id, value } = single;
+    const { id, value } = single
 
-    let resolveValue: EnvBasedResolver | undefined;
+    let resolveValue: EnvBasedResolver | undefined
     if (value) {
-      resolveValue = compileExp(value, cache);
+      resolveValue = compileExp(value, cache)
     }
 
     return (env) => {
@@ -842,16 +842,16 @@ export function compileDecl(
           true,
         )
       ) {
-        throw error(`"${id}" has already been declared in this environment`);
+        throw error(`"${id}" has already been declared in this environment`)
       }
 
       setInEnv(
         env,
         id,
         resolveValue && resolveValue(env),
-      );
+      )
 
-    };
+    }
 
   }
 
@@ -859,28 +859,28 @@ export function compileDecl(
 
     return (env) => {
       for (let i = 0; i < len; i++) {
-        resolvers[i](env);
+        resolvers[i](env)
       }
-    };
+    }
 
   }
 
-  const db = cache.let || (cache.let = {});
+  const db = cache.let || (cache.let = {})
 
   function compileCached(single: DeclareWithValue): EnvBasedResolver<void> {
 
     if (!hash) {
-      return compileSingle(single);
+      return compileSingle(single)
     }
 
-    const key = hash(single, single.id);
-    const cached = db[key];
+    const key = hash(single, single.id)
+    const cached = db[key]
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    return db[key] = compileSingle(single);
+    return db[key] = compileSingle(single)
 
   }
 
@@ -889,34 +889,34 @@ export function compileDecl(
       normalize(
         decl,
       ),
-    );
+    )
   }
 
-  const len = decl.length;
+  const len = decl.length
 
   if (!len) {
-    return null;
+    return null
   }
 
-  const norm = decl.map(normalize);
-  const resolvers = norm.map<EnvBasedResolver<void>>(compileCached);
+  const norm = decl.map(normalize)
+  const resolvers = norm.map<EnvBasedResolver<void>>(compileCached)
 
   if (len === 1) {
-    return resolvers[0];
+    return resolvers[0]
   }
 
   if (!hash) {
-    return compileMulti();
+    return compileMulti()
   }
 
-  const mkey = hash(norm, norm.length);
-  const mcached = db[mkey];
+  const mkey = hash(norm, norm.length)
+  const mcached = db[mkey]
 
   if (mcached) {
-    return mcached;
+    return mcached
   }
 
-  return db[mkey] = compileMulti();
+  return db[mkey] = compileMulti()
 
 }
 
@@ -939,29 +939,29 @@ export function compileSpread<V = any>(
 
   function compileSingle(single: SpreadableExpression): EnvBasedPopulator<V[]> {
 
-    if (single.type === "spread") {
+    if (single.type === 'spread') {
 
-      const resolveArray = compileExp<V[]>(single.exp, cache);
+      const resolveArray = compileExp<V[]>(single.exp, cache)
 
       return (env, resolved) => {
         // eslint-disable-next-line prefer-spread
         resolved.push.apply(
           resolved,
           resolveArray(env),
-        );
-        return resolved;
-      };
+        )
+        return resolved
+      }
 
     }
 
-    const resolveParam = compileExp(single, cache);
+    const resolveParam = compileExp(single, cache)
 
     return (env, resolved) => {
       resolved.push(
         resolveParam(env),
-      );
-      return resolved;
-    };
+      )
+      return resolved
+    }
 
   }
 
@@ -970,62 +970,62 @@ export function compileSpread<V = any>(
     return (env, input) => {
 
       for (let i = 0; i < len; i++) {
-        populators[i](env, input);
+        populators[i](env, input)
       }
 
-      return input;
+      return input
 
-    };
+    }
 
   }
 
-  const db = cache.spread || (cache.spread = {});
+  const db = cache.spread || (cache.spread = {})
 
   function compileCached(single: SpreadableExpression): EnvBasedPopulator<V[]> {
 
     if (!hash) {
-      return compileSingle(single);
+      return compileSingle(single)
     }
 
-    const key = hash(single, single.type);
-    const cached = db[key];
+    const key = hash(single, single.type)
+    const cached = db[key]
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    return db[key] = compileSingle(single);
+    return db[key] = compileSingle(single)
 
   }
 
   if (!isArray(exp)) {
-    return compileCached(exp);
+    return compileCached(exp)
   }
 
-  const len = exp.length;
+  const len = exp.length
 
   if (!len) {
-    return null;
+    return null
   }
 
-  const populators = exp.map(compileCached);
+  const populators = exp.map(compileCached)
 
   if (len === 1) {
-    return populators[0];
+    return populators[0]
   }
 
   if (!hash) {
-    return compileMulti();
+    return compileMulti()
   }
 
-  const mkey = hash(exp, exp.length);
-  const mcached = db[mkey];
+  const mkey = hash(exp, exp.length)
+  const mcached = db[mkey]
 
   if (mcached) {
-    return mcached;
+    return mcached
   }
 
-  return db[mkey] = compileMulti();
+  return db[mkey] = compileMulti()
 
 }
 
@@ -1051,46 +1051,46 @@ export function compileExp<V extends any = any>(
 
   function compileSingle(single: Expression) {
 
-    const { type } = single;
+    const { type } = single
 
-    const compile = expTable[type] as ExpressionCompiler<Expression> | undefined;
+    const compile = expTable[type] as ExpressionCompiler<Expression> | undefined
 
     if (!compile) {
-      throw errorInvalidType(type, "expression");
+      throw errorInvalidType(type, 'expression')
     }
 
-    return compile(single, cache, safe);
+    return compile(single, cache, safe)
 
   }
 
-  const db = cache.exp || (cache.exp = {});
+  const db = cache.exp || (cache.exp = {})
 
   function compileCached(single: Expression) {
 
     if (!single || !isObj(single)) {
-      throw errorInvalid(single, "expression");
+      throw errorInvalid(single, 'expression')
     }
 
     if (!hash) {
-      return compileSingle(single);
+      return compileSingle(single)
     }
 
-    const key = hash(single, single.type);
-    const cached = db[key];
+    const key = hash(single, single.type)
+    const cached = db[key]
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    return db[key] = compileSingle(single);
+    return db[key] = compileSingle(single)
 
   }
 
   if (!isArray(exp)) {
-    return compileCached(exp);
+    return compileCached(exp)
   }
 
-  return exp.map(compileCached);
+  return exp.map(compileCached)
 
 }
 
@@ -1119,19 +1119,19 @@ export function compileStep<V = any>(
 
   function compileSingle(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
 
-    const compile = stepTable[single.type as StatementType] as StepCompiler<FunctionStep> | undefined;
+    const compile = stepTable[single.type as StatementType] as StepCompiler<FunctionStep> | undefined
 
     if (compile) {
 
-      return compile(single, cache, breakable);
+      return compile(single, cache, breakable)
 
     }
 
-    const resolveExp = compileExp(single as Expression, cache);
+    const resolveExp = compileExp(single as Expression, cache)
 
     return (env) => {
-      resolveExp(env);
-    };
+      resolveExp(env)
+    }
 
   }
 
@@ -1141,69 +1141,69 @@ export function compileStep<V = any>(
 
       for (let i = 0; i < len; i++) {
 
-        const resolveStep = resolvers[i];
-        const result = resolveStep(env);
+        const resolveStep = resolvers[i]
+        const result = resolveStep(env)
 
         if (result) {
-          return result;
+          return result
         }
 
       }
 
-    };
+    }
 
   }
 
-  const db = cache.step || (cache.step = {});
+  const db = cache.step || (cache.step = {})
 
   function compileCached(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
 
     if (!single || !isObj(single)) {
-      throw errorInvalid(single, "step");
+      throw errorInvalid(single, 'step')
     }
 
     if (!hash) {
-      return compileSingle(single);
+      return compileSingle(single)
     }
 
-    const key = hash(single, single.type);
-    const cached = db[key];
+    const key = hash(single, single.type)
+    const cached = db[key]
 
     if (cached) {
-      return cached;
+      return cached
     }
 
-    return db[key] = compileSingle(single);
+    return db[key] = compileSingle(single)
 
   }
 
   if (!isArray(steps)) {
-    return compileCached(steps);
+    return compileCached(steps)
   }
 
-  const len = steps.length;
+  const len = steps.length
 
   if (!len) {
-    return returning();
+    return returning()
   }
 
-  const resolvers = steps.map(compileCached);
+  const resolvers = steps.map(compileCached)
 
   if (len === 1) {
-    return resolvers[0];
+    return resolvers[0]
   }
 
   if (!hash) {
-    return compileMulti();
+    return compileMulti()
   }
 
-  const mkey = hash(steps, steps.length);
-  const mcached = db[mkey];
+  const mkey = hash(steps, steps.length)
+  const mcached = db[mkey]
 
   if (mcached) {
-    return mcached;
+    return mcached
   }
 
-  return db[mkey] = compileMulti();
+  return db[mkey] = compileMulti()
 
 }

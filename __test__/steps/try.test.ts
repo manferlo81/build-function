@@ -1,295 +1,295 @@
-import { compileStep, createEnv, TryStatement } from "../../src";
-import { $call, $get } from "../helpers/expressions";
+import { compileStep, createEnv, TryStatement } from '../../src'
+import { $call, $get } from '../helpers/expressions'
 
-describe("try statement step", () => {
+describe('try statement step', () => {
 
   // test("should throw on invalid try statement step", () => {
 
   // });
 
-  test("should compile with empty options", () => {
+  test('should compile with empty options', () => {
 
     const step: TryStatement = {
-      type: "try",
-    };
+      type: 'try',
+    }
 
-    expect(() => compileStep(step, {})).not.toThrow();
+    expect(() => compileStep(step, {})).not.toThrow()
 
-  });
+  })
 
-  test("should compile with single step", () => {
+  test('should compile with single step', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: $call(
-        $get("body"),
+        $get('body'),
       ),
       catch: $call(
-        $get("catch"),
+        $get('catch'),
       ),
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const body = jest.fn();
-    const catchError = jest.fn();
+    const body = jest.fn()
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       body,
       catch: catchError,
-    });
+    })
 
-    resolve(env);
+    resolve(env)
 
-    expect(body).toHaveBeenCalledTimes(1);
-    expect(catchError).not.toHaveBeenCalled();
+    expect(body).toHaveBeenCalledTimes(1)
+    expect(catchError).not.toHaveBeenCalled()
 
-  });
+  })
 
-  test("should compile with multiple steps", () => {
+  test('should compile with multiple steps', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: [
         $call(
-          $get("body"),
+          $get('body'),
         ),
       ],
       catch: [
         $call(
-          $get("catch"),
+          $get('catch'),
         ),
       ],
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const body = jest.fn();
-    const catchError = jest.fn();
+    const body = jest.fn()
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       body,
       catch: catchError,
-    });
+    })
 
-    resolve(env);
+    resolve(env)
 
-    expect(body).toHaveBeenCalledTimes(1);
-    expect(catchError).not.toHaveBeenCalled();
+    expect(body).toHaveBeenCalledTimes(1)
+    expect(catchError).not.toHaveBeenCalled()
 
-  });
+  })
 
-  test("should catch on throw statement", () => {
+  test('should catch on throw statement', () => {
 
-    const errorMessage = "body error";
+    const errorMessage = 'body error'
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: {
-        type: "throw",
+        type: 'throw',
         msg: errorMessage,
       },
-      error: "err",
+      error: 'err',
       catch: [
         $call(
-          $get("catch"),
-          $get("err"),
+          $get('catch'),
+          $get('err'),
         ),
       ],
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const catchError = jest.fn();
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       catch: catchError,
-    });
+    })
 
-    resolve(env);
+    resolve(env)
 
-    expect(catchError).toHaveBeenCalledTimes(1);
-    expect(catchError).toHaveBeenCalledWith(errorMessage);
+    expect(catchError).toHaveBeenCalledTimes(1)
+    expect(catchError).toHaveBeenCalledWith(errorMessage)
 
-  });
+  })
 
-  test("should catch on actual error", () => {
+  test('should catch on actual error', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: $call(
-        $get("body"),
+        $get('body'),
       ),
-      error: "err",
+      error: 'err',
       catch: $call(
-        $get("catch"),
-        $get("err"),
+        $get('catch'),
+        $get('err'),
       ),
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const errorMessage = "body error";
+    const errorMessage = 'body error'
 
     const body = () => {
-      throw new Error(errorMessage);
-    };
-    const catchError = jest.fn();
+      throw new Error(errorMessage)
+    }
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       body,
       catch: catchError,
-    });
+    })
 
-    resolve(env);
+    resolve(env)
 
-    expect(catchError).toHaveBeenCalledTimes(1);
-    expect(catchError).toHaveBeenCalledWith(errorMessage);
+    expect(catchError).toHaveBeenCalledTimes(1)
+    expect(catchError).toHaveBeenCalledWith(errorMessage)
 
-  });
+  })
 
-  test("should catch on string error", () => {
+  test('should catch on string error', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: $call(
-        $get("body"),
+        $get('body'),
       ),
-      error: "err",
+      error: 'err',
       catch: $call(
-        $get("catch"),
-        $get("err"),
+        $get('catch'),
+        $get('err'),
       ),
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const errorMessage = "body error";
+    const errorMessage = 'body error'
 
     const body = () => {
-      throw errorMessage;
-    };
-    const catchError = jest.fn();
+      throw errorMessage
+    }
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       body,
       catch: catchError,
-    });
+    })
 
-    resolve(env);
+    resolve(env)
 
-    expect(catchError).toHaveBeenCalledTimes(1);
-    expect(catchError).toHaveBeenCalledWith(errorMessage);
+    expect(catchError).toHaveBeenCalledTimes(1)
+    expect(catchError).toHaveBeenCalledWith(errorMessage)
 
-  });
+  })
 
-  test("should catch without error id", () => {
+  test('should catch without error id', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: $call(
-        $get("body"),
+        $get('body'),
       ),
       catch: $call(
-        $get("catch"),
+        $get('catch'),
       ),
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const errorMessage = "body error";
+    const errorMessage = 'body error'
 
     const body = () => {
-      throw new Error(errorMessage);
-    };
-    const catchError = jest.fn();
+      throw new Error(errorMessage)
+    }
+    const catchError = jest.fn()
 
     const env = createEnv(null, {
       body,
       catch: catchError,
-    });
+    })
 
-    expect(() => resolve(env)).not.toThrow();
+    expect(() => resolve(env)).not.toThrow()
 
-  });
+  })
 
-  test("should ignore error", () => {
+  test('should ignore error', () => {
 
     const step: TryStatement = {
-      type: "try",
+      type: 'try',
       body: $call(
-        $get("body"),
+        $get('body'),
       ),
-    };
+    }
 
-    const resolve = compileStep(step, {});
+    const resolve = compileStep(step, {})
 
-    const errorMessage = "body error";
+    const errorMessage = 'body error'
 
     const body = () => {
-      throw new Error(errorMessage);
-    };
+      throw new Error(errorMessage)
+    }
 
     const env = createEnv(null, {
       body,
-    });
+    })
 
-    expect(() => resolve(env)).not.toThrow();
+    expect(() => resolve(env)).not.toThrow()
 
-  });
+  })
 
-  test("should cache throw statement step", () => {
+  test('should cache throw statement step', () => {
 
     const step1: TryStatement = {
-      type: "try",
+      type: 'try',
       body: {
-        type: "call",
+        type: 'call',
         func: {
-          type: "get",
-          id: "func",
+          type: 'get',
+          id: 'func',
         },
       },
-      error: "err",
+      error: 'err',
       catch: {
-        type: "call",
+        type: 'call',
         func: {
-          type: "get",
-          id: "log",
+          type: 'get',
+          id: 'log',
         },
         args: {
-          type: "get",
-          id: "err",
+          type: 'get',
+          id: 'err',
         },
       },
-    };
+    }
     const step2: TryStatement = {
-      type: "try",
+      type: 'try',
       body: {
-        type: "call",
+        type: 'call',
         func: {
-          type: "get",
-          id: "func",
+          type: 'get',
+          id: 'func',
         },
       },
-      error: "err",
+      error: 'err',
       catch: {
-        type: "call",
+        type: 'call',
         func: {
-          type: "get",
-          id: "log",
+          type: 'get',
+          id: 'log',
         },
         args: {
-          type: "get",
-          id: "err",
+          type: 'get',
+          id: 'err',
         },
       },
-    };
+    }
 
-    const cache = {};
-    const same = compileStep(step1, cache) === compileStep(step2, cache);
+    const cache = {}
+    const same = compileStep(step1, cache) === compileStep(step2, cache)
 
-    expect(same).toBe(true);
+    expect(same).toBe(true)
 
-  });
+  })
 
-});
+})

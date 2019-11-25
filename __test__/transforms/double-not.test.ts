@@ -1,21 +1,21 @@
-import { compileExp, TransformExpression } from "../../src";
-import { $literal, $trans } from "../helpers/expressions";
-import { rand } from "../helpers/number";
+import { compileExp, TransformExpression } from '../../src'
+import { $literal, $trans } from '../helpers/expressions'
+import { rand } from '../helpers/number'
 
-describe("not transform expression", () => {
+describe('not transform expression', () => {
 
-  test("should compile not transform expression", () => {
+  test('should compile not transform expression', () => {
 
-    const value = rand(0, 1, true);
+    const value = rand(0, 1, true)
 
     const expression: TransformExpression = $trans(
-      "!!",
+      '!!',
       $literal(value),
-    );
-    const resolve = compileExp(expression, {});
+    )
+    const resolve = compileExp(expression, {})
 
-    expect(resolve(null as any)).toBe(!!value);
+    expect(resolve(null as any)).toBe(!!value)
 
-  });
+  })
 
-});
+})

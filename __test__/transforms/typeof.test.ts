@@ -1,32 +1,32 @@
-import { compileExp, createEnv, TransformExpression } from "../../src";
-import { $get, $literal, $trans } from "../helpers/expressions";
+import { compileExp, createEnv, TransformExpression } from '../../src'
+import { $get, $literal, $trans } from '../helpers/expressions'
 
-describe("typeof transform expression", () => {
+describe('typeof transform expression', () => {
 
-  test("should compile typeof transform expression", () => {
+  test('should compile typeof transform expression', () => {
 
     const expression: TransformExpression = $trans(
-      "typeof",
+      'typeof',
       $literal(10),
-    );
-    const resolve = compileExp(expression, {});
+    )
+    const resolve = compileExp(expression, {})
 
-    expect(resolve(null as any)).toBe("number");
+    expect(resolve(null as any)).toBe('number')
 
-  });
+  })
 
-  test("should compile typeof transform expression and don't throw if not in scope", () => {
+  test('should compile typeof transform expression and don\'t throw if not in scope', () => {
 
     const expression: TransformExpression = $trans(
-      "typeof",
-      $get("notinscope"),
-    );
-    const resolve = compileExp(expression, {});
+      'typeof',
+      $get('notinscope'),
+    )
+    const resolve = compileExp(expression, {})
 
-    const scope = createEnv(null);
+    const scope = createEnv(null)
 
-    expect(resolve(scope)).toBe(typeof undefined);
+    expect(resolve(scope)).toBe(typeof undefined)
 
-  });
+  })
 
-});
+})

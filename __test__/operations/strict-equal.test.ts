@@ -1,57 +1,57 @@
-import { compileExp, OperationExpression } from "../../src";
-import { $literal, $oper } from "../helpers/expressions";
-import { rand } from "../helpers/number";
+import { compileExp, OperationExpression } from '../../src'
+import { $literal, $oper } from '../helpers/expressions'
+import { rand } from '../helpers/number'
 
-describe("strict equal operation expression", () => {
+describe('strict equal operation expression', () => {
 
-  test("should compile strict equal operation expression with 2 operands", () => {
+  test('should compile strict equal operation expression with 2 operands', () => {
 
-    const a = rand(0, 1, true);
-    const b = rand(0, 1, true);
+    const a = rand(0, 1, true)
+    const b = rand(0, 1, true)
 
     const expression: OperationExpression = $oper(
-      "===",
+      '===',
       $literal(a),
       $literal(b),
-    );
-    const resolve = compileExp(expression, {});
+    )
+    const resolve = compileExp(expression, {})
 
     // tslint:disable-next-line: triple-equals
-    expect(resolve(null as any)).toBe(a === b);
+    expect(resolve(null as any)).toBe(a === b)
 
-  });
+  })
 
-  test("should compile strict equal operation expression with multiple operands", () => {
+  test('should compile strict equal operation expression with multiple operands', () => {
 
-    const a = rand(0, 1, true);
-    const b = rand(0, 1, true);
-    const c = !rand(0, 1, true);
-    const d = !rand(0, 1, true);
+    const a = rand(0, 1, true)
+    const b = rand(0, 1, true)
+    const c = !rand(0, 1, true)
+    const d = !rand(0, 1, true)
 
     const expression: OperationExpression = $oper(
-      "===",
+      '===',
       $literal(a),
       $literal(b),
       $literal(c),
       $literal(d),
-    );
-    const resolve = compileExp(expression, {});
+    )
+    const resolve = compileExp(expression, {})
 
-    expect(resolve(null as any)).toBe(a === b === c === d);
+    expect(resolve(null as any)).toBe(a === b === c === d)
 
-  });
+  })
 
-  test("should use strict equals", () => {
+  test('should use strict equals', () => {
 
     const expression: OperationExpression = $oper(
-      "===",
-      $literal("10"),
+      '===',
+      $literal('10'),
       $literal(10),
-    );
-    const resolve = compileExp(expression, {});
+    )
+    const resolve = compileExp(expression, {})
 
-    expect(resolve(null as any)).toBe(false);
+    expect(resolve(null as any)).toBe(false)
 
-  });
+  })
 
-});
+})

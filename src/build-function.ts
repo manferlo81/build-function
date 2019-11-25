@@ -1,6 +1,6 @@
-import { compileFunc } from "./compile";
-import { createEnv } from "./env";
-import { Environment, NamedFunctionOptions } from "./types";
+import { compileFunc } from './compile'
+import { createEnv } from './env'
+import { Environment, NamedFunctionOptions } from './types'
 
 export function build<F extends (...args: any[]) => any>(
   options: NamedFunctionOptions,
@@ -12,5 +12,5 @@ export function build<F extends (...args: any[]) => any>(
     options.name,
   )(
     env || createEnv(null),
-  );
+  )
 }

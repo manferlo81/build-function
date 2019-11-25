@@ -1,22 +1,22 @@
-import { compileExp } from "../../src";
+import { compileExp } from '../../src'
 
-describe("unknown expression", () => {
+describe('unknown expression', () => {
 
-  test("should throw on unknown expression", () => {
+  test('should throw on unknown expression', () => {
 
-    expect(() => compileExp(undefined as any, {})).toThrow();
-    expect(() => compileExp(null as any, {})).toThrow();
+    expect(() => compileExp(undefined as any, {})).toThrow()
+    expect(() => compileExp(null as any, {})).toThrow()
 
-  });
+  })
 
-  test("should throw on unknown expression type", () => {
+  test('should throw on unknown expression type', () => {
 
     const expression: any = {
-      type: "unknown",
-    };
+      type: 'unknown',
+    }
 
-    expect(() => compileExp(expression, {})).toThrow();
+    expect(() => compileExp(expression, {})).toThrow()
 
-  });
+  })
 
-});
+})
