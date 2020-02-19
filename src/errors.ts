@@ -3,13 +3,17 @@ export function error(msg: string) {
 }
 
 export function errorFmt<F extends (...params: any[]) => Error>(template: string): F;
-export function errorFmt<F>(template: string): any {
-  return (...params: any[]) => error(
-    template.replace(
-      /\$(\d+)/g,
-      (_, index) => params[index],
-    ),
-  )
+export function errorFmt<F>(template: string): (...params: any[]) => Error {
+  return function () {
+    // eslint-disable-next-line prefer-rest-params
+    const args = arguments
+    return error(
+      template.replace(
+        /\$(\d+)/g,
+        (_, index) => args[index],
+      ),
+    )
+  }
 }
 
 const msgInvalid = '"$0" is not a valid $1'
