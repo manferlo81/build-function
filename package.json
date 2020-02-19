@@ -7,9 +7,9 @@
     "function",
     "json"
   ],
-  "main": "dist/build.cjs.js",
-  "module": "dist/build.es.js",
-  "browser": "dist/build.umd.js",
+  "main": "dist/build-function.js",
+  "module": "dist/build-function.mjs",
+  "browser": "dist/build-function.umd.js",
   "types": "types/index.d.ts",
   "typings": "types/index.d.ts",
   "bundlib": {
