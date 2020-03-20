@@ -1,6 +1,5 @@
 {
   "hooks": {
-    "pre-push": "npm run lint && npm test",
-    "post-merge": "npm install"
+    "pre-push": "npm run lint && npm test"
   }
 }
