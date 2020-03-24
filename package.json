@@ -41,7 +41,7 @@
     "@types/node": "^13.9.3",
     "@types/object-hash": "^1.3.1",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
-    "@typescript-eslint/parser": "^2.24.0",
+    "@typescript-eslint/parser": "^2.25.0",
     "bundlib": "^0.15.2",
     "chokidar": "^3.3.1",
     "eslint": "^6.8.0",
