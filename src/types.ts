@@ -1,56 +1,69 @@
 import { SingleOrMulti } from './helper-types'
+import { DeprecatedDeclareStatement } from './legacy-types'
 
-// FUNCTION OPTIONS
+interface Typed<T extends string> {
+  type: T;
+}
 
-export interface FunctionOptions {
+export interface FunctionBase {
   params?: SingleOrMulti<FunctionParameter>;
   body?: SingleOrMulti<FunctionStep>;
 }
 
-export interface NamedFunctionOptions extends FunctionOptions {
+export interface BuildFunctionOptions extends FunctionBase {
   name?: string;
 }
 
-// PARAMETERS
+export type ParameterType =
+  | 'param'
+  | 'rest';
 
-export type ParameterType = 'param' | 'rest';
-
-export interface ParameterDescriptor {
+export interface FunctionParameterDescriptor extends Typed<ParameterType> {
   id: string;
-  type: ParameterType;
 }
 
-export type FunctionParameter = string | ParameterDescriptor;
+export type FunctionParameter = string | FunctionParameterDescriptor;
 
-// EXPRESSIONS
+export type ExpresionType =
+  | 'literal'
+  | 'get'
+  | 'set'
+  | 'trans'
+  | 'oper'
+  | 'ternary'
+  | 'func'
+  | 'call';
 
-export interface LiteralExpression {
-  type: 'literal';
+type TypedExpresion<T extends ExpresionType> = Typed<T>;
+
+export interface LiteralExpression extends TypedExpresion<'literal'> {
   value: any;
 }
 
-export interface GetExpression {
-  type: 'get';
+export interface GetExpression extends TypedExpresion<'get'> {
   id: string;
 }
 
-export interface SetExpression {
-  type: 'set';
+export interface SetExpression extends TypedExpresion<'set'> {
   id: string;
   value: Expression;
 }
 
-export interface FunctionCallExpression {
-  type: 'call';
-  func: Expression;
-  args?: SingleOrMulti<SpreadableExpression>;
-}
+export type RegularTransformOperator =
+  | '!'
+  | '!!'
+  | '~';
 
-export interface TernaryExpression {
-  type: 'ternary';
-  condition: Expression;
-  then: Expression;
-  otherwise: Expression;
+export type SpecialTransformOperator =
+  | 'typeof';
+
+export type TransformOperator =
+  | SpecialTransformOperator
+  | RegularTransformOperator;
+
+export interface UnaryOperationExpression extends TypedExpresion<'trans'> {
+  oper: TransformOperator;
+  exp: Expression;
 }
 
 export type RegularLogicOperator =
@@ -100,56 +113,50 @@ export type MultiTermOperator =
 
 export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
 
-export interface OperationExpression {
-  type: 'oper';
+export interface BinaryOperationExpression extends TypedExpresion<'oper'> {
   oper: MultiTermOperator;
   exp: MultiTermExpressions;
 }
 
-export type RegularTransformOperator =
-  | '!'
-  | '!!'
-  | '~';
-
-export type SpecialTransformOperator =
-  | 'typeof';
-
-export type TransformOperator =
-  | SpecialTransformOperator
-  | RegularTransformOperator;
-
-export interface TransformExpression {
-  type: 'trans';
-  oper: TransformOperator;
-  exp: Expression;
+export interface TernaryOperationExpression extends TypedExpresion<'ternary'> {
+  condition: Expression;
+  then: Expression;
+  otherwise: Expression;
 }
 
-export interface FunctionExpression extends FunctionOptions {
-  type: 'func';
+export interface FunctionExpression extends TypedExpresion<'func'>, FunctionBase { }
+
+export interface FunctionCallExpression extends TypedExpresion<'call'> {
+  func: Expression;
+  args?: SingleOrMulti<SpreadableExpression>;
 }
 
 export type Expression =
   | LiteralExpression
   | GetExpression
   | SetExpression
-  | FunctionCallExpression
-  | TernaryExpression
-  | OperationExpression
-  | TransformExpression
-  | FunctionExpression;
+  | UnaryOperationExpression
+  | BinaryOperationExpression
+  | TernaryOperationExpression
+  | FunctionExpression
+  | FunctionCallExpression;
 
-export type ExpresionType = Expression['type'];
-
-export interface SpreadExpression {
-  type: 'spread';
+export interface SpreadExpression extends Typed<'spread'> {
   exp: Expression;
 }
 
-// ARGUMENTS
-
 export type SpreadableExpression = Expression | SpreadExpression;
 
-// STATEMENTS
+export type StatementType2 =
+  | 'let'
+  | 'if'
+  | 'for'
+  | 'break'
+  | 'try'
+  | 'throw'
+  | 'return';
+
+type TypedStatement<T extends StatementType2> = Typed<T>;
 
 export interface DeclareWithValue {
   id: string;
@@ -158,50 +165,37 @@ export interface DeclareWithValue {
 
 export type VariableDeclaration = string | DeclareWithValue;
 
-export interface DeprecatedDeclareStatement {
-  type: 'declare';
-  set: SingleOrMulti<VariableDeclaration>;
-}
-
-export interface LetStatement {
-  type: 'let';
+export interface LetStatement extends TypedStatement<'let'> {
   declare: SingleOrMulti<VariableDeclaration>;
 }
 
-export interface IfStatement {
-  type: 'if';
+export interface IfStatement extends TypedStatement<'if'> {
   condition: Expression;
   then?: SingleOrMulti<FunctionStep>;
   otherwise?: SingleOrMulti<FunctionStep>;
 }
 
-export interface ForStatement {
-  type: 'for';
+export interface ForStatement extends TypedStatement<'for'> {
   target: Expression;
   value?: string;
   index?: string;
   body?: SingleOrMulti<FunctionStep>;
 }
 
-export interface BreakStatement {
-  type: 'break';
-}
+export type BreakStatement = TypedStatement<'break'>;
 
-export interface ReturnStatement {
-  type: 'return';
-  value: Expression;
-}
-
-export interface TryStatement {
-  type: 'try';
+export interface TryStatement extends TypedStatement<'try'> {
   body?: SingleOrMulti<FunctionStep>;
   error?: string;
   catch?: SingleOrMulti<FunctionStep>;
 }
 
-export interface ThrowStatement {
-  type: 'throw';
+export interface ThrowStatement extends TypedStatement<'throw'> {
   msg: string | Expression;
+}
+
+export interface ReturnStatement extends TypedStatement<'return'> {
+  value: Expression;
 }
 
 export type Statement =
@@ -216,11 +210,9 @@ export type Statement =
 
 export type StatementType = Statement['type'];
 
-// STEPS
-
 export type FunctionStep =
-  | Statement
-  | Expression;
+  | Expression
+  | Statement;
 
 export interface StepReturn {
   type: 'return';
@@ -240,8 +232,6 @@ export type StepNonLoopResult =
 export type StepLoopResult =
   | 'break'
   | StepNonLoopResult;
-
-// SCOPE
 
 export type EnvLib = Record<string, any>;
 

@@ -3,40 +3,11 @@
 import { createEnv, findInEnv, setInEnv } from './env'
 import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from './errors'
 import { hash } from './hash'
+import { AnyFunction, ExpressionCompiler, ExpressionLookupTable, SingleOrMulti, StatementLookupTable, StepCompiler } from './helper-types'
 import { hasOwn, returning } from './helpers'
 import { isArray, isObj } from './type-check'
+import { ArgsLibPopulator, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, FunctionBase, FunctionParameter, FunctionParameterDescriptor, FunctionStep, ParameterType, RegularArithmeticOperator, RegularOperator, RegularTransformOperator, SpecialOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, VariableDeclaration } from './types'
 
-import {
-  AnyFunction,
-  ExpressionCompiler,
-  ExpressionLookupTable,
-  SingleOrMulti,
-  StatementLookupTable,
-  StepCompiler,
-} from './helper-types'
-import {
-  ArgsLibPopulator,
-  CompileCache,
-  DeclareWithValue,
-  EnvBasedPopulator,
-  EnvBasedResolver,
-  EnvLib,
-  Expression,
-  FunctionOptions,
-  FunctionParameter,
-  FunctionStep,
-  ParameterDescriptor,
-  ParameterType,
-  RegularArithmeticOperator,
-  RegularOperator,
-  RegularTransformOperator,
-  SpecialOperator,
-  SpreadableExpression,
-  StatementType,
-  StepLoopResult,
-  StepNonLoopResult,
-  VariableDeclaration,
-} from './types'
 
 // LOOKUP TABLES
 
@@ -635,7 +606,7 @@ const stepTable: StatementLookupTable = {
 // FUNCTION
 
 export function compileFunc<V extends AnyFunction = AnyFunction>(
-  options: FunctionOptions,
+  options: FunctionBase,
   cache: CompileCache,
   name?: string,
 ): EnvBasedResolver<V> {
@@ -704,11 +675,11 @@ export function compileParam(
   cache: CompileCache,
 ): ArgsLibPopulator | null {
 
-  function normalize(single: FunctionParameter): ParameterDescriptor {
+  function normalize(single: FunctionParameter): FunctionParameterDescriptor {
     return isObj(single) ? single : { id: single, type: 'param' }
   }
 
-  function compileSingle(single: ParameterDescriptor, index: number): ArgsLibPopulator {
+  function compileSingle(single: FunctionParameterDescriptor, index: number): ArgsLibPopulator {
 
     const { type, id } = single
 
@@ -743,7 +714,7 @@ export function compileParam(
 
   const db = cache.param || (cache.param = {})
 
-  function compileCached(single: ParameterDescriptor, index: number): ArgsLibPopulator {
+  function compileCached(single: FunctionParameterDescriptor, index: number): ArgsLibPopulator {
 
     const { id } = single
 
@@ -783,7 +754,7 @@ export function compileParam(
     return null
   }
 
-  const norm = params.map<ParameterDescriptor>(normalize)
+  const norm = params.map<FunctionParameterDescriptor>(normalize)
   const populators = norm.map<ArgsLibPopulator>(compileCached)
 
   if (len === 1) {

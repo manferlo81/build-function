@@ -1,9 +1,11 @@
 import { compileFunc } from './compile'
 import { createEnv } from './env'
-import { Environment, NamedFunctionOptions } from './types'
+import { BuildFunctionOptions, Environment } from './types'
 
-export function build<F extends (...args: any[]) => any>(
-  options: NamedFunctionOptions,
+type AnyFunction = (...args: any[]) => any
+
+export function build<F extends AnyFunction>(
+  options: BuildFunctionOptions,
   env?: Environment,
 ): F {
   return compileFunc<F>(
