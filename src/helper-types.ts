@@ -7,7 +7,7 @@ import {
   Statement,
   StatementType,
   StepLoopResult,
-} from './types'
+} from './types';
 
 export type SingleOrMulti<T> = T | T[];
 export type AnyFunction = (...args: any[]) => any;

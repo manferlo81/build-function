@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src'
-import { $get, $oper } from '../helpers/expressions'
+import { compileExp, OperationExpression } from '../../src';
+import { $get, $oper } from '../helpers/expressions';
 
 describe('unknown operation expression', () => {
 
@@ -11,10 +11,10 @@ describe('unknown operation expression', () => {
       '?',
       $get('a'),
       $get('b'),
-    )
+    );
 
-    expect(() => compileExp(expression, {})).toThrow()
+    expect(() => compileExp(expression, {})).toThrow();
 
-  })
+  });
 
-})
+});

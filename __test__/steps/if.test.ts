@@ -1,15 +1,15 @@
-import { compileExp, compileStep, createEnv, IfStatement } from '../../src'
-import { $call, $get, $literal, $set } from '../helpers/expressions'
+import { compileExp, compileStep, createEnv, IfStatement } from '../../src';
+import { $call, $get, $literal, $set } from '../helpers/expressions';
 
 describe('if statement step', () => {
 
   test('should throw on invalid if statement step', () => {
 
-    const invalid = { type: 'if' }
+    const invalid = { type: 'if' };
 
-    expect(() => compileStep(invalid as any, {})).toThrow()
+    expect(() => compileStep(invalid as any, {})).toThrow();
 
-  })
+  });
 
   test('should compile if statement step with single step', () => {
 
@@ -22,9 +22,9 @@ describe('if statement step', () => {
       otherwise: $call(
         $get('otherwise'),
       ),
-    }
+    };
 
-    const resolve = compileStep(step, {})
+    const resolve = compileStep(step, {});
 
     const setCond = compileExp(
       $set(
@@ -32,21 +32,21 @@ describe('if statement step', () => {
         $literal(true),
       ),
       {},
-    )
+    );
 
-    const then = jest.fn()
-    const otherwise = jest.fn()
+    const then = jest.fn();
+    const otherwise = jest.fn();
 
-    const scope = createEnv(null, { cond: false, then, otherwise })
+    const scope = createEnv(null, { cond: false, then, otherwise });
 
-    expect(resolve(scope)).toBeUndefined()
-    setCond(scope)
-    expect(resolve(scope)).toBeUndefined()
+    expect(resolve(scope)).toBeUndefined();
+    setCond(scope);
+    expect(resolve(scope)).toBeUndefined();
 
-    expect(then).toHaveBeenCalledTimes(1)
-    expect(otherwise).toHaveBeenCalledTimes(1)
+    expect(then).toHaveBeenCalledTimes(1);
+    expect(otherwise).toHaveBeenCalledTimes(1);
 
-  })
+  });
 
   test('should compile if statement step with multiple steps', () => {
 
@@ -63,9 +63,9 @@ describe('if statement step', () => {
           $get('otherwise'),
         ),
       ],
-    }
+    };
 
-    const resolve = compileStep(step, {})
+    const resolve = compileStep(step, {});
 
     const setCond = compileExp(
       $set(
@@ -73,34 +73,34 @@ describe('if statement step', () => {
         $literal(true),
       ),
       {},
-    )
+    );
 
-    const then = jest.fn()
-    const otherwise = jest.fn()
+    const then = jest.fn();
+    const otherwise = jest.fn();
 
-    const scope = createEnv(null, { cond: false, then, otherwise })
+    const scope = createEnv(null, { cond: false, then, otherwise });
 
-    expect(resolve(scope)).toBeUndefined()
-    setCond(scope)
-    expect(resolve(scope)).toBeUndefined()
+    expect(resolve(scope)).toBeUndefined();
+    setCond(scope);
+    expect(resolve(scope)).toBeUndefined();
 
-    expect(then).toHaveBeenCalledTimes(1)
-    expect(otherwise).toHaveBeenCalledTimes(1)
+    expect(then).toHaveBeenCalledTimes(1);
+    expect(otherwise).toHaveBeenCalledTimes(1);
 
-  })
+  });
 
   test('should compile if statement step without steps', () => {
 
     const step: IfStatement = {
       type: 'if',
       condition: $get('cond'),
-    }
+    };
 
-    const resolve = compileStep(step, {})
+    const resolve = compileStep(step, {});
 
-    expect(resolve.length).toBe(0)
+    expect(resolve.length).toBe(0);
 
-  })
+  });
 
   test('should cache if statement step', () => {
 
@@ -117,7 +117,7 @@ describe('if statement step', () => {
           $get('otherwise'),
         ),
       ],
-    }
+    };
     const step2: IfStatement = {
       type: 'if',
       condition: $get('cond'),
@@ -131,13 +131,13 @@ describe('if statement step', () => {
           $get('otherwise'),
         ),
       ],
-    }
+    };
 
-    const cache = {}
-    const same = compileStep(step1, cache) === compileStep(step2, cache)
+    const cache = {};
+    const same = compileStep(step1, cache) === compileStep(step2, cache);
 
-    expect(same).toBe(true)
+    expect(same).toBe(true);
 
-  })
+  });
 
-})
+});

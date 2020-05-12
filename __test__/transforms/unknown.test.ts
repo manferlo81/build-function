@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src'
-import { $get, $trans } from '../helpers/expressions'
+import { compileExp, OperationExpression } from '../../src';
+import { $get, $trans } from '../helpers/expressions';
 
 describe('unknown transform expression', () => {
 
@@ -10,10 +10,10 @@ describe('unknown transform expression', () => {
       // @ts-ignore
       '?',
       $get('a'),
-    )
+    );
 
-    expect(() => compileExp(expression, {})).toThrow()
+    expect(() => compileExp(expression, {})).toThrow();
 
-  })
+  });
 
-})
+});

@@ -1,6 +1,6 @@
-import { build } from '../src'
-import { $get, $oper, $return } from './helpers/expressions'
-import { rand } from './helpers/number'
+import { build } from '../src';
+import { $get, $oper, $return } from './helpers/expressions';
+import { rand } from './helpers/number';
 
 describe('build function', () => {
 
@@ -15,14 +15,14 @@ describe('build function', () => {
           $get('b'),
         ),
       ),
-    })
+    });
 
-    const a = rand(1, 50)
-    const b = rand(1, 50)
+    const a = rand(1, 50);
+    const b = rand(1, 50);
 
-    expect(func(a, b)).toBe(a + b)
+    expect(func(a, b)).toBe(a + b);
 
-  })
+  });
 
   test('should add itself to scope if name provided', () => {
 
@@ -31,12 +31,12 @@ describe('build function', () => {
       body: $return(
         $get('func'),
       ),
-    })
+    });
 
-    const result = func()
+    const result = func();
 
-    expect(result).toBe(func)
+    expect(result).toBe(func);
 
-  })
+  });
 
-})
+});

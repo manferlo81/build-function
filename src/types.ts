@@ -1,5 +1,5 @@
-import { SingleOrMulti } from './helper-types'
-import { DeprecatedDeclareStatement } from './legacy-types'
+import { SingleOrMulti } from './helper-types';
+import { DeprecatedDeclareStatement } from './legacy-types';
 
 interface Typed<T extends string> {
   type: T;

@@ -1,33 +1,33 @@
-import { hasOwn } from './helpers'
-import { EnvFound, Environment, EnvLib } from './types'
+import { hasOwn } from './helpers';
+import { EnvFound, Environment, EnvLib } from './types';
 
-const pre = '0$_'
+const pre = '0$_';
 
 export function setInEnv<V>(env: Environment, id: string, value: V): void {
-  env[pre + id] = value
+  env[pre + id] = value;
 }
 
 export function createEnv(parent: Environment | null, lib?: EnvLib | null): Environment {
 
-  const env: Environment = { parent }
+  const env: Environment = { parent };
 
   if (lib) {
     for (const id in lib) {
       if (hasOwn.call(lib, id)) {
-        setInEnv(env, id, lib[id])
+        setInEnv(env, id, lib[id]);
       }
     }
   }
 
-  return env
+  return env;
 
 }
 
 export function findInEnv<V = any>(env: Environment, id: string, topOnly?: boolean): EnvFound<V> | void {
 
-  const tid = pre + id
+  const tid = pre + id;
 
-  let current: Environment | null = env
+  let current: Environment | null = env;
 
   while (current) {
 
@@ -35,14 +35,14 @@ export function findInEnv<V = any>(env: Environment, id: string, topOnly?: boole
       return {
         env: current,
         id: tid,
-      }
+      };
     }
 
     if (topOnly) {
-      return
+      return;
     }
 
-    current = current.parent
+    current = current.parent;
 
   }
 
