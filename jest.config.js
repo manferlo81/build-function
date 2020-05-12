@@ -1,8 +1,8 @@
 module.exports = {
 
   testEnvironment: 'node',
-  preset: 'ts-jest',
   cacheDirectory: 'node_modules/.cache/jest',
+  preset: 'ts-jest',
 
   collectCoverage: true,
   collectCoverageFrom: [
@@ -13,6 +13,10 @@ module.exports = {
     process.env.CI ? 'json' : 'lcov',
     'text',
     'text-summary',
+  ],
+
+  testMatch: [
+    '**/__test__/**/*.test.ts',
   ],
 
   verbose: true,
