@@ -8,7 +8,6 @@ import { hasOwn, returning } from './helpers';
 import { isArray, isObj } from './type-check';
 import { ArgsLibPopulator, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, FunctionBase, FunctionParameter, FunctionParameterDescriptor, FunctionStep, ParameterType, RegularArithmeticOperator, RegularOperator, RegularTransformOperator, SpecialOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, VariableDeclaration } from './types';
 
-
 // LOOKUP TABLES
 
 const paramTable: Record<

@@ -38,6 +38,15 @@ rules:
     - error
     - always-multiline
 
+  no-multiple-empty-lines:
+    - error
+    - max: 1
+      maxBOF: 0
+      maxEOF: 0
+
+  object-shorthand: error
+  no-useless-rename: error
+
   "@typescript-eslint/no-explicit-any": "off"
   "@typescript-eslint/explicit-function-return-type": "off"
 
