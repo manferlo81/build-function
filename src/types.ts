@@ -78,7 +78,8 @@ export type RegularLogicOperator =
 
 export type SpecialLogicOperator =
   | '&&'
-  | '||';
+  | '||'
+  | '??';
 
 export type RegularArithmeticOperator =
   | '+'

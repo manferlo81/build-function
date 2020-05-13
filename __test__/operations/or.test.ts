@@ -4,7 +4,7 @@ import { rand } from '../helpers/number';
 
 describe('or operation expression', () => {
 
-  test('should compile and operation expression with 2 operands', () => {
+  test('should compile or operation expression with 2 operands', () => {
 
     const a = rand(0, 1, true);
     const b = [false, true][rand(0, 1, true)];
@@ -20,7 +20,7 @@ describe('or operation expression', () => {
 
   });
 
-  test('should compile and operation expression with mutiple operands', () => {
+  test('should compile or operation expression with mutiple operands', () => {
 
     const a = rand(0, 1, true);
     const b = [false, true][rand(0, 1, true)];

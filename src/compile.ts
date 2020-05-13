@@ -91,6 +91,30 @@ const specialOperTable: Record<
 
   },
 
+  '??': (resolvers) => {
+
+    const len = resolvers.length;
+
+    return (env) => {
+
+      let result;
+
+      for (let i = 0; i < len; i++) {
+
+        result = resolvers[i](env);
+
+        if (result != null) {
+          break;
+        }
+
+      }
+
+      return result;
+
+    };
+
+  },
+
   '**': (resolvers) => {
 
     const resolveLast = resolvers.pop() as EnvBasedResolver;
