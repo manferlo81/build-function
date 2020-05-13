@@ -1,14 +1,12 @@
-import { compileExp, OperationExpression } from '../../src';
+import { compileExp, UnaryOperationExpression } from '../../src';
 import { $get, $trans } from '../helpers/expressions';
 
 describe('unknown transform expression', () => {
 
-  test('should throw if less than 2 operands', () => {
+  test('should throw on invalid operation', () => {
 
-    const expression: OperationExpression = $trans(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      '?',
+    const expression: UnaryOperationExpression = $trans(
+      '#' as never,
       $get('a'),
     );
 
