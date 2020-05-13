@@ -1,0 +1,7 @@
+name: buildFunc
+min: browser
+
+globals:
+  object-hash: objectHash
+
+project: tsconfig-build.json

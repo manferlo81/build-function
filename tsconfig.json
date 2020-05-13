@@ -12,6 +12,7 @@
     "noUnusedLocals": true
   },
   "include": [
+    "__test__/**/*.ts",
     "src/**/*.ts"
   ],
   "exclude": [

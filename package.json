@@ -12,13 +12,6 @@
   "browser": "dist/build-function.umd.js",
   "types": "types/index.d.ts",
   "typings": "types/index.d.ts",
-  "bundlib": {
-    "name": "buildFunc",
-    "min": "browser",
-    "globals": {
-      "object-hash": "objectHash"
-    }
-  },
   "scripts": {
     "dev": "bundlib -dw",
     "build": "bundlib -d",
