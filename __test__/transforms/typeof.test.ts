@@ -11,7 +11,7 @@ describe('typeof transform expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as any)).toBe('number');
+    expect(resolve(null as never)).toBe('number');
 
   });
 

@@ -14,7 +14,7 @@ describe('get expression', () => {
 
     invalid.forEach((expression) => {
 
-      expect(() => compileExp(expression as any, {})).toThrow();
+      expect(() => compileExp(expression as never, {})).toThrow();
 
     });
 

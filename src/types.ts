@@ -1,9 +1,5 @@
-import { SingleOrMulti } from './helper-types';
+import { SingleOrMulti, Typed } from './helper-types';
 import { DeprecatedDeclareStatement } from './legacy-types';
-
-interface Typed<T extends string> {
-  type: T;
-}
 
 export interface FunctionBase {
   params?: SingleOrMulti<FunctionParameter>;
@@ -49,20 +45,20 @@ export interface SetExpression extends TypedExpresion<'set'> {
   value: Expression;
 }
 
-export type RegularTransformOperator =
+export type RegularUnaryOperator =
   | '!'
   | '!!'
   | '~';
 
-export type SpecialTransformOperator =
+export type SpecialUnaryOperator =
   | 'typeof';
 
-export type TransformOperator =
-  | SpecialTransformOperator
-  | RegularTransformOperator;
+export type UnaryOperator =
+  | SpecialUnaryOperator
+  | RegularUnaryOperator;
 
 export interface UnaryOperationExpression extends TypedExpresion<'trans'> {
-  oper: TransformOperator;
+  oper: UnaryOperator;
   exp: Expression;
 }
 
@@ -99,24 +95,24 @@ export type BitwiseOperator =
   | '>>'
   | '>>>';
 
-export type SpecialOperator =
+export type SpecialBinaryOperator =
   | SpecialLogicOperator
   | SpecialArithmeticOperator;
 
-export type RegularOperator =
+export type RegularBinaryOperator =
   | RegularLogicOperator
   | RegularArithmeticOperator
   | BitwiseOperator;
 
-export type MultiTermOperator =
-  | SpecialOperator
-  | RegularOperator;
+export type BinaryOperator =
+  | SpecialBinaryOperator
+  | RegularBinaryOperator;
 
-export type MultiTermExpressions = [Expression, Expression, ...Expression[]];
+export type BinaryOperationOperandExpressions = [Expression, Expression, ...Expression[]];
 
 export interface BinaryOperationExpression extends TypedExpresion<'oper'> {
-  oper: MultiTermOperator;
-  exp: MultiTermExpressions;
+  oper: BinaryOperator;
+  exp: BinaryOperationOperandExpressions;
 }
 
 export interface TernaryOperationExpression extends TypedExpresion<'ternary'> {
@@ -148,7 +144,10 @@ export interface SpreadExpression extends Typed<'spread'> {
 
 export type SpreadableExpression = Expression | SpreadExpression;
 
-export type StatementType2 =
+type DeprecatedStatementType = 'declare';
+
+export type StatementType =
+  | DeprecatedStatementType
   | 'let'
   | 'if'
   | 'for'
@@ -157,7 +156,7 @@ export type StatementType2 =
   | 'throw'
   | 'return';
 
-type TypedStatement<T extends StatementType2> = Typed<T>;
+type TypedStatement<T extends StatementType> = Typed<T>;
 
 export interface DeclareWithValue {
   id: string;
@@ -208,8 +207,6 @@ export type Statement =
   | ReturnStatement
   | TryStatement
   | ThrowStatement;
-
-export type StatementType = Statement['type'];
 
 export type FunctionStep =
   | Expression

@@ -1,4 +1,4 @@
-import { compileParam } from '../src/compile';
+import { compileParam } from '../src/compile/compile';
 
 describe('compile function parameters', () => {
 

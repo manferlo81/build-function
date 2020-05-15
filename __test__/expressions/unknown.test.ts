@@ -4,8 +4,11 @@ describe('unknown expression', () => {
 
   test('should throw on unknown expression', () => {
 
-    expect(() => compileExp(undefined as any, {})).toThrow();
-    expect(() => compileExp(null as any, {})).toThrow();
+    const invalid = [undefined, null];
+
+    invalid.forEach((value) => {
+      expect(() => compileExp(value as never, {})).toThrow();
+    });
 
   });
 

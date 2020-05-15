@@ -7,7 +7,7 @@ describe('if statement step', () => {
 
     const invalid = { type: 'if' };
 
-    expect(() => compileStep(invalid as any, {})).toThrow();
+    expect(() => compileStep(invalid as never, {})).toThrow();
 
   });
 

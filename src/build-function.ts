@@ -1,4 +1,4 @@
-import { compileFunc } from './compile';
+import { compileFunc } from './compile/compile';
 import { createEnv } from './env';
 import { BuildFunctionOptions, Environment } from './types';
 

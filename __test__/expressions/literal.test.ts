@@ -8,7 +8,7 @@ describe('literal expression', () => {
 
     const invalid = { type: 'literal' };
 
-    expect(() => compileExp(invalid as any, {})).toThrow();
+    expect(() => compileExp(invalid as never, {})).toThrow();
 
   });
 
@@ -16,7 +16,7 @@ describe('literal expression', () => {
 
     const value = rand(1, 20);
     const expression: LiteralExpression = $literal(value);
-    const resolve: () => number = compileExp(expression, {}) as any;
+    const resolve: () => number = compileExp(expression, {}) as never;
 
     const result = resolve();
 
@@ -42,11 +42,11 @@ describe('literal expression', () => {
 
     const resolve = compileExp(expression, {});
 
-    const obj = resolve(null as any);
+    const obj = resolve(null as never);
 
     obj.value = true;
 
-    expect(resolve(null as any)).not.toHaveProperty('value');
+    expect(resolve(null as never)).not.toHaveProperty('value');
 
   });
 

@@ -14,7 +14,7 @@ describe('not transform expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as any)).toBe(!value);
+    expect(resolve(null as never)).toBe(!value);
 
   });
 

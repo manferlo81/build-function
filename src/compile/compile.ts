@@ -1,181 +1,29 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-import { createEnv, findInEnv, setInEnv } from './env';
-import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from './errors';
-import { hash } from './hash';
-import { AnyFunction, ExpressionCompiler, ExpressionLookupTable, SingleOrMulti, StatementLookupTable, StepCompiler } from './helper-types';
-import { hasOwn, returning } from './helpers';
-import { isArray, isObj } from './type-check';
-import { ArgsLibPopulator, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, FunctionBase, FunctionParameter, FunctionParameterDescriptor, FunctionStep, ParameterType, RegularArithmeticOperator, RegularOperator, RegularTransformOperator, SpecialOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, VariableDeclaration } from './types';
+import { createEnv, findInEnv, setInEnv } from '../env';
+import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from '../errors';
+import { hash } from '../hash';
+import { AnyFunction, SingleOrMulti } from '../helper-types';
+import { hasOwn, returning } from '../helpers';
+import { DeprecatedDeclareStatement } from '../legacy-types';
+import { isArray, isObj } from '../type-check';
+import { ArgsLibPopulator, BinaryOperationExpression, BreakStatement, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, ForStatement, FunctionBase, FunctionCallExpression, FunctionExpression, FunctionParameter, FunctionParameterDescriptor, FunctionStep, GetExpression, IfStatement, LetStatement, LiteralExpression, RegularArithmeticOperator, ReturnStatement, SetExpression, SpecialBinaryOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, TernaryOperationExpression, ThrowStatement, TryStatement, UnaryOperationExpression, VariableDeclaration } from '../types';
+import { operTable, specialOperTable, transTable } from './oper-table';
+import { paramTable } from './param-table';
 
-// LOOKUP TABLES
+type ExpressionCompiler<E extends Expression> =
+  (expression: E, cache: CompileCache, safe?: boolean) => EnvBasedResolver<any>;
 
-const paramTable: Record<
-  ParameterType,
-  (index: number) => (input: any[]) => any
-> = {
-
-  rest: (index) => {
-
-    return (input) => {
-
-      const arg: any[] = [];
-      const len = input.length;
-
-      for (let i = index; i < len; i++) {
-        arg.push(
-          input[i],
-        );
-      }
-
-      return arg;
-
-    };
-
-  },
-
-  param: (index) => (input) => input[index],
-
-};
-
-const specialOperTable: Record<
-  SpecialOperator,
-  (resolvers: EnvBasedResolver[]) => EnvBasedResolver
-> = {
-
-  '||': (resolvers) => {
-
-    const len = resolvers.length;
-
-    return (env) => {
-
-      let result;
-
-      for (let i = 0; i < len; i++) {
-
-        result = resolvers[i](env);
-
-        if (result) {
-          break;
-        }
-
-      }
-
-      return result;
-
-    };
-
-  },
-
-  '&&': (resolvers) => {
-
-    const len = resolvers.length;
-
-    return (env) => {
-
-      let result;
-
-      for (let i = 0; i < len; i++) {
-
-        result = resolvers[i](env);
-
-        if (!result) {
-          break;
-        }
-
-      }
-
-      return result;
-
-    };
-
-  },
-
-  '??': (resolvers) => {
-
-    const len = resolvers.length;
-
-    return (env) => {
-
-      let result;
-
-      for (let i = 0; i < len; i++) {
-
-        result = resolvers[i](env);
-
-        if (result != null) {
-          break;
-        }
-
-      }
-
-      return result;
-
-    };
-
-  },
-
-  '**': (resolvers) => {
-
-    const resolveLast = resolvers.pop() as EnvBasedResolver;
-
-    return (env) => {
-
-      let result = resolveLast(env);
-      let i = resolvers.length - 1;
-
-      while (i >= 0) {
-        result = resolvers[i](env) ** result;
-        i--;
-      }
-
-      return result;
-
-    };
-
-  },
-
-};
-
-const operTable: Record<
-  RegularOperator,
-  (total: any, value: any) => any
-> = {
-  '+': (total, value) => (total + value),
-  '-': (total, value) => (total - value),
-  '*': (total, value) => (total * value),
-  '/': (total, value) => (total / value),
-  '%': (total, value) => (total % value),
-  // tslint:disable-next-line: no-bitwise
-  '&': (total, value) => (total & value),
-  // tslint:disable-next-line: no-bitwise
-  '|': (total, value) => (total | value),
-  // tslint:disable-next-line: no-bitwise
-  '^': (total, value) => (total ^ value),
-  // tslint:disable-next-line: no-bitwise
-  '<<': (total, value) => (total << value),
-  // tslint:disable-next-line: no-bitwise
-  '>>': (total, value) => (total >> value),
-  // tslint:disable-next-line: no-bitwise
-  '>>>': (total, value) => (total >>> value),
-  // tslint:disable-next-line: triple-equals
-  '==': (total, value) => (total == value),
-  '===': (total, value) => (total === value),
-  // tslint:disable-next-line: triple-equals
-  '!=': (total, value) => (total != value),
-  '!==': (total, value) => (total !== value),
-  '>': (total, value) => (total > value),
-  '<': (total, value) => (total < value),
-  '>=': (total, value) => (total >= value),
-  '<=': (total, value) => (total <= value),
-};
-
-const transTable: Record<RegularTransformOperator, (value: any) => any> = {
-  '!': (value) => !value,
-  '!!': (value) => !!value,
-  // tslint:disable-next-line: no-bitwise
-  '~': (value) => ~value,
-};
+interface ExpressionLookupTable {
+  literal: ExpressionCompiler<LiteralExpression>;
+  get: ExpressionCompiler<GetExpression>;
+  set: ExpressionCompiler<SetExpression>;
+  trans: ExpressionCompiler<UnaryOperationExpression>;
+  oper: ExpressionCompiler<BinaryOperationExpression>;
+  ternary: ExpressionCompiler<TernaryOperationExpression>;
+  func: ExpressionCompiler<FunctionExpression>;
+  call: ExpressionCompiler<FunctionCallExpression>;
+}
 
 const expTable: ExpressionLookupTable = {
 
@@ -301,7 +149,7 @@ const expTable: ExpressionLookupTable = {
 
     const resolvers = compileExp(operExps, cache);
 
-    const reduceResolvers = specialOperTable[oper as SpecialOperator];
+    const reduceResolvers = specialOperTable[oper as SpecialBinaryOperator];
 
     if (reduceResolvers) {
       return reduceResolvers(resolvers);
@@ -375,7 +223,7 @@ const expTable: ExpressionLookupTable = {
     return compileFunc(
       exp,
       cache,
-    ) as any;
+    ) as never;
 
   },
 
@@ -409,6 +257,20 @@ const expTable: ExpressionLookupTable = {
   },
 
 };
+
+type StepCompiler<S extends FunctionStep> =
+  (step: S, cache: CompileCache, breakable?: boolean) => EnvBasedResolver<StepLoopResult>;
+
+interface StatementLookupTable {
+  declare: StepCompiler<DeprecatedDeclareStatement>;
+  let: StepCompiler<LetStatement>;
+  if: StepCompiler<IfStatement>;
+  for: StepCompiler<ForStatement>;
+  break: StepCompiler<BreakStatement>;
+  try: StepCompiler<TryStatement>;
+  throw: StepCompiler<ThrowStatement>;
+  return: StepCompiler<ReturnStatement>;
+}
 
 const stepTable: StatementLookupTable = {
 

@@ -4,8 +4,14 @@ describe('unknown step', () => {
 
   test('should throw on unknown step', () => {
 
-    expect(() => compileStep(undefined as any, {})).toThrow();
-    expect(() => compileStep(null as any, {})).toThrow();
+    const invalid = [
+      undefined,
+      null,
+    ];
+
+    invalid.forEach((value) => {
+      expect(() => compileStep(value as never, {})).toThrow();
+    });
 
   });
 
@@ -15,7 +21,7 @@ describe('unknown step', () => {
       type: 'unknown',
     };
 
-    expect(() => compileStep(step as any, {})).toThrow();
+    expect(() => compileStep(step as never, {})).toThrow();
 
   });
 

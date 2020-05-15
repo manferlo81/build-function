@@ -18,7 +18,7 @@ describe('break statement step', () => {
     const step: BreakStatement = {
       type: 'break',
     };
-    const resolve: () => 'break' = compileStep(step) as any;
+    const resolve: () => 'break' = compileStep(step) as never;
 
     const result = resolve();
 

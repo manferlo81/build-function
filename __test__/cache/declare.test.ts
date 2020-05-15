@@ -1,5 +1,5 @@
 import { VariableDeclaration } from '../../src';
-import { compileDecl } from '../../src/compile';
+import { compileDecl } from '../../src/compile/compile';
 import { $literal } from '../helpers/expressions';
 
 describe('compile variable declaration with cache', () => {

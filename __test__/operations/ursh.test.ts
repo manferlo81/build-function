@@ -16,8 +16,7 @@ describe('unsigned shift right operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    // tslint:disable-next-line: no-bitwise
-    expect(resolve(null as any)).toBe(a >>> b);
+    expect(resolve(null as never)).toBe(a >>> b);
 
   });
 
@@ -37,8 +36,7 @@ describe('unsigned shift right operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    // tslint:disable-next-line: no-bitwise
-    expect(resolve(null as any)).toBe(a >>> b >>> c >>> d);
+    expect(resolve(null as never)).toBe(a >>> b >>> c >>> d);
 
   });
 

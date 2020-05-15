@@ -7,7 +7,7 @@ describe('let statement step', () => {
 
     const invalid = { type: 'let' };
 
-    expect(() => compileStep(invalid as any, {})).toThrow();
+    expect(() => compileStep(invalid as never, {})).toThrow();
 
   });
 

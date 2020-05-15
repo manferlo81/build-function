@@ -7,7 +7,7 @@ describe('throw error statement step', () => {
 
     const invalid = { type: 'throw' };
 
-    expect(() => compileStep(invalid as any, {})).toThrow();
+    expect(() => compileStep(invalid as never, {})).toThrow();
 
   });
 
@@ -21,7 +21,7 @@ describe('throw error statement step', () => {
     };
     const resolve = compileStep(step, {});
 
-    const result = resolve(null as any);
+    const result = resolve(null as never);
 
     expect(result).toEqual({
       type: 'throw',
@@ -40,7 +40,7 @@ describe('throw error statement step', () => {
     };
     const resolve = compileStep(step, {});
 
-    const result = resolve(null as any) as StepThrow;
+    const result = resolve(null as never) as StepThrow;
 
     expect(result).toEqual({
       type: 'throw',

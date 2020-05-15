@@ -8,7 +8,7 @@ describe('function expression', () => {
 
     const expression: FunctionExpression = {
       type: 'func',
-      params: { id: 'param1', type: 'invalid' } as any,
+      params: { id: 'param1', type: 'invalid' } as never,
     };
 
     expect(() => compileExp(expression, {})).toThrow();
@@ -19,7 +19,7 @@ describe('function expression', () => {
 
     const expression: FunctionExpression = {
       type: 'func',
-      params: 100 as any,
+      params: 100 as never,
     };
 
     expect(() => compileExp(expression, {})).toThrow();
@@ -188,7 +188,7 @@ describe('function expression', () => {
     };
     const resolve = compileExp<() => undefined>(expression, {});
 
-    const func = resolve(null as any);
+    const func = resolve(null as never);
 
     expect(func()).toBeUndefined();
 

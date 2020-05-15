@@ -1,5 +1,5 @@
 import { SpreadableExpression } from '../../src';
-import { compileSpread } from '../../src/compile';
+import { compileSpread } from '../../src/compile/compile';
 import { $literal } from '../helpers/expressions';
 
 describe('spread expression', () => {
@@ -17,7 +17,7 @@ describe('spread expression', () => {
 
     const resolve = compileSpread(expressions, {});
 
-    expect(resolve(null as any, [])).toEqual([0, ...array]);
+    expect(resolve(null as never, [])).toEqual([0, ...array]);
 
   });
 

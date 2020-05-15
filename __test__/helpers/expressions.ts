@@ -1,19 +1,4 @@
-import {
-  Expression,
-  FunctionCallExpression,
-  FunctionStep,
-  GetExpression,
-  IfStatement,
-  LiteralExpression,
-  MultiTermOperator,
-  OperationExpression,
-  ReturnStatement,
-  SetExpression,
-  SpreadableExpression,
-  TernaryExpression,
-  TransformExpression,
-  TransformOperator,
-} from '../../src';
+import { BinaryOperator, Expression, FunctionCallExpression, FunctionStep, GetExpression, IfStatement, LiteralExpression, OperationExpression, ReturnStatement, SetExpression, SpreadableExpression, TernaryExpression, TransformExpression, UnaryOperator } from '../../src';
 
 export const $literal = (value: any): LiteralExpression => ({
   type: 'literal',
@@ -54,7 +39,7 @@ export const $ternary = (condition: Expression, then: Expression, otherwise: Exp
 });
 
 export const $oper = (
-  oper: MultiTermOperator,
+  oper: BinaryOperator,
   ...exp: [Expression, Expression, ...Expression[]]
 ): OperationExpression => ({
   type: 'oper',
@@ -62,7 +47,7 @@ export const $oper = (
   exp,
 });
 
-export const $trans = (oper: TransformOperator, exp: Expression): TransformExpression => ({
+export const $trans = (oper: UnaryOperator, exp: Expression): TransformExpression => ({
   type: 'trans',
   oper,
   exp,

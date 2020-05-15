@@ -44,7 +44,7 @@ describe('nullish coalescing operation expression', () => {
       );
       const resolve = compileExp(expression, {});
 
-      expect(resolve(null as any)).toEqual(expected);
+      expect(resolve(null as never)).toEqual(expected);
 
     });
 

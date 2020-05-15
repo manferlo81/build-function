@@ -7,7 +7,7 @@ describe('call expression', () => {
 
     const invalid = { type: 'call' };
 
-    expect(() => compileExp(invalid as any, {})).toThrow();
+    expect(() => compileExp(invalid as never, {})).toThrow();
 
   });
 

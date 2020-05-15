@@ -1,5 +1,5 @@
 import { ParameterDescriptor } from '../../src';
-import { compileParam } from '../../src/compile';
+import { compileParam } from '../../src/compile/compile';
 
 describe('compile function parameters with cache', () => {
 

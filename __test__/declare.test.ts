@@ -1,5 +1,5 @@
 import { createEnv, findInEnv } from '../src';
-import { compileDecl } from '../src/compile';
+import { compileDecl } from '../src/compile/compile';
 
 describe('variable declaration', () => {
 

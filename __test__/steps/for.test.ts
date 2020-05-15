@@ -12,7 +12,7 @@ describe('for statement step', () => {
 
     invalid.forEach((step) => {
 
-      expect(() => compileStep(step as any, {})).toThrow();
+      expect(() => compileStep(step as never, {})).toThrow();
 
     });
 

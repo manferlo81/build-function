@@ -17,7 +17,6 @@ describe('bitwise not transform expression', () => {
       value,
     });
 
-    // tslint:disable-next-line: no-bitwise
     expect(resolve(scope)).toBe(~value);
 
   });

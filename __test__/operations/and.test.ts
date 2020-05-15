@@ -16,7 +16,7 @@ describe('and operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as any)).toBe(a && b);
+    expect(resolve(null as never)).toBe(a && b);
 
   });
 
@@ -36,7 +36,7 @@ describe('and operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as any)).toEqual(a && b && c && d);
+    expect(resolve(null as never)).toEqual(a && b && c && d);
 
   });
 

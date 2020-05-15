@@ -1,5 +1,5 @@
 import { compileExp, compileStep, DeclareWithValue, FunctionCallExpression, GetExpression, VariableDeclaration } from '../../src';
-import { compileDecl, compileParam } from '../../src/compile';
+import { compileDecl, compileParam } from '../../src/compile/compile';
 import { $call, $get, $literal } from '../helpers/expressions';
 
 jest.mock('object-hash', () => {
