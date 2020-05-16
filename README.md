@@ -26,9 +26,9 @@ Functions built with this module are very slow, despite the fact that we pre-com
   * [`literal` Literal Expression](#literal-expression)
   * [`get` Get Expression](#get-expression)
   * [`set` Set Expression](#set-expression)
-  * [`ternary` Ternary Expression](#ternary-expression)
-  * [`oper` Operation Expression](#operation-expression)
   * [`trans` Transform Expression](#transform-expression)
+  * [`oper` Operation Expression](#operation-expression)
+  * [`ternary` Ternary Expression](#ternary-expression)
   * [`func` Function Expression](#function-expression)
   * [`call` Function Call Expression](#function-call-expression)
   * [`spread` Spread Expression](#spread-expression)
@@ -104,7 +104,7 @@ interface BuildFunctionOptions {
     A `name` for the `function`, if provided it will be registered to the `environment` so you can call the function recursively.
 
   * **`params`** (*`optional`*)
-  
+
     see [Function Expression](#function-expression) for more information.
 
   * **`body`** (*`optional`*)
@@ -378,53 +378,41 @@ a = b = true
 
 Note that `set` expressions resolve to the value being set so they can be chained together.
 
-### Ternary Expression
+### Transform Expression
 
-It resolves to a ternary operation expression.
+It performs a transform operation to another expression, see [transformations](#transformations) for supported operators and information.
 
 ***syntax***
 
 ```typescript
-interface TernaryExpression {
-  type: "ternary";
-  condition: Expression;
-  then: Expression;
-  otherwise: Expression;
+interface TransformExpression {
+  type: "trans";
+  oper: TransformOperator;
+  exp: Expression;
 }
 ```
 
 * **`type`**
 
-  Always `"ternary"`, it's what identifies a `ternary` expression from other expressions and statements.
+  Always `"trans"`, it's what identifies a `trnsform` expression from other expressions and statements.
 
-* **`condition`**
+* **`oper`**
 
-  Expression which result will be used as condition for the `ternary` expression.
+  The operator to be used in the operation, see [transformations](#transformations) for more information.
 
-* **`then`**
+* **`exp`**
 
-  Expression which result will be used as resul for the `ternary` expression if `condition` is truthy.
-
-* **`otherwise`**
-
-  Expression which result will be used as resul for the `ternary` expression if `condition` is falsy.
+  Expression which result will be transformed.
 
 ***example***
 
 ```json
 {
-  "type": "ternary",
-  "condition": {
+  "type": "trans",
+  "oper": "typeof",
+  "exp": {
     "type": "get",
-    "id": "value",
-    "then": {
-      "type": "literal",
-      "value": "yes"
-    },
-    "otherwise": {
-      "type": "literal",
-      "value": "no"
-    }
+    "id": "value"
   }
 }
 ```
@@ -432,7 +420,7 @@ interface TernaryExpression {
 *... is equivalent to...*
 
 ```javascript
-value ? "yes" : "no"
+typeof value
 ```
 
 ### Operation Expression
@@ -502,41 +490,53 @@ interface OperationExpression {
 
 Every operation expression acts like its operands has been grouped inside parentheses, so the order of operations doesn't apply.
 
-### Transform Expression
+### Ternary Expression
 
-It performs a transform operation to another expression, see [transformations](#transformations) for supported operators and information.
+It resolves to a ternary operation expression.
 
 ***syntax***
 
 ```typescript
-interface TransformExpression {
-  type: "trans";
-  oper: TransformOperator;
-  exp: Expression;
+interface TernaryExpression {
+  type: "ternary";
+  condition: Expression;
+  then: Expression;
+  otherwise: Expression;
 }
 ```
 
 * **`type`**
 
-  Always `"trans"`, it's what identifies a `trnsform` expression from other expressions and statements.
+  Always `"ternary"`, it's what identifies a `ternary` expression from other expressions and statements.
 
-* **`oper`**
+* **`condition`**
 
-  The operator to be used in the operation, see [transformations](#transformations) for more information.
+  Expression which result will be used as condition for the `ternary` expression.
 
-* **`exp`**
+* **`then`**
 
-  Expression which result will be transformed.
+  Expression which result will be used as resul for the `ternary` expression if `condition` is truthy.
+
+* **`otherwise`**
+
+  Expression which result will be used as resul for the `ternary` expression if `condition` is falsy.
 
 ***example***
 
 ```json
 {
-  "type": "trans",
-  "oper": "typeof",
-  "exp": {
+  "type": "ternary",
+  "condition": {
     "type": "get",
-    "id": "value"
+    "id": "value",
+    "then": {
+      "type": "literal",
+      "value": "yes"
+    },
+    "otherwise": {
+      "type": "literal",
+      "value": "no"
+    }
   }
 }
 ```
@@ -544,7 +544,7 @@ interface TransformExpression {
 *... is equivalent to...*
 
 ```javascript
-typeof value
+value ? "yes" : "no"
 ```
 
 ### Function Expression
@@ -876,18 +876,18 @@ interface ForStatement {
     "type": "get",
     "id": "array"
   },
-  "index": "index",
+  "index": "i",
   "value": "item",
   "body": {
     "type": "call",
     "func": {
       "type": "get",
-      "id": "func"
+      "id": "func1"
     },
     "args": [
       {
         "type": "get",
-        "id": "index"
+        "id": "i"
       },
       {
         "type": "get",
@@ -902,7 +902,8 @@ interface ForStatement {
 
 ```javascript
 for (let i = 0; i < array.length; i++) {
-  func(i, array[i]);
+  const item = array[i];
+  func1(i, item);
 }
 ```
 
@@ -1102,6 +1103,8 @@ Multiterm operations are defined using the [Operation Expression](#operation-exp
 **`&&` `Logic AND Operator`**
 
 **`||` `Logic OR Operator`**
+
+**`??` `Nullish coalescing Operator`**
 
 **`==` `Equal Operator`**
 
