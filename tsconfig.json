@@ -13,7 +13,8 @@
   },
   "include": [
     "__test__/**/*.ts",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "jest.config.js"
   ],
   "exclude": [
     "node_modules/**"
