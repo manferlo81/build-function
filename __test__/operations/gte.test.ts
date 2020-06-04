@@ -34,7 +34,7 @@ describe('greater than or equal operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(resolve(null as never)).toBe(a >= b >= c);
 

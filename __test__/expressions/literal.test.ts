@@ -40,7 +40,7 @@ describe('literal expression', () => {
 
     const expression: LiteralExpression = $literal({});
 
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<{ value?: boolean }>(expression, {});
 
     const obj = resolve(null as never);
 

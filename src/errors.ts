@@ -1,4 +1,4 @@
-export function error(msg: string) {
+export function error(msg: string): Error {
   return new Error(msg);
 }
 
@@ -10,7 +10,7 @@ export function errorFmt<F>(template: string): (...params: any[]) => Error {
     return error(
       template.replace(
         /\$(\d+)/g,
-        (_, index) => args[index],
+        (_, index) => args[+index],
       ),
     );
   };

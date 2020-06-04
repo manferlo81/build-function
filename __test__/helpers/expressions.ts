@@ -1,6 +1,6 @@
 import { BinaryOperator, Expression, FunctionCallExpression, FunctionStep, GetExpression, IfStatement, LiteralExpression, OperationExpression, ReturnStatement, SetExpression, SpreadableExpression, TernaryExpression, TransformExpression, UnaryOperator } from '../../src';
 
-export const $literal = (value: any): LiteralExpression => ({
+export const $literal = (value: unknown): LiteralExpression => ({
   type: 'literal',
   value,
 });

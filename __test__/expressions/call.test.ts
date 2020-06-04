@@ -16,7 +16,7 @@ describe('call expression', () => {
     const expression: FunctionCallExpression = $call(
       $get('func'),
     );
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<string>(expression, {});
 
     const returnValue = 'ok';
     const func = jest.fn(() => returnValue);
@@ -45,9 +45,9 @@ describe('call expression', () => {
         exp: $literal([a, b, c]),
       },
     );
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<number>(expression, {});
 
-    const func = jest.fn((x, y, z) => (x + y + z));
+    const func = jest.fn((x: number, y: number, z: number): number => (x + y + z));
 
     const scope = createEnv(null, {
       func,
@@ -66,7 +66,7 @@ describe('call expression', () => {
     const expression: FunctionCallExpression = $call(
       $get('func'),
     );
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<boolean>(expression, {});
 
     const func = jest.fn(() => {
       return true;

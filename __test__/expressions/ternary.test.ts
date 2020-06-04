@@ -30,7 +30,7 @@ describe('ternary expression', () => {
       $literal('yes'),
       $literal('no'),
     );
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<string>(expression, {});
 
     const negate = compileExp(
       $set(
@@ -47,14 +47,9 @@ describe('ternary expression', () => {
       cond: false,
     });
 
-    const shouldBeNo = resolve(scope);
-
-    expect(shouldBeNo).toBe('no');
-
+    expect(resolve(scope)).toBe('no');
     negate(scope);
-    const shouldBeYes = resolve(scope);
-
-    expect(shouldBeYes).toBe('yes');
+    expect(resolve(scope)).toBe('yes');
 
   });
 

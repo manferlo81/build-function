@@ -24,7 +24,7 @@ describe('get expression', () => {
 
     const getId = 'value';
     const expression: GetExpression = $get(getId);
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<number>(expression, {});
 
     const value = rand(1, 100);
     const scope = createEnv(null, {

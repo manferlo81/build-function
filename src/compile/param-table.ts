@@ -24,6 +24,6 @@ export const paramTable: Record<
 
   },
 
-  param: (index) => (input) => input[index],
+  param: (index) => (input: any[]): any => input[index],
 
 };

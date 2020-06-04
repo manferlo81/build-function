@@ -3,12 +3,10 @@ import { $get, $oper } from '../helpers/expressions';
 
 describe('unknown operation expression', () => {
 
-  test('should compile unknown operation expression', () => {
+  test('should throw on unknown operation expression', () => {
 
     const expression: OperationExpression = $oper(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      '?',
+      '?' as never,
       $get('a'),
       $get('b'),
     );

@@ -21,7 +21,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env);
+        result = resolvers[i](env) as unknown;
 
         if (result) {
           break;
@@ -45,7 +45,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env);
+        result = resolvers[i](env) as unknown;
 
         if (!result) {
           break;
@@ -69,7 +69,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env);
+        result = resolvers[i](env) as unknown;
 
         if (result != null) {
           break;
@@ -89,7 +89,7 @@ export const specialOperTable: Record<
 
     return (env) => {
 
-      let result = resolveLast(env);
+      let result = resolveLast(env) as number;
       let i = resolvers.length - 1;
 
       while (i >= 0) {
@@ -109,6 +109,7 @@ export const operTable: Record<
   RegularBinaryOperator,
   (total: any, value: any) => any
 > = {
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
   '+': (total, value) => (total + value),
   '-': (total, value) => (total - value),
   '*': (total, value) => (total * value),

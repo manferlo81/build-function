@@ -26,7 +26,7 @@ describe('build function', () => {
 
   test('should add itself to scope if name provided', () => {
 
-    const func = build({
+    const func = build<() => () => unknown>({
       name: 'func',
       body: $return(
         $get('func'),

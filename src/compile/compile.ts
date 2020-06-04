@@ -33,6 +33,7 @@ const expTable: ExpressionLookupTable = {
       throw errorExpReq('value', 'literal');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { value } = exp;
 
     const valueType = typeof value;
@@ -91,7 +92,7 @@ const expTable: ExpressionLookupTable = {
     }
 
     const { id } = exp;
-    const resolveValue = compileExp(exp.value, cache);
+    const resolveValue = compileExp<unknown>(exp.value, cache);
 
     return (env) => {
 
@@ -147,7 +148,7 @@ const expTable: ExpressionLookupTable = {
       throw error('not enought operands');
     }
 
-    const resolvers = compileExp(operExps, cache);
+    const resolvers = compileExp<unknown>(operExps, cache);
 
     const reduceResolvers = specialOperTable[oper as SpecialBinaryOperator];
 
@@ -161,7 +162,7 @@ const expTable: ExpressionLookupTable = {
       throw errorInvalidType(oper, 'operation');
     }
 
-    const resolveFirst = resolvers.shift() as EnvBasedResolver;
+    const resolveFirst = resolvers.shift() as EnvBasedResolver<unknown>;
     const len = resolvers.length;
 
     return (env) => {
@@ -172,7 +173,7 @@ const expTable: ExpressionLookupTable = {
         result = reduce(
           result,
           resolvers[i](env),
-        );
+        ) as unknown;
       }
 
       return result;
@@ -193,7 +194,7 @@ const expTable: ExpressionLookupTable = {
 
     if (exp.oper === 'typeof') {
 
-      const resolveSafe = compileExp(exp.exp, cache, true);
+      const resolveSafe = compileExp<unknown>(exp.exp, cache, true);
 
       return (env) => {
         const value = resolveSafe(env);
@@ -355,7 +356,7 @@ const stepTable: StatementLookupTable = {
     }
 
     const { index, value } = step;
-    const resolveTarget = compileExp<any[]>(step.target, cache);
+    const resolveTarget = compileExp<unknown[]>(step.target, cache);
 
     return (env): StepNonLoopResult => {
 
@@ -417,6 +418,8 @@ const stepTable: StatementLookupTable = {
 
     return (env) => ({
       type,
+      // TODO: Check here, may be a mistake
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       value: resolveValue(env),
     });
 
@@ -454,6 +457,7 @@ const stepTable: StatementLookupTable = {
           const lib: EnvLib = {};
 
           if (errorId) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
             lib[errorId] = `${err.message || err}`;
           }
 
@@ -481,6 +485,7 @@ const stepTable: StatementLookupTable = {
 
     return (env) => ({
       type,
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       msg: resolveMessage ? resolveMessage(env) : `${msg}`,
     });
 
@@ -577,7 +582,7 @@ export function compileParam(
     const getValue = compileGetter(index);
 
     return (input, lib) => {
-      lib[id] = getValue(input);
+      lib[id] = getValue(input) as unknown;
       return lib;
     };
 

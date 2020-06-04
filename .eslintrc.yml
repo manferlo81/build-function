@@ -54,3 +54,6 @@ rules:
   "@typescript-eslint/semi":
     - error
     - always
+
+  "@typescript-eslint/ban-types": "off"
+  "@typescript-eslint/no-unsafe-return": "off"

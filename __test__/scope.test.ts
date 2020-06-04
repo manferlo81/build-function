@@ -59,7 +59,7 @@ describe('create scope', () => {
     );
 
     const b = rand(0, 10);
-    const lib = Object.assign(
+    const lib = Object.assign<{ a: null }, { b: number }>(
       Object.create({ a: null }),
       { b },
     );

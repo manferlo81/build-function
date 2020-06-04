@@ -30,7 +30,7 @@ describe('set expression', () => {
       id,
       $literal(value),
     );
-    const setValue = compileExp(expression, {});
+    const setValue = compileExp<number>(expression, {});
     const getValue = compileExp(
       $get(id),
       {},

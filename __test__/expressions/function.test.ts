@@ -239,7 +239,7 @@ describe('function expression', () => {
         $get('arguments'),
       ),
     };
-    const resolve = compileExp(expression, {});
+    const resolve = compileExp<(...args: number[]) => any>(expression, {});
 
     const scope = createEnv(null);
 
