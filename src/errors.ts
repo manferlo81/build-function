@@ -3,7 +3,7 @@ export function error(msg: string): Error {
 }
 
 export function errorFmt<F extends (...params: any[]) => Error>(template: string): F;
-export function errorFmt<F>(template: string): (...params: any[]) => Error {
+export function errorFmt(template: string): (...params: any[]) => Error {
   return function () {
     // eslint-disable-next-line prefer-rest-params
     const args = arguments;

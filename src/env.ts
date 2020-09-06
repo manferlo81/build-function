@@ -23,7 +23,7 @@ export function createEnv(parent: Environment | null, lib?: EnvLib | null): Envi
 
 }
 
-export function findInEnv<V = any>(env: Environment, id: string, topOnly?: boolean): EnvFound<V> | void {
+export function findInEnv(env: Environment, id: string, topOnly?: boolean): EnvFound | void {
 
   const tid = pre + id;
 

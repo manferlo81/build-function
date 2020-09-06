@@ -783,7 +783,7 @@ export function compileDecl(
 
 // SPREADABLE
 
-export function compileSpread<V = any>(
+export function compileSpread(
   exp: [],
   cache: CompileCache,
 ): null;
@@ -957,22 +957,22 @@ export function compileExp<V extends any = any>(
 
 // STEPS
 
-export function compileStep<V = any>(
+export function compileStep(
   steps: SingleOrMulti<FunctionStep>,
   cache: CompileCache,
   breakable: true,
 ): EnvBasedResolver<StepLoopResult>;
-export function compileStep<V = any>(
+export function compileStep(
   steps: SingleOrMulti<FunctionStep>,
   cache: CompileCache,
   breakable?: false | undefined,
 ): EnvBasedResolver<StepNonLoopResult>;
-export function compileStep<V = any>(
+export function compileStep(
   steps: SingleOrMulti<FunctionStep>,
   cache: CompileCache,
   breakable?: boolean | undefined,
 ): EnvBasedResolver<StepLoopResult>;
-export function compileStep<V = any>(
+export function compileStep(
   steps: SingleOrMulti<FunctionStep>,
   cache: CompileCache,
   breakable?: boolean | undefined,

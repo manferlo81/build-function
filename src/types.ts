@@ -237,7 +237,7 @@ export interface Environment extends EnvLib {
   parent: Environment | null;
 }
 
-export interface EnvFound<V> {
+export interface EnvFound {
   env: Environment;
   id: string;
 }
