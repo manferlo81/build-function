@@ -9,7 +9,9 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "declaration": true,
+    "declarationMap": true
   },
   "include": [
     "__test__/**/*.ts",
