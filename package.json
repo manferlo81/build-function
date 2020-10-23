@@ -43,9 +43,6 @@
     "ts-jest": "^26.4.1",
     "typescript": "^4.0.3"
   },
-  "files": [
-    "dist"
-  ],
   "author": {
     "name": "Manuel Fernandez",
     "email": "manferlo81@gmail.com"
