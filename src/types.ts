@@ -239,8 +239,14 @@ export type StepLoopResult =
 
 export type EnvLib = Record<string, any>;
 
-export interface Environment extends EnvLib {
+export interface EnvValue {
+  readonly: boolean;
+  value: unknown;
+}
+
+export interface Environment {
   parent: Environment | null;
+  values: Record<string, EnvValue>;
 }
 
 export interface EnvFound {

@@ -70,7 +70,7 @@ const expTable: ExpressionLookupTable = {
         return;
       }
 
-      return result.env[result.id];
+      return result.env.values[result.id].value;
 
     };
 
@@ -101,7 +101,7 @@ const expTable: ExpressionLookupTable = {
         throw errorNotInEnv(id);
       }
 
-      return result.env[result.id] = resolveValue(env);
+      return result.env.values[result.id].value = resolveValue(env);
 
     };
 
@@ -480,7 +480,7 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObj(msg) && compileExp<string>(msg, cache);
+    const resolveMessage = isObj(msg) as unknown as boolean && compileExp<string>(msg as Expression, cache);
 
     return (env) => ({
       type,
@@ -581,6 +581,7 @@ export function compileParam(
     const getValue = compileGetter(index);
 
     return (input, lib) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       lib[id] = getValue(input) as unknown;
       return lib;
     };

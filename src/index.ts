@@ -29,6 +29,7 @@ export {
   EnvFound,
   Environment,
   EnvLib,
+  EnvValue,
   Expression,
   ExpressionType,
   ForStatement,

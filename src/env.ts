@@ -4,12 +4,12 @@ import type { EnvFound, Environment, EnvLib } from './types';
 const pre = '0$_';
 
 export function setInEnv<V>(env: Environment, id: string, value: V): void {
-  env[pre + id] = value;
+  env.values[pre + id] = { readonly: false, value };
 }
 
 export function createEnv(parent: Environment | null, lib?: EnvLib | null): Environment {
 
-  const env: Environment = { parent };
+  const env: Environment = { parent, values: {} };
 
   if (lib) {
     for (const id in lib) {
@@ -31,7 +31,7 @@ export function findInEnv(env: Environment, id: string, topOnly?: boolean): EnvF
 
   while (current) {
 
-    if (hasOwn.call(current, tid)) {
+    if (hasOwn.call(current.values, tid)) {
       return {
         env: current,
         id: tid,
