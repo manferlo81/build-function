@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression, LiteralExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp, LiteralExpression } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 
 describe('nullish coalescing operation expression', () => {
 
@@ -15,7 +15,7 @@ describe('nullish coalescing operation expression', () => {
 
     value.forEach(({ a, b, expected }) => {
 
-      const expression: OperationExpression = $oper(
+      const expression: BinaryOperationExpression = $binary(
         '??',
         $literal(a),
         $literal(b),
@@ -38,7 +38,7 @@ describe('nullish coalescing operation expression', () => {
 
     values.forEach(({ exp, expected }) => {
 
-      const expression: OperationExpression = $oper(
+      const expression: BinaryOperationExpression = $binary(
         '??',
         ...exp.map((value) => $literal(value)) as [LiteralExpression, LiteralExpression, ...LiteralExpression[]],
       );

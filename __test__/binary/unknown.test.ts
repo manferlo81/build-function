@@ -1,11 +1,11 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $get, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $get } from '../helpers/expressions';
 
 describe('unknown operation expression', () => {
 
   test('should throw on unknown operation expression', () => {
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '?' as never,
       $get('a'),
       $get('b'),

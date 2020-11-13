@@ -1,11 +1,11 @@
-import { compileExp, createEnv, TransformExpression } from '../../src';
-import { $get, $trans } from '../helpers/expressions';
+import { compileExp, createEnv, UnaryOperationExpression } from '../../src';
+import { $get, $unary } from '../helpers/expressions';
 
 describe('bitwise not transform expression', () => {
 
   test('should compile bitwise not transform expression', () => {
 
-    const expression: TransformExpression = $trans(
+    const expression: UnaryOperationExpression = $unary(
       '~',
       $get('value'),
     );

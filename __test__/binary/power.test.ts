@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('power operation expression', () => {
@@ -9,7 +9,7 @@ describe('power operation expression', () => {
     const base = rand(1, 10);
     const exp = rand(1, 4);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '**',
       $literal(base),
       $literal(exp),
@@ -27,7 +27,7 @@ describe('power operation expression', () => {
     const exp2 = rand(1, 3);
     const exp3 = rand(1, 3);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '**',
       $literal(base),
       $literal(exp1),

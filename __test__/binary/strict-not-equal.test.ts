@@ -1,34 +1,34 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
-describe('equal operation expression', () => {
+describe('not equal operation expression', () => {
 
-  test('should compile equal operation expression with 2 operands', () => {
+  test('should compile not equal operation expression with 2 operands', () => {
 
     const a = rand(0, 1, true);
     const b = rand(0, 1, true);
 
-    const expression: OperationExpression = $oper(
-      '==',
+    const expression: BinaryOperationExpression = $binary(
+      '!==',
       $literal(a),
       $literal(b),
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as never)).toBe(a == b);
+    expect(resolve(null as never)).toBe(a !== b);
 
   });
 
-  test('should compile equal operation expression with multiple operands', () => {
+  test('should compile not equal operation expression with multiple operands', () => {
 
     const a = rand(0, 1, true);
     const b = rand(0, 1, true);
     const c = !rand(0, 1, true);
     const d = !rand(0, 1, true);
 
-    const expression: OperationExpression = $oper(
-      '==',
+    const expression: BinaryOperationExpression = $binary(
+      '!==',
       $literal(a),
       $literal(b),
       $literal(c),
@@ -36,14 +36,14 @@ describe('equal operation expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as never)).toBe(a == b == c == d);
+    expect(resolve(null as never)).toBe(a !== b !== c !== d);
 
   });
 
   test('should use non strict equals', () => {
 
-    const expression: OperationExpression = $oper(
-      '==',
+    const expression: BinaryOperationExpression = $binary(
+      '!==',
       $literal('10'),
       $literal(10),
     );

@@ -1,5 +1,5 @@
-import { compileExp, createEnv, TernaryExpression } from '../../src';
-import { $get, $literal, $set, $ternary, $trans } from '../helpers/expressions';
+import { compileExp, createEnv, TernaryOperationExpression } from '../../src';
+import { $get, $literal, $set, $ternary, $unary } from '../helpers/expressions';
 
 describe('ternary expression', () => {
 
@@ -25,7 +25,7 @@ describe('ternary expression', () => {
 
   test('should compile ternary expression', () => {
 
-    const expression: TernaryExpression = $ternary(
+    const expression: TernaryOperationExpression = $ternary(
       $get('cond'),
       $literal('yes'),
       $literal('no'),
@@ -35,7 +35,7 @@ describe('ternary expression', () => {
     const negate = compileExp(
       $set(
         'cond',
-        $trans(
+        $unary(
           '!',
           $get('cond'),
         ),
@@ -55,12 +55,12 @@ describe('ternary expression', () => {
 
   test('should cache ternary expression', () => {
 
-    const expression1: TernaryExpression = $ternary(
+    const expression1: TernaryOperationExpression = $ternary(
       $get('cond'),
       $literal('yes'),
       $literal('no'),
     );
-    const expression2: TernaryExpression = $ternary(
+    const expression2: TernaryOperationExpression = $ternary(
       $get('cond'),
       $literal('yes'),
       $literal('no'),

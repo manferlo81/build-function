@@ -1,4 +1,19 @@
-import { BinaryOperator, Expression, FunctionCallExpression, FunctionStep, GetExpression, IfStatement, LiteralExpression, OperationExpression, ReturnStatement, SetExpression, SpreadableExpression, TernaryExpression, TransformExpression, UnaryOperator } from '../../src';
+import {
+  BinaryOperationExpression,
+  BinaryOperator,
+  Expression,
+  FunctionCallExpression,
+  FunctionStep,
+  GetExpression,
+  IfStatement,
+  LiteralExpression,
+  ReturnStatement,
+  SetExpression,
+  SpreadableExpression,
+  TernaryOperationExpression,
+  UnaryOperationExpression,
+  UnaryOperator,
+} from '../../src';
 
 export const $literal = (value: unknown): LiteralExpression => ({
   type: 'literal',
@@ -31,23 +46,23 @@ export const $call = (func: Expression, ...args: SpreadableExpression[]): Functi
 
 };
 
-export const $ternary = (condition: Expression, then: Expression, otherwise: Expression): TernaryExpression => ({
+export const $ternary = (condition: Expression, then: Expression, otherwise: Expression): TernaryOperationExpression => ({
   type: 'ternary',
   condition,
   then,
   otherwise,
 });
 
-export const $oper = (
+export const $binary = (
   oper: BinaryOperator,
   ...exp: [Expression, Expression, ...Expression[]]
-): OperationExpression => ({
+): BinaryOperationExpression => ({
   type: 'oper',
   oper,
   exp,
 });
 
-export const $trans = (oper: UnaryOperator, exp: Expression): TransformExpression => ({
+export const $unary = (oper: UnaryOperator, exp: Expression): UnaryOperationExpression => ({
   type: 'trans',
   oper,
   exp,

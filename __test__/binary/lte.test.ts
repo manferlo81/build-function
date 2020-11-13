@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('less than or equal operation expression', () => {
@@ -9,7 +9,7 @@ describe('less than or equal operation expression', () => {
     const a = rand(0, 2);
     const b = rand(0, 2);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '<=',
       $literal(a),
       $literal(b),
@@ -26,7 +26,7 @@ describe('less than or equal operation expression', () => {
     const b = rand(0, 2);
     const c = 1;
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '<=',
       $literal(a),
       $literal(b),

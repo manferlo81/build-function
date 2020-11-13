@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('unsigned shift right operation expression', () => {
@@ -9,7 +9,7 @@ describe('unsigned shift right operation expression', () => {
     const a = -rand(5000, 10000, true);
     const b = rand(1, 3, true);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '>>>',
       $literal(a),
       $literal(b),
@@ -27,7 +27,7 @@ describe('unsigned shift right operation expression', () => {
     const c = rand(1, 3, true);
     const d = rand(1, 3, true);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '>>>',
       $literal(a),
       $literal(b),

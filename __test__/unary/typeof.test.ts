@@ -1,11 +1,11 @@
-import { compileExp, createEnv, TransformExpression } from '../../src';
-import { $get, $literal, $trans } from '../helpers/expressions';
+import { compileExp, createEnv, UnaryOperationExpression } from '../../src';
+import { $get, $literal, $unary } from '../helpers/expressions';
 
 describe('typeof transform expression', () => {
 
   test('should compile typeof transform expression', () => {
 
-    const expression: TransformExpression = $trans(
+    const expression: UnaryOperationExpression = $unary(
       'typeof',
       $literal(10),
     );
@@ -17,7 +17,7 @@ describe('typeof transform expression', () => {
 
   test('should compile typeof transform expression and don\'t throw if not in scope', () => {
 
-    const expression: TransformExpression = $trans(
+    const expression: UnaryOperationExpression = $unary(
       'typeof',
       $get('notinscope'),
     );

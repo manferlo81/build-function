@@ -1,11 +1,11 @@
-import { compileExp, compileStep, createEnv, OperationExpression } from '../../src';
-import { $get, $literal, $oper, $set } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp, compileStep, createEnv } from '../../src';
+import { $binary, $get, $literal, $set } from '../helpers/expressions';
 
 describe('operation expression step', () => {
 
   test('should compile and operation expression step', () => {
 
-    const step: OperationExpression = $oper(
+    const step: BinaryOperationExpression = $binary(
       '&&',
       $literal(1),
       $set(
@@ -35,7 +35,7 @@ describe('operation expression step', () => {
 
   test('should compile or operation expression step', () => {
 
-    const step: OperationExpression = $oper(
+    const step: BinaryOperationExpression = $binary(
       '||',
       $literal(0),
       $set(

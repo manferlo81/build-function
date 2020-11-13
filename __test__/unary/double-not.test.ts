@@ -1,5 +1,5 @@
-import { compileExp, TransformExpression } from '../../src';
-import { $literal, $trans } from '../helpers/expressions';
+import { compileExp, UnaryOperationExpression } from '../../src';
+import { $literal, $unary } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('not transform expression', () => {
@@ -8,13 +8,13 @@ describe('not transform expression', () => {
 
     const value = rand(0, 1, true);
 
-    const expression: TransformExpression = $trans(
-      '!',
+    const expression: UnaryOperationExpression = $unary(
+      '!!',
       $literal(value),
     );
     const resolve = compileExp(expression, {});
 
-    expect(resolve(null as never)).toBe(!value);
+    expect(resolve(null as never)).toBe(!!value);
 
   });
 

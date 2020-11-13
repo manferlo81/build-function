@@ -1,11 +1,11 @@
 import { compileExp, UnaryOperationExpression } from '../../src';
-import { $get, $trans } from '../helpers/expressions';
+import { $get, $unary } from '../helpers/expressions';
 
 describe('unknown transform expression', () => {
 
   test('should throw on invalid operation', () => {
 
-    const expression: UnaryOperationExpression = $trans(
+    const expression: UnaryOperationExpression = $unary(
       '#' as never,
       $get('a'),
     );

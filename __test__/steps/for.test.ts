@@ -1,5 +1,5 @@
 import { compileStep, createEnv, ForStatement } from '../../src';
-import { $call, $get, $if, $literal, $oper, $return } from '../helpers/expressions';
+import { $binary, $call, $get, $if, $literal, $return } from '../helpers/expressions';
 
 describe('for statement step', () => {
 
@@ -105,7 +105,7 @@ describe('for statement step', () => {
       value: 'num',
       body: [
         $if(
-          $oper(
+          $binary(
             '===',
             $get('num'),
             $literal(interrupt2),
@@ -148,7 +148,7 @@ describe('for statement step', () => {
       value: 'num',
       body: [
         $if(
-          $oper(
+          $binary(
             '===',
             $get('num'),
             $literal(interrupt2),

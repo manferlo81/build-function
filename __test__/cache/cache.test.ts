@@ -1,17 +1,17 @@
-import { CompileCache, compileExp, compileStep, TernaryExpression } from '../../src';
+import { CompileCache, compileExp, compileStep, TernaryOperationExpression } from '../../src';
 import { $get, $literal } from '../helpers/expressions';
 
 describe('compile with cache', () => {
 
   test('should cache expression', () => {
 
-    const exp1: TernaryExpression = {
+    const exp1: TernaryOperationExpression = {
       type: 'ternary',
       condition: $get('cond'),
       then: $literal('yes'),
       otherwise: $literal('no'),
     };
-    const exp2: TernaryExpression = {
+    const exp2: TernaryOperationExpression = {
       type: 'ternary',
       condition: $get('cond'),
       then: $literal('yes'),
@@ -28,13 +28,13 @@ describe('compile with cache', () => {
 
   test('should cache expression as step', () => {
 
-    const exp1: TernaryExpression = {
+    const exp1: TernaryOperationExpression = {
       type: 'ternary',
       condition: $get('cond'),
       then: $literal('yes'),
       otherwise: $literal('no'),
     };
-    const exp2: TernaryExpression = {
+    const exp2: TernaryOperationExpression = {
       type: 'ternary',
       condition: $get('cond'),
       then: $literal('yes'),

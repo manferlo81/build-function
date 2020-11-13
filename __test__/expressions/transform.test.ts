@@ -1,5 +1,5 @@
-import { compileExp, TransformExpression } from '../../src';
-import { $get, $literal, $trans } from '../helpers/expressions';
+import { compileExp, UnaryOperationExpression } from '../../src';
+import { $get, $literal, $unary } from '../helpers/expressions';
 
 describe('transform expression', () => {
 
@@ -22,11 +22,11 @@ describe('transform expression', () => {
 
   test('should cache transform expression', () => {
 
-    const expression1: TransformExpression = $trans(
+    const expression1: UnaryOperationExpression = $unary(
       '!',
       $get('a'),
     );
-    const expression2: TransformExpression = $trans(
+    const expression2: UnaryOperationExpression = $unary(
       '!',
       $get('a'),
     );

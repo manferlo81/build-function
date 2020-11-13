@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $literal } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('not equal operation expression', () => {
@@ -9,7 +9,7 @@ describe('not equal operation expression', () => {
     const a = rand(0, 1, true);
     const b = rand(0, 1, true);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '!=',
       $literal(a),
       $literal(b),
@@ -27,7 +27,7 @@ describe('not equal operation expression', () => {
     const c = !rand(0, 1, true);
     const d = !rand(0, 1, true);
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '!=',
       $literal(a),
       $literal(b),
@@ -42,7 +42,7 @@ describe('not equal operation expression', () => {
 
   test('should use non strict equals', () => {
 
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '!=',
       $literal('10'),
       $literal(10),

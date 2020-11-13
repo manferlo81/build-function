@@ -1,5 +1,5 @@
 import { compileExp, createEnv, FunctionExpression } from '../../src';
-import { $get, $if, $literal, $oper, $return, $set } from '../helpers/expressions';
+import { $binary, $get, $if, $literal, $return, $set } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('function expression', () => {
@@ -46,7 +46,7 @@ describe('function expression', () => {
         { type: 'param', id: 'b' },
       ],
       body: $return(
-        $oper(
+        $binary(
           '+',
           $get('a'),
           $get('b'),
@@ -156,7 +156,7 @@ describe('function expression', () => {
       body: [
         { type: 'declare', set: 'result' },
         $if(
-          $oper(
+          $binary(
             '===',
             $get('param'),
             $literal(true),

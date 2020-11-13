@@ -1,5 +1,5 @@
-import { compileExp, OperationExpression } from '../../src';
-import { $get, $literal, $oper } from '../helpers/expressions';
+import { BinaryOperationExpression, compileExp } from '../../src';
+import { $binary, $get, $literal } from '../helpers/expressions';
 
 describe('operation expression', () => {
 
@@ -24,7 +24,7 @@ describe('operation expression', () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const expression: OperationExpression = $oper(
+    const expression: BinaryOperationExpression = $binary(
       '+',
       $get('a'),
     );
@@ -35,12 +35,12 @@ describe('operation expression', () => {
 
   test('should cache operation expression', () => {
 
-    const expression1: OperationExpression = $oper(
+    const expression1: BinaryOperationExpression = $binary(
       '+',
       $get('a'),
       $literal(1),
     );
-    const expression2: OperationExpression = $oper(
+    const expression2: BinaryOperationExpression = $binary(
       '+',
       $get('a'),
       $literal(1),

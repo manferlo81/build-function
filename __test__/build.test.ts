@@ -1,5 +1,5 @@
 import { build } from '../src';
-import { $get, $oper, $return } from './helpers/expressions';
+import { $binary, $get, $return } from './helpers/expressions';
 import { rand } from './helpers/number';
 
 describe('build function', () => {
@@ -9,7 +9,7 @@ describe('build function', () => {
     const func = build({
       params: ['a', 'b'],
       body: $return(
-        $oper(
+        $binary(
           '+',
           $get('a'),
           $get('b'),
