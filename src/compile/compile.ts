@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-import { createEnv, findInEnv, setInEnv } from '../env';
+import { addToEnv, createEnv, findInEnv } from '../env';
 import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from '../errors';
 import { hash } from '../hash';
 import { hasOwn, returning } from '../helpers';
@@ -95,13 +95,17 @@ const expTable: ExpressionLookupTable = {
 
     return (env) => {
 
-      const result = findInEnv(env, id);
+      const found = findInEnv(env, id);
 
-      if (!result) {
+      if (!found) {
         throw errorNotInEnv(id);
       }
 
-      return result.env.values[result.id].value = resolveValue(env);
+      if (found.env.values[found.id].readonly) {
+        throw error(`"${id}" is readonly`);
+      }
+
+      return found.env.values[found.id].value = resolveValue(env);
 
     };
 
@@ -706,7 +710,7 @@ export function compileDecl(
         throw error(`"${id}" has already been declared in this environment`);
       }
 
-      setInEnv(
+      addToEnv(
         env,
         id,
         resolveValue && resolveValue(env),

@@ -3,8 +3,8 @@ import type { EnvFound, Environment, EnvLib } from './types';
 
 const pre = '0$_';
 
-export function setInEnv<V>(env: Environment, id: string, value: V): void {
-  env.values[pre + id] = { readonly: false, value };
+export function addToEnv<V>(env: Environment, id: string, value: V, readonly?: boolean): void {
+  env.values[pre + id] = { readonly: !!readonly, value };
 }
 
 export function createEnv(parent: Environment | null, lib?: EnvLib | null): Environment {
@@ -14,7 +14,7 @@ export function createEnv(parent: Environment | null, lib?: EnvLib | null): Envi
   if (lib) {
     for (const id in lib) {
       if (hasOwn.call(lib, id)) {
-        setInEnv(env, id, lib[id]);
+        addToEnv(env, id, lib[id]);
       }
     }
   }

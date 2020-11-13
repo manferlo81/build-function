@@ -1,4 +1,4 @@
-import { compileExp, createEnv, SetExpression } from '../../src';
+import { addToEnv, compileExp, createEnv, SetExpression } from '../../src';
 import { $get, $literal, $set } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
@@ -59,6 +59,21 @@ describe('set expression', () => {
     const scope = createEnv(null);
 
     expect(() => resolve(scope)).toThrow();
+
+  });
+
+  test('should throw if readonly', () => {
+
+    const expression: SetExpression = $set(
+      'value',
+      $literal(true),
+    );
+    const resolve = compileExp(expression, {});
+
+    const env = createEnv(null);
+    addToEnv(env, 'value', 10, true);
+
+    expect(() => resolve(env)).toThrow();
 
   });
 
