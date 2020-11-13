@@ -3,11 +3,10 @@
 import { createEnv, findInEnv, setInEnv } from '../env';
 import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from '../errors';
 import { hash } from '../hash';
-import { AnyFunction, SingleOrMulti } from '../helper-types';
 import { hasOwn, returning } from '../helpers';
-import { DeprecatedDeclareStatement } from '../legacy-types';
+import type { DeprecatedDeclareStatement } from '../legacy-types';
 import { isArray, isObj } from '../type-check';
-import { ArgsLibPopulator, BinaryOperationExpression, BreakStatement, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, ForStatement, FunctionBase, FunctionCallExpression, FunctionExpression, FunctionParameter, FunctionParameterDescriptor, FunctionStep, GetExpression, IfStatement, LetStatement, LiteralExpression, RegularArithmeticOperator, ReturnStatement, SetExpression, SpecialBinaryOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, TernaryOperationExpression, ThrowStatement, TryStatement, UnaryOperationExpression, VariableDeclaration } from '../types';
+import type { ArgsLibPopulator, BinaryOperationExpression, BreakStatement, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, ForStatement, FunctionBase, FunctionCallExpression, FunctionExpression, FunctionParameter, FunctionParameterDescriptor, FunctionStep, GetExpression, IfStatement, LetStatement, LiteralExpression, RegularArithmeticOperator, ReturnStatement, SetExpression, SingleOrMulti, SpecialBinaryOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, TernaryOperationExpression, ThrowStatement, TryStatement, UnaryOperationExpression, UnknownFunction, VariableDeclaration } from '../types';
 import { operTable, specialOperTable, transTable } from './oper-table';
 import { paramTable } from './param-table';
 
@@ -236,7 +235,7 @@ const expTable: ExpressionLookupTable = {
 
     const { args } = exp;
 
-    const resolveFunc = compileExp<AnyFunction>(exp.func, cache);
+    const resolveFunc = compileExp<UnknownFunction>(exp.func, cache);
     const resolveArgs = args && compileSpread(args, cache);
 
     return (env) => {
@@ -495,7 +494,7 @@ const stepTable: StatementLookupTable = {
 
 // FUNCTION
 
-export function compileFunc<V extends AnyFunction = AnyFunction>(
+export function compileFunc<V extends UnknownFunction = UnknownFunction>(
   options: FunctionBase,
   cache: CompileCache,
   name?: string,
@@ -512,7 +511,7 @@ export function compileFunc<V extends AnyFunction = AnyFunction>(
       return returning() as V;
     }
 
-    const func: AnyFunction = (...args: any[]): any => {
+    const func: UnknownFunction = (...args: unknown[]): Expression | void => {
 
       let lib: EnvLib = {};
 

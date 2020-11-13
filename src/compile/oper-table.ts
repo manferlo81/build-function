@@ -1,4 +1,4 @@
-import { EnvBasedResolver, RegularBinaryOperator, RegularUnaryOperator, SpecialBinaryOperator } from '../types';
+import type { EnvBasedResolver, RegularBinaryOperator, RegularUnaryOperator, SpecialBinaryOperator } from '../types';
 
 export const transTable: Record<RegularUnaryOperator, (value: any) => any> = {
   '!': (value) => !value,

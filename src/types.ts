@@ -1,5 +1,11 @@
-import { SingleOrMulti, Typed } from './helper-types';
 import { DeprecatedDeclareStatement } from './legacy-types';
+
+export type SingleOrMulti<T> = T | T[];
+export type UnknownFunction = (this: unknown, ...args: unknown[]) => unknown;
+
+export interface Typed<T extends string> {
+  type: T;
+}
 
 export interface FunctionBase {
   params?: SingleOrMulti<FunctionParameter>;
@@ -20,7 +26,7 @@ export interface FunctionParameterDescriptor extends Typed<ParameterType> {
 
 export type FunctionParameter = string | FunctionParameterDescriptor;
 
-export type ExpresionType =
+export type ExpressionType =
   | 'literal'
   | 'get'
   | 'set'
@@ -30,7 +36,7 @@ export type ExpresionType =
   | 'func'
   | 'call';
 
-type TypedExpresion<T extends ExpresionType> = Typed<T>;
+type TypedExpresion<T extends ExpressionType> = Typed<T>;
 
 export interface LiteralExpression extends TypedExpresion<'literal'> {
   value: any;

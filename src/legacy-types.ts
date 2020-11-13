@@ -1,5 +1,4 @@
-import { SingleOrMulti, Typed } from './helper-types';
-import { BinaryOperationExpression, BinaryOperationOperandExpressions, BinaryOperator, BuildFunctionOptions, FunctionBase, FunctionParameterDescriptor, RegularBinaryOperator, RegularUnaryOperator, SpecialBinaryOperator, SpecialUnaryOperator, TernaryOperationExpression, UnaryOperationExpression, UnaryOperator, VariableDeclaration } from './types';
+import type { BinaryOperationExpression, BinaryOperationOperandExpressions, BinaryOperator, BuildFunctionOptions, FunctionBase, FunctionParameterDescriptor, RegularBinaryOperator, RegularUnaryOperator, SingleOrMulti, SpecialBinaryOperator, SpecialUnaryOperator, TernaryOperationExpression, Typed, UnaryOperationExpression, UnaryOperator, VariableDeclaration } from './types';
 
 export type FunctionOptions = FunctionBase;
 export type NamedFunctionOptions = BuildFunctionOptions;

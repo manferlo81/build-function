@@ -1,5 +1,5 @@
 import { hasOwn } from './helpers';
-import { EnvFound, Environment, EnvLib } from './types';
+import type { EnvFound, Environment, EnvLib } from './types';
 
 const pre = '0$_';
 

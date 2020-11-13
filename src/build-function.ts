@@ -1,10 +1,8 @@
 import { compileFunc } from './compile/compile';
 import { createEnv } from './env';
-import { BuildFunctionOptions, Environment } from './types';
+import type { BuildFunctionOptions, Environment, UnknownFunction } from './types';
 
-type AnyFunction = (...args: any[]) => any;
-
-export function build<F extends AnyFunction>(
+export function build<F extends UnknownFunction>(
   options: BuildFunctionOptions,
   env?: Environment,
 ): F {
