@@ -5,7 +5,7 @@ import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, erro
 import { hash } from '../hash';
 import { hasOwn, returning } from '../helpers';
 import type { DeprecatedDeclareStatement } from '../legacy-types';
-import { isArray, isObj } from '../type-check';
+import { isArray, isObjOrNull } from '../type-check';
 import type { ArgsLibPopulator, BinaryOperationExpression, BreakStatement, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, ForStatement, FunctionBase, FunctionCallExpression, FunctionExpression, FunctionParameter, FunctionParameterDescriptor, FunctionStep, GetExpression, IfStatement, LetStatement, LiteralExpression, RegularArithmeticOperator, ReturnStatement, SetExpression, SingleOrMulti, SpecialBinaryOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, TernaryOperationExpression, ThrowStatement, TryStatement, UnaryOperationExpression, UnknownFunction, VariableDeclaration } from '../types';
 import { operTable, specialOperTable, transTable } from './oper-table';
 import { paramTable } from './param-table';
@@ -484,7 +484,7 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObj(msg) as unknown as boolean && compileExp<string>(msg as Expression, cache);
+    const resolveMessage = isObjOrNull(msg) as unknown as boolean && compileExp<string>(msg as Expression, cache);
 
     return (env) => ({
       type,
@@ -569,7 +569,7 @@ export function compileParam(
 ): ArgsLibPopulator | null {
 
   function normalize(single: FunctionParameter): FunctionParameterDescriptor {
-    return isObj(single) ? single : { id: single, type: 'param' };
+    return isObjOrNull(single) ? single : { id: single, type: 'param' };
   }
 
   function compileSingle(single: FunctionParameterDescriptor, index: number): ArgsLibPopulator {
@@ -679,7 +679,7 @@ export function compileDecl(
 
   function normalize(single: VariableDeclaration): DeclareWithValue {
 
-    const obj = isObj(single) ? { id: single.id, value: single.value } : { id: single };
+    const obj = isObjOrNull(single) ? { id: single.id, value: single.value } : { id: single };
 
     if (hasOwn.call(obj, 'value') && typeof obj.value === 'undefined') {
       delete obj.value;
@@ -932,7 +932,7 @@ export function compileExp<V extends any = any>(
 
   function compileCached(single: Expression) {
 
-    if (!single || !isObj(single)) {
+    if (!single || !isObjOrNull(single)) {
       throw errorInvalid(single, 'expression');
     }
 
@@ -1023,7 +1023,7 @@ export function compileStep(
 
   function compileCached(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
 
-    if (!single || !isObj(single)) {
+    if (!single || !isObjOrNull(single)) {
       throw errorInvalid(single, 'step');
     }
 
