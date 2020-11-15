@@ -87,24 +87,24 @@ const expTable: ExpressionLookupTable = {
       throw errorExpReq('id', 'get');
     }
 
-    if (typeof exp.id !== 'string') {
+    const { id } = exp;
+
+    if (typeof id !== 'string') {
       throw error('A "get" expression "id" must be a string');
     }
 
-    const { id } = exp;
-
     return (env) => {
 
-      const result = findInEnv(env, id);
+      const found = findInEnv(env, id);
 
-      if (!result) {
+      if (!found) {
         if (!safe) {
           throw errorNotInEnv(id);
         }
         return;
       }
 
-      return result.env.values[result.id].value;
+      return found.env.values[found.id].value;
 
     };
 
@@ -120,11 +120,12 @@ const expTable: ExpressionLookupTable = {
       throw errorExpReq('value', 'set');
     }
 
-    if (typeof exp.id !== 'string') {
+    const { id } = exp;
+
+    if (typeof id !== 'string') {
       throw error('A "set" expression "id" must be a string');
     }
 
-    const { id } = exp;
     const resolveValue = compileExp<unknown>(exp.value, cache);
 
     return (env) => {
@@ -182,7 +183,7 @@ const expTable: ExpressionLookupTable = {
     const { exp: operExps, oper } = exp;
 
     if (operExps.length < 2) {
-      throw error('not enought operands');
+      throw error('not enough operands');
     }
 
     const resolvers = compileExp<unknown>(operExps, cache);
@@ -200,7 +201,7 @@ const expTable: ExpressionLookupTable = {
     }
 
     const resolveFirst = resolvers.shift() as EnvBasedResolver<unknown>;
-    const len = resolvers.length;
+    const { length: len } = resolvers;
 
     return (env) => {
 
@@ -261,7 +262,7 @@ const expTable: ExpressionLookupTable = {
     return compileFunc(
       exp,
       cache,
-    ) as never;
+    );
 
   },
 
@@ -451,12 +452,10 @@ const stepTable: StatementLookupTable = {
     }
 
     const { value, type } = step;
-    const resolveValue = compileExp(value, cache);
+    const resolveValue = compileExp<unknown>(value, cache);
 
     return (env) => ({
       type,
-      // TODO: Check here, may be a mistake
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       value: resolveValue(env),
     });
 
@@ -549,7 +548,7 @@ export function compileFunc<V extends UnknownFunction = UnknownFunction>(
       return returning() as V;
     }
 
-    const func: UnknownFunction = (...args: unknown[]): Expression | void => {
+    const func: UnknownFunction = (...args: unknown[]) => {
 
       let lib: EnvLib = {};
 
@@ -1069,7 +1068,7 @@ export function compileStep(
     const cached = db[key];
 
     if (cached) {
-      return cached;
+      return cached as EnvBasedResolver<LoopBlockResult>;
     }
 
     return db[key] = compileSingle(single);
@@ -1100,7 +1099,7 @@ export function compileStep(
   const mcached = db[mkey];
 
   if (mcached) {
-    return mcached;
+    return mcached as EnvBasedResolver<LoopBlockResult>;
   }
 
   return db[mkey] = compileMulti();

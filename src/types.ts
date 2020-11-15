@@ -218,9 +218,9 @@ export type BlockStep =
   | Expression
   | Statement;
 
-export interface ReturnBlockResult {
+export interface ReturnBlockResult<V = unknown> {
   type: 'return';
-  value: Expression;
+  value: V;
 }
 
 export interface ThrowBlockResult {
@@ -228,39 +228,41 @@ export interface ThrowBlockResult {
   msg: string;
 }
 
-export type NonLoopBlockResult =
-  | ReturnBlockResult
+export type NonLoopBlockResult<V = unknown> =
+  | ReturnBlockResult<V>
   | ThrowBlockResult
   | void;
 
 export type LookBreakResult = 'break';
 
-export type LoopBlockResult =
+export type LoopBlockResult<V = unknown> =
   | LookBreakResult
-  | NonLoopBlockResult;
+  | NonLoopBlockResult<V>;
 
-export type EnvLib = Record<string, any>;
+export type EnvLib<V = unknown> = Record<string, V>;
 
-export interface EnvValue {
+export interface EnvValue<V = unknown> {
   readonly: boolean;
-  value: unknown;
+  value: V;
 }
 
-export interface Environment {
+export type EnvValues<V = unknown> = Record<string, EnvValue<V>>;
+
+export interface Environment<V = unknown> {
   parent: Environment | null;
-  values: Record<string, EnvValue>;
+  values: EnvValues<V>;
 }
 
-export interface EnvFound {
-  env: Environment;
+export interface EnvFound<V = unknown> {
+  env: Environment<V>;
   id: string;
 }
 
 // GENERAL
 
 export type EnvBasedPopulator<R> = (env: Environment, target: R) => R;
-export type EnvBasedResolver<V extends any = any> = (env: Environment) => V;
-export type ArgsLibPopulator = (input: any[], lib: EnvLib) => EnvLib;
+export type EnvBasedResolver<V = unknown> = (env: Environment) => V;
+export type ArgsLibPopulator = (input: unknown[], lib: EnvLib) => EnvLib;
 
 export interface CompileCache {
   param?: Record<string, ArgsLibPopulator>;

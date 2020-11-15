@@ -21,7 +21,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env) as unknown;
+        result = resolvers[i](env);
 
         if (result) {
           break;
@@ -45,7 +45,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env) as unknown;
+        result = resolvers[i](env);
 
         if (!result) {
           break;
@@ -69,7 +69,7 @@ export const specialOperTable: Record<
 
       for (let i = 0; i < len; i++) {
 
-        result = resolvers[i](env) as unknown;
+        result = resolvers[i](env);
 
         if (result != null) {
           break;
@@ -93,7 +93,7 @@ export const specialOperTable: Record<
       let i = resolvers.length - 1;
 
       while (i >= 0) {
-        result = resolvers[i](env) ** result;
+        result = resolvers[i](env) as number ** result;
         i--;
       }
 
