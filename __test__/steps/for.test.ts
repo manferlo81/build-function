@@ -193,7 +193,7 @@ describe('for statement step', () => {
 
     const resolve = compileStep(step, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(() => resolve(scope)).not.toThrow();
 

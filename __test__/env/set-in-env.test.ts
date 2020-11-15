@@ -4,7 +4,7 @@ describe('setInEnv method', () => {
 
   test('Should set value in', () => {
 
-    const env = createEnv(null);
+    const env = createEnv();
     const key = 'key';
     const value = 'value';
 

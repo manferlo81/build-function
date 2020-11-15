@@ -14,7 +14,7 @@ describe('variable declaration', () => {
     const declare = 'id';
     const resolve = compileDecl(declare, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     if (resolve) {
       resolve(scope);

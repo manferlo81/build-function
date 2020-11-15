@@ -11,6 +11,6 @@ export function build<F extends UnknownFunction>(
     {},
     options.name,
   )(
-    env || createEnv(null),
+    env || createEnv(),
   );
 }

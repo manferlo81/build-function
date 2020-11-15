@@ -23,7 +23,7 @@ describe('typeof transform expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(resolve(scope)).toBe(typeof undefined);
 

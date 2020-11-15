@@ -41,7 +41,7 @@ describe('get expression', () => {
     const expression: GetExpression = $get('value');
     const resolve = compileExp(expression, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(() => resolve(scope)).toThrow();
 

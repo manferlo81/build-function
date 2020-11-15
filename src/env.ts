@@ -3,17 +3,18 @@ import type { EnvFound, Environment, EnvLib } from './types';
 
 const pre = '0$_';
 
-export function addToEnv<V>(env: Environment, id: string, value: V, readonly?: boolean): void {
+export function addToEnv(env: Environment, id: string, value: unknown, readonly?: boolean): void {
   env.values[pre + id] = { readonly: !!readonly, value };
 }
 
-export function createEnv(parent: Environment | null, lib?: EnvLib | null): Environment {
+export function createEnv(parent?: Environment | null, lib?: EnvLib | null): Environment {
 
-  const env: Environment = { parent, values: {} };
+  const env: Environment = { parent: parent || null, values: {} };
 
   if (lib) {
     for (const id in lib) {
       if (hasOwn.call(lib, id)) {
+        // TODO: Lib members should be declared as constants
         addToEnv(env, id, lib[id]);
       }
     }

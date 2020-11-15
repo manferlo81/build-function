@@ -24,7 +24,7 @@ describe('let statement step', () => {
       {},
     );
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(() => getValue(scope)).toThrow();
 
@@ -55,7 +55,7 @@ describe('let statement step', () => {
       {},
     );
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(() => getValue1(scope)).toThrow();
     expect(() => getValue2(scope)).toThrow();
@@ -88,7 +88,7 @@ describe('let statement step', () => {
       {},
     );
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     const result = resolve(scope);
 
@@ -106,7 +106,7 @@ describe('let statement step', () => {
     };
     const resolve = compileStep(step, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
     const result = resolve(scope);
 
     expect(result).toBeUndefined();
@@ -121,7 +121,7 @@ describe('let statement step', () => {
     };
     const resolve = compileStep(step, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     resolve(scope);
     expect(() => resolve(scope)).toThrow();

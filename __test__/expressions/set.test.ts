@@ -56,7 +56,7 @@ describe('set expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    const scope = createEnv(null);
+    const scope = createEnv();
 
     expect(() => resolve(scope)).toThrow();
 
@@ -70,7 +70,7 @@ describe('set expression', () => {
     );
     const resolve = compileExp(expression, {});
 
-    const env = createEnv(null);
+    const env = createEnv();
     addToEnv(env, 'value', 10, true);
 
     expect(() => resolve(env)).toThrow();
