@@ -9,7 +9,7 @@ export interface Typed<T extends string> {
 
 export interface FunctionBase {
   params?: SingleOrMulti<FunctionParameter>;
-  body?: SingleOrMulti<FunctionStep>;
+  body?: SingleOrMulti<BlockStep>;
 }
 
 export interface BuildFunctionOptions extends FunctionBase {
@@ -36,17 +36,17 @@ export type ExpressionType =
   | 'func'
   | 'call';
 
-type TypedExpresion<T extends ExpressionType> = Typed<T>;
+type TypedExpression<T extends ExpressionType> = Typed<T>;
 
-export interface LiteralExpression extends TypedExpresion<'literal'> {
-  value: any;
+export interface LiteralExpression extends TypedExpression<'literal'> {
+  value: unknown;
 }
 
-export interface GetExpression extends TypedExpresion<'get'> {
+export interface GetExpression extends TypedExpression<'get'> {
   id: string;
 }
 
-export interface SetExpression extends TypedExpresion<'set'> {
+export interface SetExpression extends TypedExpression<'set'> {
   id: string;
   value: Expression;
 }
@@ -63,7 +63,7 @@ export type UnaryOperator =
   | SpecialUnaryOperator
   | RegularUnaryOperator;
 
-export interface UnaryOperationExpression extends TypedExpresion<'trans'> {
+export interface UnaryOperationExpression extends TypedExpression<'trans'> {
   oper: UnaryOperator;
   exp: Expression;
 }
@@ -116,20 +116,20 @@ export type BinaryOperator =
 
 export type BinaryOperationOperandExpressions = [Expression, Expression, ...Expression[]];
 
-export interface BinaryOperationExpression extends TypedExpresion<'oper'> {
+export interface BinaryOperationExpression extends TypedExpression<'oper'> {
   oper: BinaryOperator;
   exp: BinaryOperationOperandExpressions;
 }
 
-export interface TernaryOperationExpression extends TypedExpresion<'ternary'> {
+export interface TernaryOperationExpression extends TypedExpression<'ternary'> {
   condition: Expression;
   then: Expression;
   otherwise: Expression;
 }
 
-export interface FunctionExpression extends TypedExpresion<'func'>, FunctionBase { }
+export interface FunctionExpression extends TypedExpression<'func'>, FunctionBase { }
 
-export interface FunctionCallExpression extends TypedExpresion<'call'> {
+export interface FunctionCallExpression extends TypedExpression<'call'> {
   func: Expression;
   args?: SingleOrMulti<SpreadableExpression>;
 }
@@ -177,23 +177,23 @@ export interface LetStatement extends TypedStatement<'let'> {
 
 export interface IfStatement extends TypedStatement<'if'> {
   condition: Expression;
-  then?: SingleOrMulti<FunctionStep>;
-  otherwise?: SingleOrMulti<FunctionStep>;
+  then?: SingleOrMulti<BlockStep>;
+  otherwise?: SingleOrMulti<BlockStep>;
 }
 
 export interface ForStatement extends TypedStatement<'for'> {
   target: Expression;
   value?: string;
   index?: string;
-  body?: SingleOrMulti<FunctionStep>;
+  body?: SingleOrMulti<BlockStep>;
 }
 
 export type BreakStatement = TypedStatement<'break'>;
 
 export interface TryStatement extends TypedStatement<'try'> {
-  body?: SingleOrMulti<FunctionStep>;
+  body?: SingleOrMulti<BlockStep>;
   error?: string;
-  catch?: SingleOrMulti<FunctionStep>;
+  catch?: SingleOrMulti<BlockStep>;
 }
 
 export interface ThrowStatement extends TypedStatement<'throw'> {
@@ -214,28 +214,30 @@ export type Statement =
   | TryStatement
   | ThrowStatement;
 
-export type FunctionStep =
+export type BlockStep =
   | Expression
   | Statement;
 
-export interface StepReturn {
+export interface ReturnBlockResult {
   type: 'return';
   value: Expression;
 }
 
-export interface StepThrow {
+export interface ThrowBlockResult {
   type: 'throw';
   msg: string;
 }
 
-export type StepNonLoopResult =
-  | StepReturn
-  | StepThrow
+export type NonLoopBlockResult =
+  | ReturnBlockResult
+  | ThrowBlockResult
   | void;
 
-export type StepLoopResult =
-  | 'break'
-  | StepNonLoopResult;
+export type LookBreakResult = 'break';
+
+export type LoopBlockResult =
+  | LookBreakResult
+  | NonLoopBlockResult;
 
 export type EnvLib = Record<string, any>;
 

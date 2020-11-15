@@ -1,4 +1,5 @@
-import { compileStep, StepThrow, ThrowStatement } from '../../src';
+import type { ThrowBlockResult, ThrowStatement } from '../../src';
+import { compileStep } from '../../src';
 import { $literal } from '../helpers/expressions';
 
 describe('throw error statement step', () => {
@@ -40,7 +41,7 @@ describe('throw error statement step', () => {
     };
     const resolve = compileStep(step, {});
 
-    const result = resolve(null as never) as StepThrow;
+    const result = resolve(null as never) as ThrowBlockResult;
 
     expect(result).toEqual({
       type: 'throw',

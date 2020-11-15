@@ -1,16 +1,16 @@
 import {
+  BlockStep,
   BreakStatement,
   CompileCache,
   compileExp,
-  compileStep as _compileStep,
+  compileStep,
   FunctionExpression,
-  FunctionStep,
 } from '../../src';
 
 describe('break statement step', () => {
 
-  const compileStep = (step: FunctionStep, cache?: CompileCache) => (
-    _compileStep(step, cache || {}, true)
+  const compile = (step: BlockStep, cache?: CompileCache) => (
+    compileStep(step, cache || {}, true)
   );
 
   test('should compile break statement step', () => {
@@ -18,7 +18,7 @@ describe('break statement step', () => {
     const step: BreakStatement = {
       type: 'break',
     };
-    const resolve: () => 'break' = compileStep(step) as never;
+    const resolve: () => 'break' = compile(step) as never;
 
     const result = resolve();
 
@@ -49,7 +49,7 @@ describe('break statement step', () => {
     };
 
     const cache = {};
-    const same = compileStep(step1, cache) === compileStep(step2, cache);
+    const same = compile(step1, cache) === compile(step2, cache);
 
     expect(same).toBe(true);
 

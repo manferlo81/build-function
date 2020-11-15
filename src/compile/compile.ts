@@ -1,12 +1,46 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 import { addToEnv, createEnv, findInEnv } from '../env';
 import { error, errorExpReq, errorInvalid, errorInvalidType, errorNotInEnv, errorStmnReq } from '../errors';
 import { hash } from '../hash';
 import { hasOwn, returning } from '../helpers';
 import type { DeprecatedDeclareStatement } from '../legacy-types';
 import { isArray, isObjOrNull } from '../type-check';
-import type { ArgsLibPopulator, BinaryOperationExpression, BreakStatement, CompileCache, DeclareWithValue, EnvBasedPopulator, EnvBasedResolver, EnvLib, Expression, ForStatement, FunctionBase, FunctionCallExpression, FunctionExpression, FunctionParameter, FunctionParameterDescriptor, FunctionStep, GetExpression, IfStatement, LetStatement, LiteralExpression, RegularArithmeticOperator, ReturnStatement, SetExpression, SingleOrMulti, SpecialBinaryOperator, SpreadableExpression, StatementType, StepLoopResult, StepNonLoopResult, TernaryOperationExpression, ThrowStatement, TryStatement, UnaryOperationExpression, UnknownFunction, VariableDeclaration } from '../types';
+import type {
+  ArgsLibPopulator,
+  BinaryOperationExpression,
+  BlockStep,
+  BreakStatement,
+  CompileCache,
+  DeclareWithValue,
+  EnvBasedPopulator,
+  EnvBasedResolver,
+  EnvLib,
+  Expression,
+  ForStatement,
+  FunctionBase,
+  FunctionCallExpression,
+  FunctionExpression,
+  FunctionParameter,
+  FunctionParameterDescriptor,
+  GetExpression,
+  IfStatement,
+  LetStatement,
+  LiteralExpression,
+  LoopBlockResult,
+  NonLoopBlockResult,
+  RegularArithmeticOperator,
+  ReturnStatement,
+  SetExpression,
+  SingleOrMulti,
+  SpecialBinaryOperator,
+  SpreadableExpression,
+  StatementType,
+  TernaryOperationExpression,
+  ThrowStatement,
+  TryStatement,
+  UnaryOperationExpression,
+  UnknownFunction,
+  VariableDeclaration,
+} from '../types';
 import { operTable, specialOperTable, transTable } from './oper-table';
 import { paramTable } from './param-table';
 
@@ -262,8 +296,8 @@ const expTable: ExpressionLookupTable = {
 
 };
 
-type StepCompiler<S extends FunctionStep> =
-  (step: S, cache: CompileCache, breakable?: boolean) => EnvBasedResolver<StepLoopResult>;
+type StepCompiler<S extends BlockStep> =
+  (step: S, cache: CompileCache, breakable?: boolean) => EnvBasedResolver<LoopBlockResult>;
 
 interface StatementLookupTable {
   declare: StepCompiler<DeprecatedDeclareStatement>;
@@ -361,7 +395,7 @@ const stepTable: StatementLookupTable = {
     const { index, value } = step;
     const resolveTarget = compileExp<unknown[]>(step.target, cache);
 
-    return (env): StepNonLoopResult => {
+    return (env): NonLoopBlockResult => {
 
       const array = resolveTarget(env);
       const len = array.length;
@@ -962,29 +996,29 @@ export function compileExp<V extends any = any>(
 // STEPS
 
 export function compileStep(
-  steps: SingleOrMulti<FunctionStep>,
+  steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
   breakable: true,
-): EnvBasedResolver<StepLoopResult>;
+): EnvBasedResolver<LoopBlockResult>;
 export function compileStep(
-  steps: SingleOrMulti<FunctionStep>,
+  steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
   breakable?: false | undefined,
-): EnvBasedResolver<StepNonLoopResult>;
+): EnvBasedResolver<NonLoopBlockResult>;
 export function compileStep(
-  steps: SingleOrMulti<FunctionStep>,
+  steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
   breakable?: boolean | undefined,
-): EnvBasedResolver<StepLoopResult>;
+): EnvBasedResolver<LoopBlockResult>;
 export function compileStep(
-  steps: SingleOrMulti<FunctionStep>,
+  steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
   breakable?: boolean | undefined,
-): EnvBasedResolver<StepLoopResult> {
+): EnvBasedResolver<LoopBlockResult> {
 
-  function compileSingle(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
+  function compileSingle(single: BlockStep): EnvBasedResolver<LoopBlockResult> {
 
-    const compile = stepTable[single.type as StatementType] as StepCompiler<FunctionStep> | undefined;
+    const compile = stepTable[single.type as StatementType] as StepCompiler<BlockStep> | undefined;
 
     if (compile) {
 
@@ -1000,9 +1034,9 @@ export function compileStep(
 
   }
 
-  function compileMulti(): EnvBasedResolver<StepLoopResult> {
+  function compileMulti(): EnvBasedResolver<LoopBlockResult> {
 
-    return (env): StepLoopResult => {
+    return (env): LoopBlockResult => {
 
       for (let i = 0; i < len; i++) {
 
@@ -1021,7 +1055,7 @@ export function compileStep(
 
   const db = cache.step || (cache.step = {});
 
-  function compileCached(single: FunctionStep): EnvBasedResolver<StepLoopResult> {
+  function compileCached(single: BlockStep): EnvBasedResolver<LoopBlockResult> {
 
     if (!single || !isObjOrNull(single)) {
       throw errorInvalid(single, 'step');

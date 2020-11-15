@@ -1,9 +1,9 @@
-import {
+import type {
   BinaryOperationExpression,
   BinaryOperator,
+  BlockStep,
   Expression,
   FunctionCallExpression,
-  FunctionStep,
   GetExpression,
   IfStatement,
   LiteralExpression,
@@ -70,8 +70,8 @@ export const $unary = (oper: UnaryOperator, exp: Expression): UnaryOperationExpr
 
 export const $if = (
   condition: Expression,
-  then: FunctionStep | FunctionStep[],
-  otherwise?: FunctionStep | FunctionStep[],
+  then: BlockStep | BlockStep[],
+  otherwise?: BlockStep | BlockStep[],
 ): IfStatement => {
 
   const step: IfStatement = {
