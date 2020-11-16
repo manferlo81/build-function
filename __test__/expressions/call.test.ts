@@ -3,20 +3,18 @@ import { $call, $get, $literal } from '../helpers/expressions';
 
 describe('call expression', () => {
 
+  const compile = <V = unknown>(exp: FunctionCallExpression, cache = {}) => compileExp<V>(exp, cache);
+
   test('should throw on invalid call expression', () => {
-
-    const invalid = { type: 'call' };
-
-    expect(() => compileExp(invalid as never, {})).toThrow();
-
+    expect(() => compile({ type: 'call' } as never)).toThrow();
   });
 
   test('should compile function call expression', () => {
 
-    const expression: FunctionCallExpression = $call(
+    const exp: FunctionCallExpression = $call(
       $get('func'),
     );
-    const resolve = compileExp<string>(expression, {});
+    const resolve = compile<string>(exp);
 
     const returnValue = 'ok';
     const func = jest.fn(() => returnValue);
@@ -45,7 +43,7 @@ describe('call expression', () => {
         exp: $literal([a, b, c]),
       },
     );
-    const resolve = compileExp<number>(expression, {});
+    const resolve = compile<number>(expression);
 
     const func = jest.fn((x: number, y: number, z: number): number => (x + y + z));
 
@@ -66,7 +64,7 @@ describe('call expression', () => {
     const expression: FunctionCallExpression = $call(
       $get('func'),
     );
-    const resolve = compileExp<boolean>(expression, {});
+    const resolve = compile<boolean>(expression);
 
     const func = jest.fn(() => {
       return true;
@@ -86,21 +84,22 @@ describe('call expression', () => {
 
   test('should cache function call expression', () => {
 
-    const expression1: FunctionCallExpression = $call(
+    const exp1 = $call(
       $get('func'),
       $literal(1),
       $literal(2),
     );
-    const expression2: FunctionCallExpression = $call(
+    const exp2 = $call(
       $get('func'),
       $literal(1),
       $literal(2),
     );
 
     const cache = {};
-    const same = compileExp(expression1, cache) === compileExp(expression2, cache);
 
-    expect(same).toBe(true);
+    expect(exp1).toEqual(exp2);
+    expect(exp1).not.toBe(exp2);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
 
   });
 

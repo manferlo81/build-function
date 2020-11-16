@@ -1,25 +1,16 @@
-import { addToEnv, compileExp, createEnv, SetExpression } from '../../src';
+import { addToEnv, compileExp, createEnv, Expression, SetExpression } from '../../src';
 import { $get, $literal, $set } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('set expression', () => {
 
+  const compile = <V = unknown>(exp: Expression, cache = {}) => compileExp<V>(exp, cache);
+
   test('should throw on invalid set expression', () => {
-
-    const base = { type: 'set' };
-    const invalid = [
-      base,
-      { ...base, id: 'id' },
-      { ...base, value: $literal(0) },
-      { ...base, id: 10, value: $literal(0) },
-    ];
-
-    invalid.forEach((expression) => {
-
-      expect(() => compileExp(expression as never, {})).toThrow();
-
-    });
-
+    expect(() => compile({ type: 'set' } as never)).toThrow();
+    expect(() => compile({ type: 'set', id: 'id' } as never)).toThrow();
+    expect(() => compile({ type: 'set', value: $literal(0) } as never)).toThrow();
+    expect(() => compile({ type: 'set', id: 10, value: $literal(0) } as never)).toThrow();
   });
 
   test('should compile set expression with string id', () => {
@@ -30,11 +21,8 @@ describe('set expression', () => {
       id,
       $literal(value),
     );
-    const setValue = compileExp<number>(expression, {});
-    const getValue = compileExp(
-      $get(id),
-      {},
-    );
+    const setValue = compile<number>(expression);
+    const getValue = compile($get(id));
 
     const initial = 100;
     const scope = createEnv(null, { [id]: initial });
@@ -49,26 +37,14 @@ describe('set expression', () => {
   });
 
   test('should throw if not found', () => {
-
-    const expression: SetExpression = $set(
-      'value',
-      $literal(true),
-    );
-    const resolve = compileExp(expression, {});
-
+    const resolve = compile($set('value', $literal(true)));
     const scope = createEnv();
-
     expect(() => resolve(scope)).toThrow();
-
   });
 
   test('should throw if readonly', () => {
 
-    const expression: SetExpression = $set(
-      'value',
-      $literal(true),
-    );
-    const resolve = compileExp(expression, {});
+    const resolve = compile($set('value', $literal(true)));
 
     const env = createEnv();
     addToEnv(env, 'value', 10, true);
@@ -79,13 +55,14 @@ describe('set expression', () => {
 
   test('should cache set expression', () => {
 
-    const expression1: SetExpression = $set('value', $literal(1));
-    const expression2: SetExpression = $set('value', $literal(1));
+    const exp1 = $set('value', $literal(1));
+    const exp2 = $set('value', $literal(1));
 
     const cache = {};
-    const same = compileExp(expression1, cache) === compileExp(expression2, cache);
 
-    expect(same).toBe(true);
+    expect(exp1).toEqual(exp2);
+    expect(exp1).not.toBe(exp2);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
 
   });
 

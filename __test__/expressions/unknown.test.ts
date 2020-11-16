@@ -3,23 +3,12 @@ import { compileExp } from '../../src';
 describe('unknown expression', () => {
 
   test('should throw on unknown expression', () => {
-
-    const invalid = [undefined, null];
-
-    invalid.forEach((value) => {
-      expect(() => compileExp(value as never, {})).toThrow();
-    });
-
+    expect(() => compileExp(undefined as never, {})).toThrow();
+    expect(() => compileExp(null as never, {})).toThrow();
   });
 
   test('should throw on unknown expression type', () => {
-
-    const expression: any = {
-      type: 'unknown',
-    };
-
-    expect(() => compileExp(expression, {})).toThrow();
-
+    expect(() => compileExp({ type: 'unknown' } as never, {})).toThrow();
   });
 
 });

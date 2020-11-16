@@ -1,45 +1,27 @@
-import { compileExp, createEnv, FunctionExpression } from '../../src';
+import { compileExp, createEnv, Expression, FunctionExpression } from '../../src';
 import { $binary, $get, $if, $literal, $return, $set } from '../helpers/expressions';
 import { rand } from '../helpers/number';
 
 describe('function expression', () => {
 
+  const compile = <V = unknown>(exp: Expression, cache = {}) => compileExp<V>(exp, cache);
+
   test('should throw on invalid parameter type', () => {
-
-    const expression: FunctionExpression = {
-      type: 'func',
-      params: { id: 'param1', type: 'invalid' } as never,
-    };
-
-    expect(() => compileExp(expression, {})).toThrow();
-
+    const exp = { type: 'func', params: { id: 'param1', type: 'invalid' } };
+    expect(() => compile(exp as never)).toThrow();
   });
 
   test('should throw on invalid parameter id', () => {
-
-    const expression: FunctionExpression = {
-      type: 'func',
-      params: 100 as never,
-    };
-
-    expect(() => compileExp(expression, {})).toThrow();
-
+    expect(() => compile({ type: 'func', params: 100 as never })).toThrow();
   });
 
   test('should throw on parameter id named arguments', () => {
-
-    const expression: FunctionExpression = {
-      type: 'func',
-      params: 'arguments',
-    };
-
-    expect(() => compileExp(expression, {})).toThrow();
-
+    expect(() => compile({ type: 'func', params: 'arguments' })).toThrow();
   });
 
   test('should compile function expression', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       params: [
         'a',
@@ -53,7 +35,8 @@ describe('function expression', () => {
         ),
       ),
     };
-    const resolve = compileExp<(a: number, b: number) => number>(expression, {});
+
+    const resolve = compile<(a: number, b: number) => number>(exp);
 
     const scope = createEnv();
     const func = resolve(scope);
@@ -67,13 +50,13 @@ describe('function expression', () => {
 
   test('should compile function expression with no params', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       body: $return(
         $literal(true),
       ),
     };
-    const resolve = compileExp<() => true>(expression, {});
+    const resolve = compile<() => true>(exp);
 
     const scope = createEnv();
     const func = resolve(scope);
@@ -84,14 +67,14 @@ describe('function expression', () => {
 
   test('should compile function expression with single param', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       params: 'param',
       body: $return(
         $get('param'),
       ),
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
+    const resolve = compile<(param: any) => true | undefined>(exp);
 
     const scope = createEnv();
     const func = resolve(scope);
@@ -103,14 +86,14 @@ describe('function expression', () => {
 
   test('should compile function expression with single rest param', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       params: { id: 'params', type: 'rest' },
       body: $return(
         $get('params'),
       ),
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
+    const resolve = compile<(param: any) => true | undefined>(exp);
 
     const scope = createEnv();
     const func: (...args: any[]) => any = resolve(scope);
@@ -122,7 +105,7 @@ describe('function expression', () => {
 
   test('should compile function expression with rest parameters', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       params: [
         'a',
@@ -135,7 +118,7 @@ describe('function expression', () => {
         ),
       ],
     };
-    const resolve = compileExp<(a: number, b: number, ...others: number[]) => number>(expression, {});
+    const resolve = compile<(a: number, b: number, ...others: number[]) => number>(exp);
 
     const scope = createEnv();
     const func = resolve(scope);
@@ -150,7 +133,7 @@ describe('function expression', () => {
 
   test('should compile function expression with multi-step body', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       params: ['param'],
       body: [
@@ -171,7 +154,7 @@ describe('function expression', () => {
         ),
       ],
     };
-    const resolve = compileExp<(param: any) => true | undefined>(expression, {});
+    const resolve = compile<(param: any) => true | undefined>(exp);
 
     const scope = createEnv();
     const func = resolve(scope);
@@ -183,10 +166,10 @@ describe('function expression', () => {
 
   test('should compile function expression without body', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
     };
-    const resolve = compileExp<() => undefined>(expression, {});
+    const resolve = compile<() => undefined>(exp);
 
     const func = resolve(null as never);
 
@@ -196,11 +179,11 @@ describe('function expression', () => {
 
   test('should return undefined if empty', () => {
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       body: [],
     };
-    const resolve = compileExp<() => void>(expression, {});
+    const resolve = compile<() => void>(exp);
 
     const scope = createEnv();
 
@@ -214,14 +197,14 @@ describe('function expression', () => {
 
     const msg = 'User error';
 
-    const expression: FunctionExpression = {
+    const exp: FunctionExpression = {
       type: 'func',
       body: {
         type: 'throw',
         msg,
       },
     };
-    const resolve = compileExp<() => void>(expression, {});
+    const resolve = compile<() => void>(exp);
 
     const scope = createEnv();
 
@@ -239,7 +222,7 @@ describe('function expression', () => {
         $get('arguments'),
       ),
     };
-    const resolve = compileExp<(...args: number[]) => any>(expression, {});
+    const resolve = compile<(...args: number[]) => any>(expression);
 
     const scope = createEnv();
 
@@ -253,14 +236,14 @@ describe('function expression', () => {
 
   test('should cache function expression', () => {
 
-    const expression1: FunctionExpression = {
+    const exp1: FunctionExpression = {
       type: 'func',
       params: ['a', 'b'],
       body: $return(
         $literal(null),
       ),
     };
-    const expression2: FunctionExpression = {
+    const exp2: FunctionExpression = {
       type: 'func',
       params: ['a', 'b'],
       body: $return(
@@ -269,9 +252,10 @@ describe('function expression', () => {
     };
 
     const cache = {};
-    const same = compileExp(expression1, cache) === compileExp(expression2, cache);
 
-    expect(same).toBe(true);
+    expect(exp1).toEqual(exp2);
+    expect(exp1).not.toBe(exp2);
+    expect(compileExp(exp1, cache)).toBe(compileExp(exp2, cache));
 
   });
 

@@ -4,6 +4,8 @@ import { $literal } from '../helpers/expressions';
 
 describe('spread expression', () => {
 
+  const compile = (exp: SpreadableExpression | SpreadableExpression[], cache = {}) => compileSpread(exp, cache);
+
   test('should compile spread expression', () => {
 
     const array = [1, 2, 3];
@@ -15,18 +17,14 @@ describe('spread expression', () => {
       },
     ];
 
-    const resolve = compileSpread(expressions, {});
+    const resolve = compile(expressions);
 
     expect(resolve(null as never, [])).toEqual([0, ...array]);
 
   });
 
   test('should return null on empty array', () => {
-
-    const resolve = compileSpread([], {});
-
-    expect(resolve).toBeNull();
-
+    expect(compile([])).toBeNull();
   });
 
   test('should cache single spread expression', () => {
@@ -41,9 +39,10 @@ describe('spread expression', () => {
     };
 
     const cache = {};
-    const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
 
-    expect(same).toEqual(true);
+    expect(exp1).toEqual(exp2);
+    expect(exp1).not.toBe(exp2);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
 
   });
 
@@ -61,9 +60,8 @@ describe('spread expression', () => {
     ];
 
     const cache = {};
-    const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
 
-    expect(same).toEqual(true);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
 
   });
 
@@ -85,9 +83,8 @@ describe('spread expression', () => {
     ];
 
     const cache = {};
-    const same = compileSpread(exp1, cache) === compileSpread(exp2, cache);
 
-    expect(same).toEqual(true);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
 
   });
 

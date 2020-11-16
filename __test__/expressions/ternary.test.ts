@@ -1,26 +1,16 @@
-import { compileExp, createEnv, TernaryOperationExpression } from '../../src';
+import { compileExp, createEnv, Expression, TernaryOperationExpression } from '../../src';
 import { $get, $literal, $set, $ternary, $unary } from '../helpers/expressions';
 
 describe('ternary expression', () => {
 
+  const compile = <V = unknown>(exp: Expression, cache = {}) => compileExp<V>(exp, cache);
+
   test('should throw on invalid ternary expression', () => {
-
-    const base = { type: 'ternary' };
-    const invalid = [
-      base,
-      { ...base, condition: $literal(0) },
-      { ...base, then: $literal(0) },
-      { ...base, otherwise: $literal(0) },
-      { ...base, condition: $literal(0), then: $literal(0) },
-      { ...base, condition: $literal(0), otherwise: $literal(0) },
-    ];
-
-    invalid.forEach((expression) => {
-
-      expect(() => compileExp(expression as never, {})).toThrow();
-
-    });
-
+    expect(() => compile({ type: 'ternary', condition: $literal(0) } as never)).toThrow();
+    expect(() => compile({ type: 'ternary', then: $literal(0) } as never)).toThrow();
+    expect(() => compile({ type: 'ternary', otherwise: $literal(0) } as never)).toThrow();
+    expect(() => compile({ type: 'ternary', condition: $literal(0), then: $literal(0) } as never)).toThrow();
+    expect(() => compile({ type: 'ternary', condition: $literal(0), otherwise: $literal(0) } as never)).toThrow();
   });
 
   test('should compile ternary expression', () => {
@@ -30,9 +20,9 @@ describe('ternary expression', () => {
       $literal('yes'),
       $literal('no'),
     );
-    const resolve = compileExp<string>(expression, {});
+    const resolve = compile<string>(expression);
 
-    const negate = compileExp(
+    const negate = compile(
       $set(
         'cond',
         $unary(
@@ -40,7 +30,6 @@ describe('ternary expression', () => {
           $get('cond'),
         ),
       ),
-      {},
     );
 
     const scope = createEnv(null, {
@@ -55,21 +44,22 @@ describe('ternary expression', () => {
 
   test('should cache ternary expression', () => {
 
-    const expression1: TernaryOperationExpression = $ternary(
+    const exp1: TernaryOperationExpression = $ternary(
       $get('cond'),
       $literal('yes'),
       $literal('no'),
     );
-    const expression2: TernaryOperationExpression = $ternary(
+    const exp2: TernaryOperationExpression = $ternary(
       $get('cond'),
       $literal('yes'),
       $literal('no'),
     );
 
     const cache = {};
-    const same = compileExp(expression1, cache) === compileExp(expression2, cache);
 
-    expect(same).toBe(true);
+    expect(exp1).toEqual(exp2);
+    expect(exp1).not.toBe(exp2);
+    expect(compile(exp1, cache)).toBe(compile(exp2, cache));
   });
 
 });
