@@ -15,8 +15,8 @@
     "default": "./dist/build-function.cjs"
   },
   "browser": "./dist/build-function.umd.js",
-  "types": "./dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
   "scripts": {
     "clean:cache": "rimraf node_modules/.cache/{bundlib,jest}",
     "clean:build": "rimraf dist coverage",
