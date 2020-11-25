@@ -35,7 +35,7 @@
     "object-hash": "^2.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.8",
+    "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.12.7",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.9",
