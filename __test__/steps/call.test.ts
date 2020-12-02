@@ -32,7 +32,7 @@ describe('call function expression step', () => {
     );
     const resolve = compileStep(step, {});
 
-    const func = jest.fn(() => 'ignored');
+    const func = jest.fn<string, [number, boolean]>(() => 'ignored');
 
     const scope = createEnv(null, {
       func,
