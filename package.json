@@ -32,13 +32,13 @@
     "release": "standard-version"
   },
   "dependencies": {
-    "object-hash": "^2.2.0"
+    "object-hash": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@types/jest": "^27.0.2",
-    "@types/object-hash": "^2.1.1",
+    "@types/object-hash": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.3",
     "bundlib": "^0.18.4",
