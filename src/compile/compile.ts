@@ -486,7 +486,7 @@ const stepTable: StatementLookupTable = {
 
         return result;
 
-      } catch (err) {
+      } catch (err: any) {
 
         if (resolveCatch) {
 
@@ -517,12 +517,12 @@ const stepTable: StatementLookupTable = {
 
     const { type, msg } = step;
 
-    const resolveMessage = isObjOrNull(msg) as unknown as boolean && compileExp<string>(msg as Expression, cache);
+    const resolveMessage = isObjOrNull(msg) && compileExp<string>(msg, cache);
 
     return (env) => ({
       type,
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      msg: resolveMessage ? resolveMessage(env) : `${msg}`,
+      msg: resolveMessage ? resolveMessage(env) : `${msg as string}`,
     });
 
   },
@@ -548,7 +548,7 @@ export function compileFunc<V extends UnknownFunction = UnknownFunction>(
       return returning() as V;
     }
 
-    const func: UnknownFunction = (...args: unknown[]) => {
+    const func: UnknownFunction = (...args: unknown[]): any => {
 
       let lib: EnvLib = {};
 
@@ -852,11 +852,11 @@ export function compileSpread<V = any>(
 
     }
 
-    const resolveParam = compileExp(single, cache);
+    const resolveParam = compileExp<unknown>(single, cache);
 
     return (env, resolved) => {
       resolved.push(
-        resolveParam(env),
+        resolveParam(env) as V,
       );
       return resolved;
     };
@@ -929,18 +929,21 @@ export function compileSpread<V = any>(
 
 // EXPRESSION
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export function compileExp<V extends any = any>(
   exp: Expression[],
   cache: CompileCache,
   safe?: boolean,
 ): Array<EnvBasedResolver<V>>;
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export function compileExp<V extends any = any>(
   exp: Expression,
   cache: CompileCache,
   safe?: boolean,
 ): EnvBasedResolver<V>;
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export function compileExp<V extends any = any>(
   exp: SingleOrMulti<Expression>,
   cache: CompileCache,
