@@ -9,9 +9,7 @@ import {
 
 describe('break statement step', () => {
 
-  const compile = (step: BlockStep, cache?: CompileCache) => (
-    compileStep(step, cache || {}, true)
-  );
+  const compile = (step: BlockStep, cache?: CompileCache) => compileStep(step, cache || {}, true);
 
   test('should compile break statement step', () => {
 

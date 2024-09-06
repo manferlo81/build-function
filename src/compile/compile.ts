@@ -66,7 +66,6 @@ const expTable: ExpressionLookupTable = {
       throw errorExpReq('value', 'literal');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { value } = exp;
 
     const valueType = typeof value;
@@ -493,7 +492,6 @@ const stepTable: StatementLookupTable = {
           const lib: EnvLib = {};
 
           if (errorId) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
             lib[errorId] = `${err.message || err}`;
           }
 
@@ -521,7 +519,6 @@ const stepTable: StatementLookupTable = {
 
     return (env) => ({
       type,
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       msg: resolveMessage ? resolveMessage(env) : `${msg as string}`,
     });
 
@@ -618,7 +615,7 @@ export function compileParam(
     const getValue = compileGetter(index);
 
     return (input, lib) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
       lib[id] = getValue(input) as unknown;
       return lib;
     };

@@ -45,7 +45,7 @@ describe('call expression', () => {
     );
     const resolve = compile<number>(expression);
 
-    const func = jest.fn((x: number, y: number, z: number): number => (x + y + z));
+    const func = jest.fn((x: number, y: number, z: number) => x + y + z);
 
     const scope = createEnv(null, {
       func,

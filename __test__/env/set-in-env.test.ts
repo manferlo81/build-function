@@ -16,7 +16,7 @@ describe('setInEnv method', () => {
       id: expect.any(String) as unknown,
     });
 
-    const found = maybeFound as { env: Environment, id: string };
+    const found = maybeFound as { env: Environment; id: string };
     expect(found.env.values[found.id].value).toBe(value);
 
   });
