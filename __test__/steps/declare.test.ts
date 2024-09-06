@@ -33,6 +33,7 @@ describe('declare statement step', () => {
 
     const scope = createEnv();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     expect(() => getValue(scope)).toThrow();
 
     const result = resolve(scope);
@@ -64,7 +65,9 @@ describe('declare statement step', () => {
 
     const scope = createEnv();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     expect(() => getValue1(scope)).toThrow();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     expect(() => getValue2(scope)).toThrow();
 
     const result = resolve(scope);

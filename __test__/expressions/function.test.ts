@@ -173,6 +173,7 @@ describe('function expression', () => {
 
     const func = resolve(null as never);
 
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(func()).toBeUndefined();
 
   });
@@ -189,6 +190,7 @@ describe('function expression', () => {
 
     const func = resolve(scope);
 
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(func()).toBeUndefined();
 
   });
@@ -210,6 +212,7 @@ describe('function expression', () => {
 
     const func = resolve(scope);
 
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(() => func()).toThrow(msg);
 
   });

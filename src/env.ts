@@ -9,7 +9,7 @@ export function addToEnv<V = unknown>(env: Environment<V>, id: string, value: V,
 
 export function createEnv<V = unknown>(parent?: Environment | null, lib?: EnvLib<V> | null): Environment<V> {
 
-  const env: Environment<V> = { parent: parent || null, values: {} };
+  const env: Environment<V> = { parent: parent ?? null, values: {} };
 
   if (lib) {
     for (const id in lib) {
@@ -24,6 +24,7 @@ export function createEnv<V = unknown>(parent?: Environment | null, lib?: EnvLib
 
 }
 
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 export function findInEnv<V = unknown>(env: Environment, id: string, topOnly?: boolean): EnvFound<V> | void {
 
   const tid = pre + id;

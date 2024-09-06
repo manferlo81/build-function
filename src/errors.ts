@@ -2,6 +2,7 @@ export function error(msg: string): Error {
   return new Error(msg);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function errorFmt<F extends (...params: any[]) => Error>(template: string): F;
 export function errorFmt(template: string): (...params: any[]) => Error {
   return function () {
@@ -10,6 +11,7 @@ export function errorFmt(template: string): (...params: any[]) => Error {
     return error(
       template.replace(
         /\$(\d+)/g,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         (_, index) => args[+index],
       ),
     );

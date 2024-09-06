@@ -9,6 +9,7 @@ import {
 
 describe('break statement step', () => {
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const compile = (step: BlockStep, cache?: CompileCache) => compileStep(step, cache || {}, true);
 
   test('should compile break statement step', () => {

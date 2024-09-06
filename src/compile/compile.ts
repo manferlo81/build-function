@@ -76,11 +76,12 @@ const expTable: ExpressionLookupTable = {
 
     const serialized = JSON.stringify(value);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return () => JSON.parse(serialized);
 
   },
 
-  get(exp, cache, safe) {
+  get(exp, _cache, safe) {
 
     if (!hasOwn.call(exp, 'id')) {
       throw errorExpReq('id', 'get');
@@ -163,6 +164,7 @@ const expTable: ExpressionLookupTable = {
     const resolveThen = compileExp(exp.then, cache);
     const resolveOtherwise = compileExp(exp.otherwise, cache);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (env) => resolveCondition(env)
       ? resolveThen(env)
       : resolveOtherwise(env);
@@ -189,17 +191,19 @@ const expTable: ExpressionLookupTable = {
 
     const reduceResolvers = specialOperTable[oper as SpecialBinaryOperator];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (reduceResolvers) {
       return reduceResolvers(resolvers);
     }
 
     const reduce = operTable[oper as RegularArithmeticOperator];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!reduce) {
       throw errorInvalidType(oper, 'operation');
     }
 
-    const resolveFirst = resolvers.shift() as EnvBasedResolver<unknown>;
+    const resolveFirst = resolvers.shift() as EnvBasedResolver;
     const { length: len } = resolvers;
 
     return (env) => {
@@ -242,6 +246,7 @@ const expTable: ExpressionLookupTable = {
 
     const transform = transTable[exp.oper];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!transform) {
       throw errorInvalidType(exp.oper, 'transform operation');
     }
@@ -249,6 +254,7 @@ const expTable: ExpressionLookupTable = {
     const resolve = compileExp(exp.exp, cache);
 
     return (env) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return transform(
         resolve(env),
       );
@@ -432,7 +438,7 @@ const stepTable: StatementLookupTable = {
 
   },
 
-  break(step, cache, breakable) {
+  break(step, _cache, breakable) {
 
     if (!breakable) {
       throw error('"break" is not allowed outside loops');
@@ -480,6 +486,7 @@ const stepTable: StatementLookupTable = {
         );
 
         if (result && result.type === 'throw') {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw result.msg;
         }
 
@@ -492,6 +499,7 @@ const stepTable: StatementLookupTable = {
           const lib: EnvLib = {};
 
           if (errorId) {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access
             lib[errorId] = `${err.message || err}`;
           }
 
@@ -519,7 +527,7 @@ const stepTable: StatementLookupTable = {
 
     return (env) => ({
       type,
-      msg: resolveMessage ? resolveMessage(env) : `${msg as string}`,
+      msg: resolveMessage ? resolveMessage(env) : (msg as string),
     });
 
   },
@@ -565,6 +573,7 @@ export function compileFunc<V extends UnknownFunction = UnknownFunction>(
       if (result) {
 
         if (result.type === 'throw') {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw result.msg;
         }
 
@@ -608,6 +617,7 @@ export function compileParam(
 
     const compileGetter = paramTable[type];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!compileGetter) {
       throw errorInvalidType(type, 'parameter');
     }
@@ -636,6 +646,7 @@ export function compileParam(
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const db = cache.param || (cache.param = {});
 
   function compileCached(single: FunctionParameterDescriptor, index: number): ArgsLibPopulator {
@@ -657,6 +668,7 @@ export function compileParam(
     const key = hash(single, single.type, index);
     const cached = db[key];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (cached) {
       return cached;
     }
@@ -692,6 +704,7 @@ export function compileParam(
   const mkey = hash(norm, norm.length);
   const mcached = db[mkey];
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (mcached) {
     return mcached;
   }
@@ -743,7 +756,7 @@ export function compileDecl(
       addToEnv(
         env,
         id,
-        resolveValue && resolveValue(env),
+        resolveValue?.(env),
       );
 
     };
@@ -760,6 +773,7 @@ export function compileDecl(
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const db = cache.let || (cache.let = {});
 
   function compileCached(single: DeclareWithValue): EnvBasedResolver<void> {
@@ -771,6 +785,7 @@ export function compileDecl(
     const key = hash(single, single.id);
     const cached = db[key];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (cached) {
       return cached;
     }
@@ -807,6 +822,7 @@ export function compileDecl(
   const mkey = hash(norm, norm.length);
   const mcached = db[mkey];
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (mcached) {
     return mcached;
   }
@@ -874,6 +890,7 @@ export function compileSpread<V = any>(
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const db = cache.spread || (cache.spread = {});
 
   function compileCached(single: SpreadableExpression): EnvBasedPopulator<V[]> {
@@ -885,6 +902,7 @@ export function compileSpread<V = any>(
     const key = hash(single, single.type);
     const cached = db[key];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (cached) {
       return cached;
     }
@@ -916,6 +934,7 @@ export function compileSpread<V = any>(
   const mkey = hash(exp, exp.length);
   const mcached = db[mkey];
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (mcached) {
     return mcached;
   }
@@ -931,7 +950,7 @@ export function compileExp<V extends any = any>(
   exp: Expression[],
   cache: CompileCache,
   safe?: boolean,
-): Array<EnvBasedResolver<V>>;
+): EnvBasedResolver<V>[];
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export function compileExp<V extends any = any>(
@@ -961,10 +980,12 @@ export function compileExp<V extends any = any>(
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const db = cache.exp || (cache.exp = {});
 
   function compileCached(single: Expression) {
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!single || !isObjOrNull(single)) {
       throw errorInvalid(single, 'expression');
     }
@@ -976,6 +997,7 @@ export function compileExp<V extends any = any>(
     const key = hash(single, single.type);
     const cached = db[key];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (cached) {
       return cached;
     }
@@ -1052,10 +1074,12 @@ export function compileStep(
 
   }
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const db = cache.step || (cache.step = {});
 
   function compileCached(single: BlockStep): EnvBasedResolver<LoopBlockResult> {
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!single || !isObjOrNull(single)) {
       throw errorInvalid(single, 'step');
     }
@@ -1067,6 +1091,7 @@ export function compileStep(
     const key = hash(single, single.type);
     const cached = db[key];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (cached) {
       return cached as EnvBasedResolver<LoopBlockResult>;
     }
@@ -1098,6 +1123,7 @@ export function compileStep(
   const mkey = hash(steps, steps.length);
   const mcached = db[mkey];
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (mcached) {
     return mcached as EnvBasedResolver<LoopBlockResult>;
   }

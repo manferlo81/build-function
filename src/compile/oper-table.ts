@@ -85,6 +85,7 @@ export const specialOperTable: Record<
 
   '**': (resolvers) => {
 
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
     const resolveLast = resolvers.pop() as EnvBasedResolver;
 
     return (env) => {
@@ -109,6 +110,7 @@ export const operTable: Record<
   RegularBinaryOperator,
   (total: any, value: any) => any
 > = {
+  // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-return
   '+': (total, value) => total + value,
   '-': (total, value) => total - value,
   '*': (total, value) => total * value,

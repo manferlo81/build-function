@@ -167,6 +167,7 @@ describe('try statement step', () => {
     const errorMessage = 'body error';
 
     const body = () => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw errorMessage;
     };
     const catchError = jest.fn();

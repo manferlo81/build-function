@@ -55,7 +55,10 @@ const typescriptRules = normalizeRules('@typescript-eslint', {
 });
 
 const typescriptConfig = config(
-  ...typescriptConfigs.recommended,
+  ...typescriptConfigs.strictTypeChecked,
+  ...typescriptConfigs.stylisticTypeChecked,
+  { languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: process.cwd() } } },
+  { files: ['**/*.{js,cjs,mjs}'], ...typescriptConfigs.disableTypeChecked },
 );
 
 export default config(

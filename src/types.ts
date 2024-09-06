@@ -231,6 +231,7 @@ export interface ThrowBlockResult {
 export type NonLoopBlockResult<V = unknown> =
   | ReturnBlockResult<V>
   | ThrowBlockResult
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   | void;
 
 export type LookBreakResult = 'break';
