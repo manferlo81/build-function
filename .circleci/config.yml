@@ -83,7 +83,7 @@ workflows:
             - job_test_and_build
           filters:
             branches:
-              only: /master/
+              only: /main/
 
       - job_publish_to_npm:
           context: npm
