@@ -2,24 +2,27 @@
   "compilerOptions": {
     "target": "ES2017",
     "module": "ES2015",
-    "moduleResolution": "Node",
+    "moduleResolution": "Node10",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "strict": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "declaration": true,
     "declarationMap": true
   },
   "include": [
-    "__test__/**/*.ts",
-    "src/**/*.ts",
-    "jest.config.js",
-    "bundlib.config.mjs"
+    "src",
+    "__test__"
   ],
   "exclude": [
-    "node_modules/**"
+    "node_modules",
+    "dist",
+    "coverage"
   ]
 }
