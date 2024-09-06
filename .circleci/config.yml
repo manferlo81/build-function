@@ -6,7 +6,7 @@ orbs:
 executors:
   executor_node_18:
     docker:
-      - image: cimg/node:18.20
+      - image: cimg/node:18.20.4
     working_directory: ~/build-function
 
 commands:
@@ -32,7 +32,7 @@ commands:
           command: npm publish
 
 jobs:
-  job_test_and_build:
+  job_checkout_lint:
     executor: executor_node_18
     steps:
       - checkout
@@ -47,6 +47,15 @@ jobs:
           paths:
             - node_modules
           key: v2-deps-build-function-{{ checksum "package-lock.json" }}
+      - run:
+          name: Lint
+          command: npm run lint
+      - command_save_workspace
+
+  job_ci:
+    executor: executor_node_18
+    steps:
+      - command_restore_workspace
       - run:
           name: Test
           command: npm test
@@ -71,7 +80,16 @@ jobs:
 workflows:
   workflow_ci:
     jobs:
-      - job_test_and_build:
+      - job_checkout_lint:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+
+      - job_ci:
+          requires:
+            - job_checkout_lint
           filters:
             tags:
               only: /.*/
@@ -80,7 +98,7 @@ workflows:
 
       - job_upload_coverage:
           requires:
-            - job_test_and_build
+            - job_ci
           filters:
             branches:
               only: /main/
@@ -88,7 +106,7 @@ workflows:
       - job_publish_to_npm:
           context: npm
           requires:
-            - job_test_and_build
+            - job_ci
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
