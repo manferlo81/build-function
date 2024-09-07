@@ -47,6 +47,7 @@
     "@types/object-hash": "^3.0.6",
     "bundlib": "^0.21.0",
     "chokidar": "^3.6.0",
+    "core-js": "^3.38.1",
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
     "husky": "^9.1.5",
