@@ -37,7 +37,7 @@ const stylisticRules = normalizeRules('@stylistic', {
   semi: 'always',
   indent: 2,
   quotes: 'single',
-  'linebreak-style': 'windows',
+  'linebreak-style': 'unix',
 
   'quote-props': 'as-needed',
   'arrow-parens': 'always',

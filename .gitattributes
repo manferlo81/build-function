@@ -1,1 +1,16 @@
-*.ts  text  eol=crlf
+*         text=auto
+
+*.js      text  eol=lf
+*.cjs     text  eol=lf
+*.mjs     text  eol=lf
+*.ts      text  eol=lf
+
+*.json    text  eol=lf
+*.yaml    text  eol=lf
+*.yml     text  eol=lf
+*.md      text  eol=lf
+
+.*rc      text  eol=lf
+.*config  text  eol=lf
+.*ignore  text  eol=lf
+.git*     text  eol=lf
