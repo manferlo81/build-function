@@ -45,7 +45,7 @@
     "@stylistic/eslint-plugin": "^2.7.2",
     "@types/jest": "^29.5.12",
     "@types/object-hash": "^3.0.6",
-    "bundlib": "^0.21.0",
+    "bundlib": "^0.21.1",
     "chokidar": "^3.6.0",
     "core-js": "^3.38.1",
     "eslint": "^9.10.0",
