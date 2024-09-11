@@ -1024,17 +1024,17 @@ export function compileStep(
 export function compileStep(
   steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
-  breakable?: false | undefined,
+  breakable?: false,
 ): EnvBasedResolver<NonLoopBlockResult>;
 export function compileStep(
   steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
-  breakable?: boolean | undefined,
+  breakable?: boolean,
 ): EnvBasedResolver<LoopBlockResult>;
 export function compileStep(
   steps: SingleOrMulti<BlockStep>,
   cache: CompileCache,
-  breakable?: boolean | undefined,
+  breakable?: boolean,
 ): EnvBasedResolver<LoopBlockResult> {
 
   function compileSingle(single: BlockStep): EnvBasedResolver<LoopBlockResult> {
