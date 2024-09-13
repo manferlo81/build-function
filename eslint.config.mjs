@@ -45,7 +45,7 @@ const typescriptRules = normalizeRules('@typescript-eslint', {
   'no-explicit-any': 'off',
 });
 
-const stylisticConfig = stylistic.configs.customize({
+const stylisticPluginConfig = stylistic.configs.customize({
   semi: true,
   quotes: 'single',
   quoteProps: 'as-needed',
@@ -53,7 +53,7 @@ const stylisticConfig = stylistic.configs.customize({
   braceStyle: '1tbs',
 });
 
-const typescriptConfig = config(
+const typescriptPluginConfig = config(
   ...typescriptConfigs.strictTypeChecked,
   ...typescriptConfigs.stylisticTypeChecked,
   { languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: process.cwd() } } },
@@ -64,7 +64,7 @@ export default config(
   { ignores: ['dist', 'coverage'] },
   { languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   js.configs.recommended,
-  stylisticConfig,
-  ...typescriptConfig,
+  stylisticPluginConfig,
+  ...typescriptPluginConfig,
   { rules: { ...eslintRules, ...stylisticRules, ...typescriptRules } },
 );

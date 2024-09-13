@@ -6,10 +6,39 @@ orbs:
 executors:
   executor_node_18:
     docker:
-      - image: cimg/node:18.20.4
+      - image: cimg/node:18.20
     working_directory: ~/build-function
 
+  executor_node_20:
+    docker:
+      - image: cimg/node:20.17
+    working_directory: ~/build-function-node-20
+
 commands:
+  command_checkout_and_install:
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v2-deps-build-function-{{ checksum "package-lock.json" }}
+            - v2-deps-build-function-
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v2-deps-build-function-{{ checksum "package-lock.json" }}
+
+  command_ci:
+    steps:
+      - run:
+          name: Test
+          command: npm test
+      - run:
+          name: Build
+          command: npm run build
+
   command_save_workspace:
     steps:
       - persist_to_workspace:
@@ -35,34 +64,24 @@ jobs:
   job_checkout_lint:
     executor: executor_node_18
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v2-deps-build-function-{{ checksum "package-lock.json" }}
-            - v2-deps-build-function-
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v2-deps-build-function-{{ checksum "package-lock.json" }}
+      - command_checkout_and_install
       - run:
           name: Lint
           command: npm run lint
       - command_save_workspace
 
-  job_ci:
+  job_ci_node_18:
     executor: executor_node_18
     steps:
       - command_restore_workspace
-      - run:
-          name: Test
-          command: npm test
-      - run:
-          name: Build
-          command: npm run build
+      - command_ci
       - command_save_workspace
+
+  job_ci_node_20:
+    executor: executor_node_20
+    steps:
+      - command_checkout_and_install
+      - command_ci
 
   job_upload_coverage:
     executor: executor_node_18
@@ -87,7 +106,16 @@ workflows:
             branches:
               only: /.*/
 
-      - job_ci:
+      - job_ci_node_18:
+          requires:
+            - job_checkout_lint
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+
+      - job_ci_node_20:
           requires:
             - job_checkout_lint
           filters:
@@ -98,7 +126,8 @@ workflows:
 
       - job_upload_coverage:
           requires:
-            - job_ci
+            - job_ci_node_18
+            - job_ci_node_20
           filters:
             branches:
               only: /main/
@@ -106,7 +135,8 @@ workflows:
       - job_publish_to_npm:
           context: npm
           requires:
-            - job_ci
+            - job_ci_node_18
+            - job_ci_node_20
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
