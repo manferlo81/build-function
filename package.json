@@ -46,7 +46,7 @@
     "@types/jest": "^29.5.13",
     "@types/object-hash": "^3.0.6",
     "bundlib": "^0.21.1",
-    "chokidar": "^4.0.0",
+    "chokidar": "^4.0.1",
     "core-js": "^3.38.1",
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
