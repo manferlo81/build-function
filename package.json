@@ -42,7 +42,7 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
     "@eslint/js": "^9.10.0",
-    "@stylistic/eslint-plugin": "^2.8.0",
+    "@stylistic/eslint-plugin": "^2.9.0",
     "@types/jest": "^29.5.13",
     "@types/object-hash": "^3.0.6",
     "bundlib": "^0.21.1",
