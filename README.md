@@ -58,13 +58,13 @@ Functions built with this module are very slow, despite the fact that we pre-com
 ### jsDelivr
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/build-function@latest/dist/build.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/build-function@latest/dist/umd/build-function.umd.js"></script>
 ```
 
 ***for production...***
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/build-function@latest/dist/build.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/build-function@latest/dist/umd/build-function.umd.min.js"></script>
 ```
 
 *[more options...](https://www.jsdelivr.com/package/npm/build-function?version=latest)*
@@ -72,13 +72,13 @@ Functions built with this module are very slow, despite the fact that we pre-com
 ### UNPKG
 
 ```html
-<script src="https://unpkg.com/build-function@latest/dist/build.umd.js"></script>
+<script src="https://unpkg.com/build-function@latest/dist/build-function.umd.js"></script>
 ```
 
 ***for production...***
 
 ```html
-<script src="https://unpkg.com/build-function@latest/dist/build.umd.min.js"></script>
+<script src="https://unpkg.com/build-function@latest/dist/build-function.umd.min.js"></script>
 ```
 
 *[more options...](https://unpkg.com/browse/build-function@latest/)*

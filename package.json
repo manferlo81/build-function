@@ -10,12 +10,13 @@
   "type": "commonjs",
   "exports": {
     "types": "./dist/types/index.d.ts",
-    "import": "./dist/build-function.mjs",
-    "default": "./dist/build-function.cjs"
+    "import": "./dist/esm/build-function.mjs",
+    "require": "./dist/cjs/build-function.cjs",
+    "default": "./dist/cjs/build-function.cjs"
   },
-  "main": "./dist/build-function.cjs",
-  "module": "./dist/build-function.mjs",
-  "browser": "./dist/build-function.umd.js",
+  "main": "./dist/cjs/build-function.cjs",
+  "module": "./dist/esm/build-function.mjs",
+  "browser": "./dist/umd/build-function.umd.js",
   "types": "./dist/types/index.d.ts",
   "typings": "./dist/types/index.d.ts",
   "scripts": {
