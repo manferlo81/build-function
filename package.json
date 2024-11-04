@@ -24,6 +24,7 @@
     "clean": "run-p clean:*",
     "lint:test": "eslint __test__",
     "lint:src": "eslint src",
+    "lint:config": "eslint *.config.mjs",
     "lint": "run-p lint:*",
     "test": "jest --color -w 3",
     "watch": "npm test -- --watch-all",
@@ -60,7 +61,9 @@
     "typescript-eslint": "^8.5.0"
   },
   "overrides": {
-    "eslint": "^9.10.0"
+    "bundlib": {
+      "eslint": "$eslint"
+    }
   },
   "author": {
     "name": "Manuel Fernandez",
