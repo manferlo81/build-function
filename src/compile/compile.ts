@@ -950,7 +950,7 @@ export function compileExp<V extends any = any>(
   exp: Expression[],
   cache: CompileCache,
   safe?: boolean,
-): EnvBasedResolver<V>[];
+): Array<EnvBasedResolver<V>>;
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export function compileExp<V extends any = any>(
