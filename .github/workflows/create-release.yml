@@ -29,10 +29,6 @@ jobs:
 
       - name: Create Release
         id: create-release
-        uses: softprops/action-gh-release@v2
+        uses: manferlo81/action-auto-release@v0
         with:
-          generate_release_notes: true
           files: build-function-*.tgz
-
-      - name: Show Release URL on Summary
-        run: echo "GitHub Release Created! ( ${{ steps.create-release.outputs.url }} )" >> $GITHUB_STEP_SUMMARY
