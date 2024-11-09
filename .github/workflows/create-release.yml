@@ -12,6 +12,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout, Setup Node.js 20.x and Install dependencies
         uses: manferlo81/action-checkout-node-install@v0
