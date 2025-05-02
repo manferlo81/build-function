@@ -499,7 +499,7 @@ const stepTable: StatementLookupTable = {
           const lib: EnvLib = {};
 
           if (errorId) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/prefer-nullish-coalescing
             lib[errorId] = `${err.message || err}`;
           }
 
