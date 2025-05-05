@@ -6,5 +6,5 @@ export default config({
   globals: {
     'object-hash': 'objectHash',
   },
-  project: 'tsconfig-build.json',
+  project: './tsconfig.build.json',
 });
